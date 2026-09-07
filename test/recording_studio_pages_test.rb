@@ -273,6 +273,6 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes page_model, 'public_layout: "recording_studio_pages/public"'
 
     hero = File.read(File.expand_path("../app/components/recording_studio_pages/sections/hero_component.rb", __dir__))
-    assert_includes hero, "min-h-screen!"
+    assert_includes hero, "h-screen"
   end
 end

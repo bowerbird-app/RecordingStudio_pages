@@ -23,7 +23,7 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 - Dummy root switcher includes the Admin root so `/admin` can open after switching to it.
 - Public pages use `recording_studio_pages/public` (Flatpack tokens then Tailwind, `data-theme` on `html`). Heroes use Flatpack Hero at full width; other sections use `max-w-6xl`. Dummy overrides `recording_studio/default_layout` so `data-theme` sits on `html` and `flat_pack/application` loads.
 - Inner published pages use that same public layout, so a fullscreen hero is not boxed by the staff default layout.
-- Fullscreen heroes fill the viewport (`min-h-screen!`). Flatpack’s `:centered_image` kit default is `min-h-[560px]`.
+- Fullscreen heroes fill the viewport (`h-screen`). Flatpack’s `:centered_image` kit default is `min-h-[560px]`.
 
 ### Changed
 - Gem identity is `recording_studio_pages` `0.3.0`. Homepage is `https://github.com/bowerbird-app/RecordingStudio_pages`.
