@@ -8,7 +8,8 @@ module RecordingStudioPages
       before_action :authenticate_user!, raise: false
       before_action :require_admin_access!
 
-      helper_method :page_recording, :section_recordings, :page_builder_page_path, :page_builder_new_section_path
+      helper_method :page_recording, :section_recordings, :page_builder_page_path, :section_definitions,
+                    :add_section_form_id
 
       private
 
@@ -17,11 +18,31 @@ module RecordingStudioPages
         admin_page_path(id: recording.id)
       end
 
-      def page_builder_new_section_path(recording = nil, section_type: nil)
-        recording ||= page_recording
-        options = { page_id: recording.id }
-        options[:section_type] = section_type if section_type.present?
-        new_admin_page_section_path(options)
+      def section_definitions
+        RecordingStudioPages.sections
+      end
+
+      def add_section_form_id(definition)
+        "add-section-#{page_recording.id}-#{definition.key}"
+      end
+
+      def load_editor
+        @unknown_sections = unknown_sections
+        @editor_subtitle = editor_subtitle
+      end
+
+      def unknown_sections
+        Composition.section_recordings_for(page_recording).reject do |recording|
+          RecordingStudioPages.section?(recording.recordable.section_type)
+        end
+      end
+
+      def editor_subtitle
+        parts = []
+        parts << "This is the public home page." if page_recording.recordable.homepage?
+        unpublished = !page_recording.respond_to?(:currently_published?) || !page_recording.currently_published?
+        parts << "Staff preview. This page is not public yet." if unpublished
+        parts.join(" ").presence
       end
 
       def require_admin_access!

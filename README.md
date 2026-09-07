@@ -129,7 +129,7 @@ Rich text is JSON plus `sanitize`. Action Text expects a mutable record, so this
 
 RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. Reorder is Move up and Move down. Flatpack has no sortable-list primitive. Copy duplicates a section into another generic section recording.
 
-The editor is also the staff preview. Unpublished pages render there. They stay private on public routes.
+The editor is also the staff preview. Unpublished pages render there. They stay private on public routes. Add a section from the **Add section** dropdown on that editor. Picking a type posts immediately and Turbo updates the editor in place. Open **Edit** on a section to fill in its copy.
 
 Writes need Accessible `:edit` on the configured admin root. Reads need `:view`.
 

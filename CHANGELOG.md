@@ -26,6 +26,7 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 ### Changed
 - Gem identity is `recording_studio_pages` `0.3.0`. Homepage is `https://github.com/bowerbird-app/RecordingStudio_pages`.
 - Dummy `/` is the published homepage. Dummy sandbox moved to `/studio`.
+- The page editor adds sections from an **Add section** dropdown. Turbo updates the editor. The old add-section library page redirects there.
 
 ### Notes
 - Publishable cannot own `/` because slugs cannot be empty and public paths require `:uuid`. Page Builder owns homepage routing. See the README upstream gaps.

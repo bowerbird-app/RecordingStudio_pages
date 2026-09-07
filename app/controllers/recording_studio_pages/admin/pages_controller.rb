@@ -35,9 +35,7 @@ module RecordingStudioPages
       end
 
       def show
-        @rendered_sections = Renderer.call(page_recording, context: self)
-        @unknown_sections = unknown_sections
-        @editor_subtitle = editor_subtitle
+        load_editor
       end
 
       def edit; end
@@ -112,20 +110,6 @@ module RecordingStudioPages
           trashed_at: nil,
           recordable_type: "Workspace"
         )
-      end
-
-      def unknown_sections
-        Composition.section_recordings_for(page_recording).reject do |recording|
-          RecordingStudioPages.section?(recording.recordable.section_type)
-        end
-      end
-
-      def editor_subtitle
-        parts = []
-        parts << "This is the public home page." if page_recording.recordable.homepage?
-        unpublished = !page_recording.respond_to?(:currently_published?) || !page_recording.currently_published?
-        parts << "Staff preview. This page is not public yet." if unpublished
-        parts.join(" ").presence
       end
 
       def render_failure(result, view)

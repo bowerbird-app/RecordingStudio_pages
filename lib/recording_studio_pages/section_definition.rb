@@ -60,6 +60,15 @@ module RecordingStudioPages
       component.to_s.safe_constantize
     end
 
+    def starter_content
+      fields.fields.each_with_object({}) do |(key, spec), content|
+        next unless spec[:required]
+        next unless %i[string text rich_text].include?(spec[:type].to_sym)
+
+        content[key.to_s] = name
+      end
+    end
+
     private
 
     def normalize_variant(value)

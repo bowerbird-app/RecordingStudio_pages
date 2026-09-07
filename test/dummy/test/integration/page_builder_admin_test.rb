@@ -67,25 +67,54 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_equal %w[hero hero], sections.map { |recording| recording.recordable.section_type }
   end
 
-  test "staff can open the add section library from the registry" do
+  test "staff can add a section from the editor dropdown" do
     page_recording = create_page!(parent_recording: @root, title: "Library", actor: @actor)
 
-    get recording_studio_pages.new_admin_page_section_path(page_recording)
+    get recording_studio_pages.admin_page_path(page_recording)
 
     assert_response :success
+    assert_includes response.body, "Add section"
     assert_includes response.body, "Hero"
     assert_includes response.body, "Call to action"
-    assert_includes response.body, "Add section"
+    assert_includes response.body, "add-section-#{page_recording.id}-hero"
+    assert_includes response.body, 'id="page_editor"'
+
+    post recording_studio_pages.admin_page_sections_path(page_recording),
+         params: { section: { section_type: "hero" } },
+         as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, "turbo-stream"
+    assert_includes response.body, 'action="update"'
+    assert_includes response.body, "page_editor"
+    assert_includes response.body, "Section added."
+    assert_includes response.body, "Hero"
+    sections = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
+    assert_equal %w[hero], sections.map { |recording| recording.recordable.section_type }
+    assert_equal "Hero", sections.first.recordable.content["title"]
   end
 
-  test "staff can open a generated hero editor from the registry" do
+  test "staff can open a generated hero editor after adding a section" do
     page_recording = create_page!(parent_recording: @root, title: "Hero form", actor: @actor)
+    post recording_studio_pages.admin_page_sections_path(page_recording), params: {
+      section: { section_type: "hero" }
+    }
+    follow_redirect!
 
-    get recording_studio_pages.new_admin_page_section_path(page_id: page_recording.id, section_type: "hero")
+    section = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload).first
+    get recording_studio_pages.edit_admin_page_section_path(page_id: page_recording.id, id: section.id)
 
     assert_response :success
     assert_includes response.body, "Title"
     assert_includes response.body, "Layout"
+  end
+
+  test "the add section library redirects to the page editor" do
+    page_recording = create_page!(parent_recording: @root, title: "Redirect", actor: @actor)
+
+    get recording_studio_pages.new_admin_page_section_path(page_recording)
+
+    assert_redirected_to recording_studio_pages.admin_page_path(id: page_recording.id)
   end
 
   test "visitors cannot mutate pages" do

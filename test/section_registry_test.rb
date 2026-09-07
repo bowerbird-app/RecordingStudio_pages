@@ -64,6 +64,17 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "centered", settings["variant"]
   end
 
+  def test_starter_content_fills_required_copy
+    RecordingStudioPages.register_section(
+      key: :probe,
+      name: "Probe",
+      component: "RecordingStudioPages::Sections::HeroComponent",
+      fields: { title: { type: :string, required: true }, body: :string }
+    )
+
+    assert_equal({ "title" => "Probe" }, RecordingStudioPages.section(:probe).starter_content)
+  end
+
   def test_payload_validation_rejects_bad_urls
     RecordingStudioPages.register_section(
       key: :probe,

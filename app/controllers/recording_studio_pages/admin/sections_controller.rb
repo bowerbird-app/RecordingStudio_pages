@@ -7,8 +7,7 @@ module RecordingStudioPages
       before_action :page_recording
 
       def new
-        @definition = RecordingStudioPages.section(params[:section_type]) if params[:section_type].present?
-        @definitions = RecordingStudioPages.sections
+        redirect_to admin_page_path(id: page_recording.id)
       end
 
       def create
@@ -16,18 +15,17 @@ module RecordingStudioPages
         result = Services::AddSection.call(
           page_recording: page_recording,
           section_type: payload[:section_type],
-          content: payload[:content],
+          content: starter_content_for(payload[:section_type]).merge(payload[:content]),
           settings: payload[:settings],
           actor: current_admin_actor
         )
-        if result.failure?
-          return redirect_to(
-            new_admin_page_section_path(page_recording, section_type: payload[:section_type]),
-            alert: result.error
-          )
-        end
+        return redirect_to(admin_page_path(id: page_recording.id), alert: result.error) if result.failure?
 
-        redirect_to admin_page_path(page_recording), notice: "Section added."
+        load_editor
+        respond_to do |format|
+          format.turbo_stream
+          format.html { redirect_to admin_page_path(id: page_recording.id), notice: added_notice }
+        end
       end
 
       def edit
@@ -45,17 +43,17 @@ module RecordingStudioPages
         )
         if result.failure?
           return redirect_to(
-            edit_admin_page_section_path(page_recording, section_recording),
+            edit_admin_page_section_path(page_id: page_recording.id, id: section_recording.id),
             alert: result.error
           )
         end
 
-        redirect_to admin_page_path(page_recording), notice: "Section saved."
+        redirect_to admin_page_path(id: page_recording.id), notice: "Section saved."
       end
 
       def destroy
         Services::RemoveSection.call(section_recording: section_recording, actor: current_admin_actor).value!
-        redirect_to admin_page_path(page_recording), notice: "Section removed."
+        redirect_to admin_page_path(id: page_recording.id), notice: "Section removed."
       end
 
       def move
@@ -71,7 +69,7 @@ module RecordingStudioPages
             actor: current_admin_actor
           ).value!
         end
-        redirect_to admin_page_path(page_recording)
+        redirect_to admin_page_path(id: page_recording.id)
       end
 
       def toggle
@@ -80,7 +78,7 @@ module RecordingStudioPages
           enabled: !section_recording.recordable.enabled?,
           actor: current_admin_actor
         ).value!
-        redirect_to admin_page_path(page_recording)
+        redirect_to admin_page_path(id: page_recording.id)
       end
 
       def duplicate
@@ -88,9 +86,9 @@ module RecordingStudioPages
           section_recording: section_recording,
           actor: current_admin_actor
         )
-        return redirect_to(admin_page_path(page_recording), alert: result.error) if result.failure?
+        return redirect_to(admin_page_path(id: page_recording.id), alert: result.error) if result.failure?
 
-        redirect_to admin_page_path(page_recording), notice: "Section copied."
+        redirect_to admin_page_path(id: page_recording.id), notice: "Section copied."
       end
 
       private
@@ -106,10 +104,26 @@ module RecordingStudioPages
         raw = params.fetch(:section, {}).to_unsafe_h
         {
           section_type: raw["section_type"],
-          content: raw["content"] || {},
-          settings: raw["settings"] || {}
+          content: stringify_payload(raw["content"]),
+          settings: stringify_payload(raw["settings"])
         }
       end
+
+      def stringify_payload(raw)
+        (raw || {}).to_h.stringify_keys
+      end
+
+      def starter_content_for(section_type)
+        definition = RecordingStudioPages.find_section(section_type)
+        return {} unless definition
+
+        definition.starter_content
+      end
+
+      def added_notice
+        "Section added."
+      end
+      helper_method :added_notice
     end
   end
 end
