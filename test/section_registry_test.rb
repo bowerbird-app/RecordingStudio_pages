@@ -98,6 +98,12 @@ class SectionRegistryTest < Minitest::Test
       assert RecordingStudioPages.section?(key), "expected #{key} to be registered"
     end
     assert_equal "marketing_home", RecordingStudioPages.template(:marketing_home).key
+    hero_only = RecordingStudioPages.template(:full_bleed_hero)
+
+    assert_equal "full_bleed_hero", hero_only.key
+    assert_equal 1, hero_only.sections.length
+    assert_equal "hero", hero_only.sections.first.fetch("type")
+    assert_equal "fullscreen_image", hero_only.sections.first.fetch("settings").to_h.stringify_keys.fetch("variant")
   end
 
   def test_catalog_exposes_sections_and_templates_for_agents
@@ -112,6 +118,7 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "string", hero[:fields][:title][:type]
     assert_equal true, hero[:fields][:title][:required]
     assert(catalog[:templates].any? { |entry| entry[:key] == "marketing_home" })
+    assert(catalog[:templates].any? { |entry| entry[:key] == "full_bleed_hero" })
   end
 
   def test_duplicate_template_raises

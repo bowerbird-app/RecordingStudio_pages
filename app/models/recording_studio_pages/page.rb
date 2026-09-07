@@ -30,6 +30,7 @@ module RecordingStudioPages
       include RecordingStudio::Capabilities::Publishable.to(
         public_controller: "recording_studio_pages/published_pages",
         public_action: :show,
+        public_layout: "recording_studio_pages/public",
         path: "/pages/:uuid/:slug",
         schedule: true,
         seo: true

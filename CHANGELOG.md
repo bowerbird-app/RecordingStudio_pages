@@ -14,7 +14,7 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 ### Added
 - `RecordingStudioPages::Page` and `RecordingStudioPages::Section` recordables. Page columns are `title`, `homepage`, and `template_key`. Section columns are `section_type`, `content`, `settings`, and `enabled`.
 - Section and template registries. Duplicate keys raise. Unknown section types skip render and keep their rows.
-- Built-in sections: `hero`, `rich_text`, `image_text`, `logo_cloud`, `feature_grid`, `call_to_action`. Built-in template: `marketing_home`.
+- Built-in sections: `hero`, `rich_text`, `image_text`, `logo_cloud`, `feature_grid`, `call_to_action`. Built-in templates: `marketing_home` and `full_bleed_hero`. Dummy seeds a published **Tonight** page that is only the fullscreen hero.
 - Services for create, revise, add, reorder, toggle, remove, apply template, and homepage uniqueness.
 - Engine admin under `/recording_studio_pages/admin/pages` plus an RS Admin Pages section.
 - Public homepage at `/` and Publishable public paths at `/pages/:uuid/:slug`.
@@ -22,6 +22,7 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 - Required field flags and `recording_ids` in the section schema catalog.
 - Dummy root switcher includes the Admin root so `/admin` can open after switching to it.
 - Public pages use `recording_studio_pages/public` (Flatpack tokens then Tailwind, `data-theme` on `html`). Heroes use Flatpack Hero at full width; other sections use `max-w-6xl`. Dummy overrides `recording_studio/default_layout` so `data-theme` sits on `html` and `flat_pack/application` loads.
+- Inner published pages use that same public layout, so a fullscreen hero is not boxed by the staff default layout.
 
 ### Changed
 - Gem identity is `recording_studio_pages` `0.3.0`. Homepage is `https://github.com/bowerbird-app/RecordingStudio_pages`.

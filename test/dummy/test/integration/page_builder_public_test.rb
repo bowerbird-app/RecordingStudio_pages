@@ -105,6 +105,42 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "About us"
     assert_includes response.body, "max-w-6xl"
     refute_includes response.body, "max-w-md"
+    refute_includes response.body, "data-recording-studio-default-layout"
+    assert_includes response.body, 'data-theme="rounded"'
+  end
+
+  test "a published page can be only a fullscreen hero" do
+    page_recording = create_page!(parent_recording: @root, title: "Tonight", actor: @actor)
+    RecordingStudioPages::Services::ApplyTemplate.call(
+      page_recording: page_recording,
+      template_key: "full_bleed_hero",
+      actor: @actor
+    ).value!
+    heroes = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
+    assert_equal 1, heroes.size
+    hero = heroes.first
+    RecordingStudioPages::Services::ReviseSection.call(
+      section_recording: hero,
+      content: hero.recordable.content.merge("image_url" => "/images/hero-tonight.jpg"),
+      actor: @actor
+    ).value!
+    publishable = publish_page!(page_recording, slug: "tonight", actor: @actor)
+
+    get "/pages/#{publishable.id}/tonight"
+
+    assert_response :success
+    assert_includes response.body, "The floor is already warm"
+    assert_includes response.body, "Doors at eight"
+    assert_includes response.body, "Take a seat"
+    assert_includes response.body, "hero-tonight.jpg"
+    assert_includes response.body, "background-image:"
+    assert_includes response.body, "bg-black/60"
+    refute_includes response.body, "What this gem owns"
+    refute_includes response.body, "max-w-6xl"
+    refute_includes response.body, "data-recording-studio-default-layout"
+    types = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
+                                             .map { |recording| recording.recordable.section_type }
+    assert_equal ["hero"], types
   end
 
   test "unpublished inner page is not public" do

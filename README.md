@@ -127,7 +127,7 @@ RecordingStudioPages.register_template(
 
 hero, rich_text, image_text, logo_cloud, feature_grid, call_to_action. Registered variants change layout: image left/right, narrow rich text, compact logos, feature column counts, and CTA banner vs card.
 
-Built-in template: `marketing_home`.
+Built-in templates: `marketing_home` (hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero). Dummy seeds a published **Tonight** page from `full_bleed_hero` with a local background photo at `/images/hero-tonight.jpg`.
 
 Rich text is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero images are URL fields until Attachable is wired.
 
@@ -145,7 +145,7 @@ Writes need Accessible `:edit` on the configured admin root. Reads need `:view`.
 
 `/admin` is the RS Admin hub. Switch the current root to **Admin** first. RS Admin forbids the hub while the current root is a workspace. The page builder editor does not require that switch.
 
-Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`.
+Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`. Public inner pages at `/pages/:uuid/:slug` use the same `recording_studio_pages/public` layout as `/`, so a fullscreen hero can actually go edge to edge.
 
 Drag-reorder persists through Flatpack List `orderable_url`. The Pages Stimulus controller only blocks More-menu drags and reloads if that save fails.
 
@@ -165,6 +165,7 @@ bin/dev
 Sign in with `admin@admin.com` / `Password`.
 
 - `/` published homepage
+- `/pages/:uuid/tonight` one fullscreen hero (seeded **Tonight**)
 - `/studio` dummy sandbox
 - `/recording_studio_pages/admin/pages` page builder
 - `/admin` RS Admin hub

@@ -269,5 +269,6 @@ class RecordingStudioPagesTest < Minitest::Test
 
     page_model = File.read(File.expand_path("../app/models/recording_studio_pages/page.rb", __dir__))
     assert_includes page_model, "respond_to?(:page_parent_types)"
+    assert_includes page_model, 'public_layout: "recording_studio_pages/public"'
   end
 end

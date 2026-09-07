@@ -48,8 +48,15 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
       recordable_type: "RecordingStudioPages::Page",
       trashed_at: nil
     ).includes(:recordable).find { |recording| recording.recordable&.title == "Home" }
+    tonight_recording = RecordingStudio::Recording.where(
+      recordable_type: "RecordingStudioPages::Page",
+      trashed_at: nil
+    ).includes(:recordable).find { |recording| recording.recordable&.title == "Tonight" }
     assert_not_nil homepage_recording
+    assert_not_nil tonight_recording
     homepage = homepage_recording.recordable
+    tonight_sections = RecordingStudioPages::Composition.section_recordings_for(tonight_recording)
+    tonight_hero = tonight_sections.first.recordable
 
     assert_nil Current.actor
     assert_nil root_recording.parent_recording_id
@@ -60,6 +67,11 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal root_recording, homepage_recording.parent_recording
     assert_equal root_recording, homepage_recording.root_recording
     assert homepage.homepage?
+    assert_equal 1, tonight_sections.size
+    assert_equal "hero", tonight_hero.section_type
+    assert_equal "fullscreen_image", tonight_hero.settings["variant"]
+    assert_equal "/images/hero-tonight.jpg", tonight_hero.content["image_url"]
+    assert_equal "The floor is already warm", tonight_hero.content["title"]
     assert_equal 3, Workspace.count
 
     assert_no_difference -> { User.count } do

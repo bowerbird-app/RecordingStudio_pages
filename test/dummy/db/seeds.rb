@@ -120,6 +120,36 @@ begin
 
   publish_page.call(about_recording, "about", user)
 
+  tonight_recording = find_page_recording.call("Tonight")
+
+  unless tonight_recording
+    tonight_recording = RecordingStudioPages::Services::CreatePage.call(
+      parent_recording: root_recording,
+      title: "Tonight",
+      homepage: false,
+      actor: user
+    ).value!
+    RecordingStudioPages::Services::ApplyTemplate.call(
+      page_recording: tonight_recording,
+      template_key: "full_bleed_hero",
+      actor: user
+    ).value!
+  end
+
+  hero_recording = RecordingStudioPages::Composition.section_recordings_for(tonight_recording).find do |recording|
+    recording.recordable.section_type == "hero"
+  end
+  if hero_recording && hero_recording.recordable.content["image_url"].blank?
+    RecordingStudioPages::Services::ReviseSection.call(
+      section_recording: hero_recording,
+      content: hero_recording.recordable.content.merge("image_url" => "/images/hero-tonight.jpg"),
+      settings: hero_recording.recordable.settings.merge("variant" => "fullscreen_image"),
+      actor: user
+    ).value!
+  end
+
+  publish_page.call(tonight_recording, "tonight", user)
+
   puts "Seeded: admin@admin.com / Password"
   puts "Seeded: Workspace '#{workspace.name}' with homepage '#{homepage_recording.recordable.title}'"
   puts "Seeded: Admin root '#{admin_root.name}'"

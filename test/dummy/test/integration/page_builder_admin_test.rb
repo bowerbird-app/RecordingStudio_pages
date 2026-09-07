@@ -192,6 +192,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "max-w-prose"
     assert_includes response.body, "Use a template"
     assert_includes response.body, "apply-template-#{page_recording.id}-marketing_home"
+    assert_includes response.body, "apply-template-#{page_recording.id}-full_bleed_hero"
     assert_includes response.body, "orderable-url-value"
     refute_includes response.body, "Staff preview"
 

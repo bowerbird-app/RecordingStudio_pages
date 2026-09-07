@@ -56,7 +56,7 @@ module RecordingStudioPages
 
       def variant
         mapped = FLATPACK_VARIANTS.fetch(settings["variant"].to_s, :centered)
-        return :centered if mapped == :split_image && image_url.blank?
+        return :centered if image_url.blank? && %i[split_image centered_image].include?(mapped)
 
         mapped
       end

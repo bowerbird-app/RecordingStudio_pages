@@ -19,6 +19,11 @@ module RecordingStudioPages
     end
 
     def register_templates!
+      register_marketing_home_template!
+      register_full_bleed_hero_template!
+    end
+
+    def register_marketing_home_template!
       RecordingStudioPages.register_template(
         key: :marketing_home,
         name: "Marketing home",
@@ -64,6 +69,26 @@ module RecordingStudioPages
               body: "Drafts stay private. RS Publishable owns live state and SEO.",
               primary_action: { text: "Open pages", url: "/admin" }
             }
+          }
+        ]
+      )
+    end
+
+    def register_full_bleed_hero_template!
+      RecordingStudioPages.register_template(
+        key: :full_bleed_hero,
+        name: "Full-bleed hero",
+        source: "recording_studio_pages",
+        sections: [
+          {
+            type: :hero,
+            content: {
+              eyebrow: "Doors at eight",
+              title: "The floor is already warm",
+              body: "One picture. One line. Come in if you want a seat.",
+              primary_action: { text: "Take a seat", url: "/users/sign_in" }
+            },
+            settings: { variant: "fullscreen_image" }
           }
         ]
       )
