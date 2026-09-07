@@ -8,7 +8,7 @@
   ) %>
 
   <div class="flex flex-wrap gap-3">
-    <%= render FlatPack::Button::Component.new(text: "Edit page", href: edit_admin_page_path(@page_recording), style: :secondary, size: :md) %>
+    <%= render FlatPack::Button::Component.new(text: "Edit page", href: edit_admin_page_path(id: page_recording.id), style: :secondary, size: :md) %>
     <%= render FlatPack::Button::Component.new(text: "Add section", href: page_builder_new_section_path, style: :primary, size: :md) %>
     <%= render FlatPack::Button::Component.new(
       text: "Publish",
@@ -42,12 +42,49 @@
       <% end %>
       <% card.footer do %>
         <div class="flex flex-wrap gap-2">
-          <%= button_to "Move up", move_admin_page_section_path(@page_recording, recording, direction: "up"), method: :post, class: "inline-flex" %>
-          <%= button_to "Move down", move_admin_page_section_path(@page_recording, recording, direction: "down"), method: :post, class: "inline-flex" %>
-          <%= render FlatPack::Button::Component.new(text: "Edit", href: edit_admin_page_section_path(@page_recording, recording), style: :secondary, size: :sm) if definition %>
-          <%= button_to "Copy", duplicate_admin_page_section_path(@page_recording, recording), method: :post %>
-          <%= button_to(recordable.enabled? ? "Turn off" : "Turn on", toggle_admin_page_section_path(@page_recording, recording), method: :post) %>
-          <%= button_to "Remove", admin_page_section_path(@page_recording, recording), method: :delete, data: { turbo_confirm: "Remove this section?" } %>
+          <%= render FlatPack::Button::Component.new(
+            text: "Move up",
+            href: move_admin_page_section_path(page_id: page_recording.id, id: recording.id, direction: "up"),
+            method: :post,
+            style: :secondary,
+            size: :sm
+          ) %>
+          <%= render FlatPack::Button::Component.new(
+            text: "Move down",
+            href: move_admin_page_section_path(page_id: page_recording.id, id: recording.id, direction: "down"),
+            method: :post,
+            style: :secondary,
+            size: :sm
+          ) %>
+          <% if definition %>
+            <%= render FlatPack::Button::Component.new(
+              text: "Edit",
+              href: edit_admin_page_section_path(page_id: page_recording.id, id: recording.id),
+              style: :secondary,
+              size: :sm
+            ) %>
+          <% end %>
+          <%= render FlatPack::Button::Component.new(
+            text: "Copy",
+            href: duplicate_admin_page_section_path(page_id: page_recording.id, id: recording.id),
+            method: :post,
+            style: :secondary,
+            size: :sm
+          ) %>
+          <%= render FlatPack::Button::Component.new(
+            text: recordable.enabled? ? "Turn off" : "Turn on",
+            href: toggle_admin_page_section_path(page_id: page_recording.id, id: recording.id),
+            method: :post,
+            style: :secondary,
+            size: :sm
+          ) %>
+          <%= render FlatPack::Button::Component.new(
+            text: "Remove",
+            href: admin_page_section_path(page_id: page_recording.id, id: recording.id),
+            method: :delete,
+            style: :danger,
+            size: :sm
+          ) %>
         </div>
       <% end %>
     <% end %>

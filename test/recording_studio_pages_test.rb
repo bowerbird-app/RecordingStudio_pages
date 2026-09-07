@@ -83,6 +83,7 @@ class RecordingStudioPagesTest < Minitest::Test
 
     assert_includes application_layout, '<html data-theme="rounded">'
     assert_includes application_layout, 'stylesheet_link_tag "flat_pack/variables"'
+    assert_includes application_layout, 'stylesheet_link_tag "flat_pack/application"'
     assert_includes application_layout, "javascript_importmap_tags"
     assert_includes application_layout, "min-h-screen"
     refute_includes application_layout, "mt-28"
@@ -92,14 +93,28 @@ class RecordingStudioPagesTest < Minitest::Test
   def test_dummy_tailwind_keeps_flatpack_theme_selection_in_flatpack
     tailwind_source = File.read(File.expand_path("dummy/app/assets/tailwind/application.css", __dir__))
 
-    assert_includes tailwind_source, "../../../vendor/bundle/**/flatpack/app/components/**/*.{rb,erb}"
-    assert_includes tailwind_source, "flatpack-*/app/components/**/*.{rb,erb}"
-    assert_includes tailwind_source, "../../../vendor/bundle/**/recording_studio/app/views/**/*.erb"
-    assert_includes tailwind_source, "recordingstudio-*/app/views/**/*.erb"
-    assert_includes tailwind_source, "../../../../../app/components/**/*.{rb,erb}"
+    assert_includes tailwind_source, "tmp/tailwind/flat_pack_components/**/*.rb"
+    assert_includes tailwind_source, "tmp/tailwind/flat_pack_components/**/*.erb"
+    assert_includes tailwind_source, "RecordingStudio-*/app/views/**/*.erb"
+    assert_includes tailwind_source, "../../../../../app/components/**/*.rb"
+    assert_includes tailwind_source, "../../../../../app/components/**/*.erb"
     refute_includes tailwind_source, "@theme"
     refute_includes tailwind_source, ":root {"
     refute_includes tailwind_source, "--color-fp-primary"
+    refute_includes tailwind_source, "{rb,erb}"
+  end
+
+  def test_dummy_default_layout_loads_flatpack_application_on_html_theme
+    layout = File.read(File.expand_path("dummy/app/views/layouts/recording_studio/default_layout.html.erb", __dir__))
+
+    assert_includes layout, '<html data-theme="rounded">'
+    assert_includes layout, 'stylesheet_link_tag "flat_pack/variables"'
+    assert_includes layout, 'stylesheet_link_tag "flat_pack/application"'
+    assert_includes layout, 'stylesheet_link_tag "tailwind"'
+    assert_includes layout, "max-w-6xl"
+    variables_at = layout.index('stylesheet_link_tag "flat_pack/variables"')
+    tailwind_at = layout.index('stylesheet_link_tag "tailwind"')
+    assert_operator variables_at, :<, tailwind_at
   end
 
   def test_recording_studio_keeps_strict_recordable_declarations_enabled

@@ -53,6 +53,11 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Welcome home"
     assert_includes response.body, "Publish when ready"
     refute_includes response.body, "disabled_section_copy"
+    assert_includes response.body, 'data-theme="rounded"'
+    assert_includes response.body, "max-w-6xl"
+    refute_includes response.body, "max-w-md"
+    assert_includes response.body, "flat_pack/application"
+    refute_includes response.body, "data-recording-studio-default-layout"
   end
 
   test "published inner page is public at /pages/:uuid/:slug" do
@@ -69,6 +74,8 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "About us"
+    assert_includes response.body, "max-w-6xl"
+    refute_includes response.body, "max-w-md"
   end
 
   test "unpublished inner page is not public" do

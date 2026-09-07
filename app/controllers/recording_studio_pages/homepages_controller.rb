@@ -2,6 +2,8 @@
 
 module RecordingStudioPages
   class HomepagesController < ApplicationController
+    layout "recording_studio_pages/public"
+
     skip_before_action :authenticate_user!, raise: false
     skip_recording_studio_root_resolution if respond_to?(:skip_recording_studio_root_resolution)
 
@@ -13,7 +15,6 @@ module RecordingStudioPages
       @page_recording = recording
       @page = recording.recordable
       @rendered_sections = Renderer.call(recording, context: self)
-      render :show, layout: public_layout
     end
 
     private
@@ -22,12 +23,6 @@ module RecordingStudioPages
       return false unless defined?(RecordingStudioPublishable)
 
       recording.currently_published?
-    end
-
-    def public_layout
-      return RecordingStudioPublishable.configuration.layout if defined?(RecordingStudioPublishable)
-
-      "application"
     end
   end
 end

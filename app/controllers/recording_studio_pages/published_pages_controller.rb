@@ -2,6 +2,8 @@
 
 module RecordingStudioPages
   class PublishedPagesController < ApplicationController
+    layout "recording_studio_pages/public"
+
     skip_before_action :authenticate_user!, raise: false
     skip_recording_studio_root_resolution if respond_to?(:skip_recording_studio_root_resolution)
 

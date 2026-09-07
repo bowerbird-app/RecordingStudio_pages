@@ -46,7 +46,7 @@ recording_studio_admin_for :admin, at: "/admin", root_section: :pages
 root to: "recording_studio_pages/homepages#show"
 ```
 
-Point `/` at the homepage controller. Publishable owns `/pages/:uuid/:slug`. The homepage cannot use that path. See [Upstream gaps](#upstream-gaps).
+Point `/` at the homepage controller. Public pages use `recording_studio_pages/public` (`layouts/recording_studio_pages/public.html.erb`: full width `max-w-6xl`, Flatpack tokens then Tailwind). Do not reuse the Devise `application` layout — it is `max-w-md` for sign-in. Publishable `config.layout` is for Publishable’s own screens; dummy sets it to `recording_studio/default_layout`.
 
 ## How a page is stored
 
