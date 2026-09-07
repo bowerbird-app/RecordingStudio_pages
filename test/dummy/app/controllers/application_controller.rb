@@ -12,6 +12,7 @@ class ApplicationController < ActionController::Base
 
   before_action :authenticate_user!
   before_action :set_current_actor
+  skip_recording_studio_root_resolution if: :devise_controller?
 
   private
 

@@ -3,6 +3,7 @@
 module RecordingStudioPages
   class PublishedPagesController < ApplicationController
     skip_before_action :authenticate_user!, raise: false
+    skip_recording_studio_root_resolution if respond_to?(:skip_recording_studio_root_resolution)
 
     def show
       @page_recording = @parent_recording || @recording

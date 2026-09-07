@@ -3,6 +3,7 @@
 module RecordingStudioPages
   class HomepagesController < ApplicationController
     skip_before_action :authenticate_user!, raise: false
+    skip_recording_studio_root_resolution if respond_to?(:skip_recording_studio_root_resolution)
 
     def show
       recording = Composition.homepage_recording
