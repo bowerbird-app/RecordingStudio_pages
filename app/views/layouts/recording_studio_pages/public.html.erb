@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-theme="rounded">
+<html class="h-full" data-theme="rounded">
   <head>
     <title><%= content_for(:title).presence || @page&.title.presence || "Page" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -12,7 +12,7 @@
     <%= yield :head %>
     <%= javascript_importmap_tags if respond_to?(:javascript_importmap_tags) %>
   </head>
-  <body class="m-0 min-h-screen bg-(--surface-page-background-color) text-(--surface-content-color)">
+  <body class="m-0 h-full min-h-screen bg-(--surface-page-background-color) text-(--surface-content-color)">
     <%= yield %>
   </body>
 </html>

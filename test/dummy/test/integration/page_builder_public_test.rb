@@ -138,6 +138,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "What this gem owns"
     refute_includes response.body, "max-w-6xl"
     refute_includes response.body, "data-recording-studio-default-layout"
+    assert_includes response.body, "min-h-screen!"
     types = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
                                              .map { |recording| recording.recordable.section_type }
     assert_equal ["hero"], types

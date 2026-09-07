@@ -103,11 +103,12 @@ class RecordingStudioPagesTest < Minitest::Test
   def test_public_layout_loads_flatpack_without_the_sign_in_column
     layout = File.read(File.expand_path("../app/views/layouts/recording_studio_pages/public.html.erb", __dir__))
 
-    assert_includes layout, '<html data-theme="rounded">'
+    assert_includes layout, '<html class="h-full" data-theme="rounded">'
     assert_includes layout, 'stylesheet_link_tag "flat_pack/variables"'
     assert_includes layout, 'stylesheet_link_tag "flat_pack/application"'
     assert_includes layout, 'stylesheet_link_tag "tailwind"'
     assert_includes layout, "bg-(--surface-page-background-color)"
+    assert_includes layout, "min-h-screen"
     refute_includes layout, "max-w-md"
     variables_at = layout.index('stylesheet_link_tag "flat_pack/variables"')
     tailwind_at = layout.index('stylesheet_link_tag "tailwind"')
@@ -270,5 +271,8 @@ class RecordingStudioPagesTest < Minitest::Test
     page_model = File.read(File.expand_path("../app/models/recording_studio_pages/page.rb", __dir__))
     assert_includes page_model, "respond_to?(:page_parent_types)"
     assert_includes page_model, 'public_layout: "recording_studio_pages/public"'
+
+    hero = File.read(File.expand_path("../app/components/recording_studio_pages/sections/hero_component.rb", __dir__))
+    assert_includes hero, "min-h-screen!"
   end
 end

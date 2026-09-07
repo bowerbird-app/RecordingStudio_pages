@@ -127,7 +127,7 @@ RecordingStudioPages.register_template(
 
 hero, rich_text, image_text, logo_cloud, feature_grid, call_to_action. Registered variants change layout: image left/right, narrow rich text, compact logos, feature column counts, and CTA banner vs card.
 
-Built-in templates: `marketing_home` (hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero). Dummy seeds a published **Tonight** page from `full_bleed_hero` with a local background photo at `/images/hero-tonight.jpg`.
+Built-in templates: `marketing_home` (hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero). Dummy seeds a published **Tonight** page from `full_bleed_hero` with a local background photo at `/images/hero-tonight.jpg`. A fullscreen hero fills the public viewport; Flatpack’s image hero is otherwise `min-h-[560px]`.
 
 Rich text is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero images are URL fields until Attachable is wired.
 

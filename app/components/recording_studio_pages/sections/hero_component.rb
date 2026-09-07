@@ -47,6 +47,9 @@ module RecordingStudioPages
         }
         if variant == :centered_image
           attributes[:background_image_url] = image_url
+          # Flatpack Hero :centered_image is min-h-[560px]. Fullscreen pages need the
+          # image to fill the viewport; !important beats that kit minimum.
+          attributes[:class] = "min-h-screen!"
         else
           attributes[:image_url] = image_url
           attributes[:image_alt] = title
