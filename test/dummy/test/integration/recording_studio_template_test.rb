@@ -81,6 +81,16 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert RecordingStudio.capability_enabled?(:accessible, for: Workspace)
     refute RecordingStudio.capability_enabled?(:accessible, for: Folder)
     refute RecordingStudio.capability_enabled?(:accessible, for: RecordingStudioPages::Page)
+    assert RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Section)
+    refute RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Page)
     assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
+  end
+
+  test "dummy app mounts duplicatable for section copy" do
+    routes = File.read(Rails.root.join("config/routes.rb"))
+
+    assert defined?(RecordingStudioDuplicatable)
+    assert_includes routes, "RecordingStudioDuplicatable::Engine"
+    assert RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Section)
   end
 end

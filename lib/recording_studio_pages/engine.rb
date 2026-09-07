@@ -20,6 +20,7 @@ module RecordingStudioPages
         recording_studio_attachable
         recording_studio_publishable
         recording_studio_orderable
+        recording_studio_duplicatable
         recording_studio_admin
       ].each do |name|
         require name

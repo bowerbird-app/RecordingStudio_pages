@@ -90,3 +90,4 @@ Lint/MissingSuper:
 Lint/SuppressedException:
   Exclude:
     - "app/models/recording_studio_pages/page.rb"
+    - "app/models/recording_studio_pages/section.rb"

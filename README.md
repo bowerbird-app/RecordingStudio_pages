@@ -13,6 +13,7 @@ Add the gem, then install and migrate:
 gem "recording_studio_pages", github: "bowerbird-app/RecordingStudio_pages"
 gem "recording_studio_publishable", github: "bowerbird-app/RecordingStudio_publishable"
 gem "recording_studio_orderable", github: "bowerbird-app/RecordingStudio_orderable"
+gem "recording_studio_duplicatable", github: "bowerbird-app/RecordingStudio_duplicatable"
 gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin"
 ```
 
@@ -41,6 +42,7 @@ Mount the engines. Keep the page builder off `/` so it does not collide with RS 
 
 ```ruby
 mount RecordingStudioPages::Engine, at: "/recording_studio_pages"
+mount RecordingStudioDuplicatable::Engine, at: "/recording_studio_duplicatable"
 mount RecordingStudioPublishable::Engine, at: "/"
 recording_studio_admin_for :admin, at: "/admin", root_section: :pages
 root to: "recording_studio_pages/homepages#show"
@@ -127,7 +129,7 @@ Rich text is JSON plus `sanitize`. Action Text expects a mutable record, so this
 
 ## Admin
 
-RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a Flatpack ordered, orderable list. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s More menu. Copy duplicates a section into another generic section recording.
+RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a Flatpack ordered, orderable list. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s More menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page.
 
 The editor is also the staff preview. Unpublished pages render there. They stay private on public routes. Add a section from the **Add section** dropdown on that editor. Picking a type posts immediately and Turbo updates the editor in place. Open **Edit** on a section to fill in its copy.
 
@@ -169,4 +171,12 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.0. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.6.0`, Attachable `0.4.0`, Publishable `v0.2.1`, Orderable `v0.2.1`, Admin `v2.0.2`, FlatPack `v0.1.133`.
+0.3.0. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.6.0`, Attachable `0.4.0`, Publishable `v0.2.1`, Orderable `v0.2.1`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.133`.
+
+## Upgrade
+
+1. Bundle `recording_studio_pages` with Publishable, Orderable, and Duplicatable.
+2. Mount Pages, Duplicatable, and Publishable. Keep Pages off `/`.
+3. `RecordingStudioPages::Section` already opts into Duplicatable when that gem is loaded. Do not add a second copy path.
+4. Public pages must load `flat_pack/application` with `data-theme` on `html`.
+5. Pin the Pages Stimulus controllers (`recording-studio-pages--section-list`) so drag-reorder persists.

@@ -52,11 +52,21 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_attachable", tag: "0.4.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_publishable", tag: "v0.2.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_orderable", tag: "v0.2.1"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_duplicatable", tag: "v0.4.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.0.2"'
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.133"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.134"'
     refute_includes gemfile, 'tag: "0.3.1"'
+  end
+
+  def test_section_opts_into_duplicatable
+    section_source = File.read(File.expand_path("../app/models/recording_studio_pages/section.rb", __dir__))
+    service_source = File.read(File.expand_path("../lib/recording_studio_pages/services/duplicate_section.rb", __dir__))
+
+    assert_includes section_source, "Capabilities::Duplicatable.to"
+    assert_includes service_source, "duplicate_in_place!"
+    refute_includes service_source, "AddSection.call"
   end
 
   def test_template_does_not_ship_copied_core_hooks_or_base_service

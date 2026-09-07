@@ -100,6 +100,8 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
     assert RecordingStudio.capability_enabled?(:accessible, for: "AdminRoot")
     refute RecordingStudio.capability_enabled?(:accessible, for: "Folder")
     refute RecordingStudio.capability_enabled?(:accessible, for: "RecordingStudioPages::Page")
+    assert RecordingStudio.capability_enabled?(:duplicatable, for: "RecordingStudioPages::Section")
+    refute RecordingStudio.capability_enabled?(:duplicatable, for: "RecordingStudioPages::Page")
   end
 
   private

@@ -66,9 +66,14 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
 
     post recording_studio_pages.duplicate_admin_page_section_path(page_recording, section)
     assert_response :redirect
+    follow_redirect!
+    assert_includes response.body, "Section copied."
 
     sections = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
     assert_equal %w[hero hero], sections.map { |recording| recording.recordable.section_type }
+    assert_equal "Copy me", sections.last.recordable.content["title"]
+    assert_not_equal section.recordable_id, sections.last.recordable_id
+    assert sections.last.events.exists?(action: "duplicated")
   end
 
   test "staff can add a section from the editor dropdown" do
@@ -137,6 +142,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, first.id.to_s
     assert_includes response.body, 'role="list"'
     assert_includes response.body, "More"
+    assert_includes response.body, "Copy"
     assert_includes response.body, "data-controller=\"recording-studio-pages--section-list\""
     assert_includes response.body, "flat-pack--list-orderable"
     assert_includes response.body, "list-decimal"
@@ -174,6 +180,9 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     patch recording_studio_pages.reorder_admin_page_sections_path(page_recording),
           params: { moving_recording_id: "missing", target_position: 1 },
           headers: { "Accept" => "application/json" }
+    assert_includes [401, 302, 403], response.status
+
+    post recording_studio_pages.duplicate_admin_page_section_path(page_recording, "missing")
     assert_includes [401, 302, 403], response.status
   end
 

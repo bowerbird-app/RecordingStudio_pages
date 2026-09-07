@@ -192,7 +192,32 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
     assert_equal 2, sections.length
     assert_equal "hero", copy.recordable.section_type
     assert_equal "Original hero", copy.recordable.content["title"]
+    assert_equal "centered", copy.recordable.settings["variant"]
     assert_not_equal original.id, copy.id
+    assert_not_equal original.recordable_id, copy.recordable_id
+    assert_equal original.parent_recording_id, copy.parent_recording_id
+    assert_equal sections.last.id, copy.id
+    assert copy.events.exists?(action: "duplicated")
+  end
+
+  test "duplicating a section requires edit access" do
+    page_recording = create_page!(parent_recording: @root, title: "Locked copy", actor: @actor)
+    original = add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Stay put" },
+      actor: @actor
+    )
+    stranger = create_actor!("copy-stranger@example.com")
+
+    result = RecordingStudioPages::Services::DuplicateSection.call(
+      section_recording: original,
+      actor: stranger
+    )
+
+    assert result.failure?
+    assert_match(/access/i, result.error.to_s)
+    assert_equal 1, RecordingStudioPages::Composition.section_recordings_for(page_recording.reload).length
   end
 
   test "moving a section uses Recording Studio Orderable position" do

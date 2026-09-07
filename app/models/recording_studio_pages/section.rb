@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+begin
+  require "recording_studio_duplicatable"
+rescue LoadError
+end
+
 module RecordingStudioPages
   class Section < ApplicationRecord
     include RecordingStudio::Recordable
@@ -10,6 +15,13 @@ module RecordingStudioPages
                                 plural_label: "Sections",
                                 root: false,
                                 allowed_parent_types: ["RecordingStudioPages::Page"]
+
+    if defined?(RecordingStudio::Capabilities::Duplicatable)
+      include RecordingStudio::Capabilities::Duplicatable.to(
+        prefix: nil,
+        suffix: nil
+      )
+    end
 
     def enabled?
       enabled != false

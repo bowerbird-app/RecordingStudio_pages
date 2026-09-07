@@ -18,7 +18,7 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 - Services for create, revise, add, reorder, toggle, remove, apply template, and homepage uniqueness.
 - Engine admin under `/recording_studio_pages/admin/pages` plus an RS Admin Pages section.
 - Public homepage at `/` and Publishable public paths at `/pages/:uuid/:slug`.
-- Duplicate a section into another generic section recording.
+- Duplicate a section through Recording Studio Duplicatable (`duplicate_in_place!`). Copy in the editor More menu uses that mixin.
 - Required field flags and `recording_ids` in the section schema catalog.
 - Dummy root switcher includes the Admin root so `/admin` can open after switching to it.
 - Public pages use `recording_studio_pages/public` (Flatpack tokens then Tailwind, `data-theme` on `html`). Heroes use Flatpack Hero at full width; other sections use `max-w-6xl`. Dummy overrides `recording_studio/default_layout` so `data-theme` sits on `html` and `flat_pack/application` loads.
@@ -28,6 +28,11 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 - Dummy `/` is the published homepage. Dummy sandbox moved to `/studio`.
 - The page editor adds sections from an **Add section** dropdown. Turbo updates the editor. The old add-section library page redirects there.
 - The editor lists sections in a Flatpack ordered list. Drag a row to reorder. Row actions live in a More menu.
+
+### Upgrade notes
+- Bundle `recording_studio_duplicatable` and mount `RecordingStudioDuplicatable::Engine`. Copy on a section calls `duplicate_in_place!`; do not keep a host-local copy that re-adds the same section type.
+- `RecordingStudioPages::Section` opts into Duplicatable when the gem is loaded. Page is not duplicatable.
+- Pin dummy or host Gemfiles at Duplicatable `v0.4.1`.
 
 ### Notes
 - Publishable cannot own `/` because slugs cannot be empty and public paths require `:uuid`. Page Builder owns homepage routing. See the README upstream gaps.
