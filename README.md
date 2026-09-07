@@ -135,7 +135,7 @@ List fields skip blank extra slots and items marked `_destroy`.
 
 ## Admin
 
-RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a Flatpack ordered, orderable list. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s More menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page, then Orderable moves it to the end.
+RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a Flatpack ordered, orderable list. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s More menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page, then Orderable `recording_studio_orderable_append!` puts it at the end.
 
 The editor is also the staff preview. Enabled sections render there with the same components as the public page. Unpublished pages stay private on public routes. Add a section from **Add section**. Apply **Use a template** to append that template’s sections. Open **Edit page** to rename, set home, or remove the page.
 
@@ -147,7 +147,7 @@ Writes need Accessible `:edit` on the configured admin root. Reads need `:view`.
 
 Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`.
 
-Drag-reorder persists through `recording-studio-pages--section-list`. Do not also set Flatpack `orderable_url` on the list: Flatpack’s orderable save still checks `hasOrderablePathValue` after the value was renamed to `orderableUrl`, so a later Flatpack fix would double-PATCH.
+Drag-reorder persists through Flatpack List `orderable_url`. The Pages Stimulus controller only blocks More-menu drags and reloads if that save fails.
 
 ## Shared sections later
 
@@ -178,13 +178,12 @@ These are limits in sibling gems. This gem documents them instead of forking the
 3. **RS Admin is a hub of screens and widgets**, not a nested canvas for ordered sections.
 4. **Action Text assumes mutable records.** Section copy is JSON plus `sanitize`.
 5. **Attachable is required by Publishable 0.2.1** even when you only want slug and status. Hero `image_url` is still a URL field, not an attachment recording.
-6. **Flatpack list orderable save is a no-op.** `saveOrder` checks `hasOrderablePathValue` after the value was renamed to `orderableUrl`. Page Builder persists drag itself. List item `display:flex` also hides native `<ol>` markers.
-7. **Orderable has no public append-to-end helper.** Page Builder calls `recording_studio_orderable_move!` with the last index.
-8. **Core has no `trash!`.** Page Builder calls `trash!` when Trashable is present; otherwise it logs `trashed` and sets `trashed_at`. Install Trashable for a real trash path.
+6. **Core has no `trash!`.** Page Builder calls `trash!` when Trashable is present; otherwise it logs `trashed` and sets `trashed_at`. Install Trashable for a real trash path.
+7. **Flatpack ordered list items are `display:flex`**, so native `<ol>` markers stay hidden. Page Builder sets `leading:` to the position number.
 
 ## Version
 
-0.3.0. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.6.0`, Attachable `0.4.0`, Publishable `v0.2.1`, Orderable `v0.2.1`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.133`.
+0.3.0. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.6.0`, Attachable `0.4.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
 
 ## Upgrade
 
@@ -192,6 +191,6 @@ These are limits in sibling gems. This gem documents them instead of forking the
 2. Mount Pages, Duplicatable, and Publishable. Keep Pages off `/`.
 3. `RecordingStudioPages::Section` already opts into Duplicatable when that gem is loaded. Do not add a second copy path.
 4. Public pages must load `flat_pack/application` with `data-theme` on `html`.
-5. Pin the Pages Stimulus controllers (`recording-studio-pages--section-list`) so drag-reorder persists. Do not set Flatpack `orderable_url` on the section list.
+5. Pin Flatpack `v0.1.162` (or later) so List `orderable_url` persists drag. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`.
 6. Define `recording_studio_pages_page_nav` if gem screens should share host chrome. Otherwise they use Recording Studio page nav.
 7. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.

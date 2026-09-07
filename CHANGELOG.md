@@ -31,8 +31,8 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 
 ### Fixed
 - Empty-state Flatpack Alerts use `style` and `description`.
-- Drag persist checks the HTTP response and reloads the list when the new order did not save.
-- Add and Copy append through Orderable `recording_studio_orderable_move!` instead of writing the position column.
+- Drag-reorder persists through Flatpack List `orderable_url` (Flatpack `v0.1.162`). The list reloads when that save fails.
+- Add and Copy append through Orderable `recording_studio_orderable_append!`.
 - Remove page and remove section go through `trash!` when Trashable is present, otherwise `log_event!("trashed")` plus `trashed_at`.
 - `page_parent_types` and `homepage_path` now gate create and the editor subtitle.
 - The editor renders a live Preview of enabled sections. **Use a template** appends template sections in place.
@@ -41,14 +41,13 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 - Admin live/draft widgets count through Publishable `currently_published` instead of loading every page.
 - `data:` failures log a warning instead of failing silently.
 - Gem screens call `recording_studio_pages_nav` instead of dummy-only `dummy_page_nav`.
-- The section list does not set Flatpack `orderable_url`, so a Flatpack orderable fix would not double-PATCH.
 
 ### Upgrade notes
 - Bundle `recording_studio_duplicatable` and mount `RecordingStudioDuplicatable::Engine`. Copy on a section calls `duplicate_in_place!`; do not keep a host-local copy that re-adds the same section type.
 - `RecordingStudioPages::Section` opts into Duplicatable when the gem is loaded. Page is not duplicatable.
-- Pin dummy or host Gemfiles at Duplicatable `v0.4.1`.
+- Pin dummy or host Gemfiles at Duplicatable `v0.4.1`, Orderable `v0.2.2`, and Flatpack `v0.1.162`.
 - Define `recording_studio_pages_page_nav` if gem screens should share host chrome. Dummy wraps `dummy_page_nav`.
-- Do not set Flatpack `orderable_url` on the page editor list. Persist stays on `recording-studio-pages--section-list` until Flatpack’s `hasOrderablePathValue` / `orderableUrl` mismatch is fixed.
+- Set Flatpack `orderable_url` on the page editor list. Do not add a second persist PATCH.
 - Install Recording Studio Trashable if page and section remove should use `trash!`.
 
 ### Notes

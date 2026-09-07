@@ -20,14 +20,9 @@ module RecordingStudioPages
       end
 
       def append_to_end
-        return @section_recording unless @page_recording.respond_to?(:recording_studio_orderable_move!)
+        return @section_recording unless @page_recording.respond_to?(:recording_studio_orderable_append!)
 
-        siblings = Composition.section_recordings_for(@page_recording.reload)
-        @page_recording.recording_studio_orderable_move!(
-          @section_recording,
-          to_index: [siblings.length - 1, 0].max,
-          actor: actor
-        )
+        @page_recording.recording_studio_orderable_append!(@section_recording, actor: actor)
         @section_recording.reload
       end
     end

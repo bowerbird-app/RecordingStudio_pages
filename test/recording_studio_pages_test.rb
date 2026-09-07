@@ -51,10 +51,10 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.5.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_attachable", tag: "0.4.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_publishable", tag: "v0.2.1"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_orderable", tag: "v0.2.1"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_orderable", tag: "v0.2.2"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_duplicatable", tag: "v0.4.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.0.2"'
-    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.133"'
+    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.162"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.134"'
     refute_includes gemfile, 'tag: "0.3.1"'
@@ -250,14 +250,19 @@ class RecordingStudioPagesTest < Minitest::Test
       File.expand_path("../app/views/recording_studio_pages/admin/pages/_add_template_dropdown.html.erb", __dir__)
     )
 
-    refute_includes editor, "orderable_url"
+    assert_includes editor, "orderable_url:"
     assert_includes editor, "add_template_dropdown"
     assert_includes editor, 'title: "Preview"'
     assert_includes template_dropdown, "Use a template"
 
-    persist = File.read(File.expand_path("../app/javascript/recording_studio_pages/controllers/section_list_controller.js", __dir__))
-    assert_includes persist, "!response.ok"
-    assert_includes persist, "list:error"
+    list_js = File.read(File.expand_path("../app/javascript/recording_studio_pages/controllers/section_list_controller.js", __dir__))
+    refute_includes list_js, "persist"
+    refute_includes list_js, "moving_recording_id"
+    assert_includes list_js, "list:error"
+
+    append = File.read(File.expand_path("../lib/recording_studio_pages/services/append_section_order.rb", __dir__))
+    assert_includes append, "recording_studio_orderable_append!"
+    refute_includes append, "recording_studio_orderable_move!"
     assert_includes index, "description:"
     refute_includes index, "message:"
     assert_includes edit, "Remove page"

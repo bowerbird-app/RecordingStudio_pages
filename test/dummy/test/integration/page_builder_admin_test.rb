@@ -145,6 +145,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Copy"
     assert_includes response.body, "data-controller=\"recording-studio-pages--section-list\""
     assert_includes response.body, "flat-pack--list-orderable"
+    assert_includes response.body, "orderable-url-value"
     assert_includes response.body, "list-decimal"
     refute_includes response.body, "Move up"
     refute_includes response.body, "Move down"
@@ -191,7 +192,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "max-w-prose"
     assert_includes response.body, "Use a template"
     assert_includes response.body, "apply-template-#{page_recording.id}-marketing_home"
-    refute_includes response.body, "orderable-url-value"
+    assert_includes response.body, "orderable-url-value"
     refute_includes response.body, "Staff preview"
 
     post recording_studio_pages.apply_template_admin_page_path(page_recording),

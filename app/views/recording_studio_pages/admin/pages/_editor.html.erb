@@ -41,14 +41,11 @@
   <% end %>
 
   <% if section_recordings.any? %>
-    <div
-      data-controller="recording-studio-pages--section-list"
-      data-recording-studio-pages--section-list-url-value="<%= reorder_admin_page_sections_path(page_id: page_recording.id) %>"
-      data-action="list:reordered->recording-studio-pages--section-list#persist"
-    >
+    <div data-controller="recording-studio-pages--section-list">
       <%= render FlatPack::List::Component.new(
         ordered: true,
         orderable: true,
+        orderable_url: reorder_admin_page_sections_path(page_id: page_recording.id),
         orderable_method: :patch,
         param_uuid_name: "moving_recording_id",
         param_target_position_name: "target_position",
