@@ -7,7 +7,7 @@ class RenameGemIdentityTest < Minitest::Test
     script = File.read(File.expand_path("../bin/rename_gem", __dir__))
 
     assert_includes script, "https://github.com/bowerbird-app/RecordingStudio_gem_template"
-    assert_includes script, 'https://github.com/bowerbird-app/#{@new_name}'
+    assert_includes script, "'https://github.com/bowerbird-app/\#{@new_name}'"
     assert_includes script, "rewrite_leftover_homepages!"
     assert_includes script, "leftover_template_identity?"
     assert_includes script, "README.md"

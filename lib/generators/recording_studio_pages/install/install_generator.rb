@@ -25,7 +25,9 @@ module RecordingStudioPages
       end
 
       def add_yaml_config
-        return unless yes?("Would you like to add `config/recording_studio_pages.yml` for environment-specific settings? [y/N]")
+        prompt = "Would you like to add `config/recording_studio_pages.yml` " \
+                 "for environment-specific settings? [y/N]"
+        return unless yes?(prompt)
 
         template "recording_studio_pages.yml", "config/recording_studio_pages.yml"
       end

@@ -20,7 +20,12 @@ module RecordingStudioPages
                                )),
                 if action["text"].present? && action["url"].present?
                   helpers.render(
-                    FlatPack::Button::Component.new(text: action["text"], href: action["url"], style: :primary, size: :md)
+                    FlatPack::Button::Component.new(
+                      text: action["text"],
+                      href: action["url"],
+                      style: :primary,
+                      size: :md
+                    )
                   )
                 end
               ].compact

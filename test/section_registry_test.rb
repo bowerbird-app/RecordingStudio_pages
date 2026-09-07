@@ -100,7 +100,7 @@ class SectionRegistryTest < Minitest::Test
     assert_includes hero[:variants], "split_image"
     assert_equal "string", hero[:fields][:title][:type]
     assert_equal true, hero[:fields][:title][:required]
-    assert catalog[:templates].any? { |entry| entry[:key] == "marketing_home" }
+    assert(catalog[:templates].any? { |entry| entry[:key] == "marketing_home" })
   end
 
   def test_duplicate_template_raises

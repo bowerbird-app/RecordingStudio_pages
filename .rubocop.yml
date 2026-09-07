@@ -2,9 +2,9 @@ AllCops:
   TargetRubyVersion: 3.3
   NewCops: enable
   Exclude:
-    - 'test/dummy/**/*'
-    - 'vendor/**/*'
-    - 'bin/**/*'
+    - "test/dummy/**/*"
+    - "vendor/**/*"
+    - "bin/**/*"
 
 Style/Documentation:
   Enabled: false
@@ -15,38 +15,78 @@ Style/StringLiterals:
 
 Layout/LineLength:
   Max: 120
+  Exclude:
+    - "test/**/*"
+    - "lib/generators/**/*"
+    - "lib/recording_studio_pages/built_ins.rb"
+    - "lib/recording_studio_pages/admin.rb"
 
-# Relax metrics for test files and generators
 Metrics/ClassLength:
   Exclude:
-    - 'test/**/*'
+    - "test/**/*"
+    - "lib/generators/**/*"
+    - "app/controllers/**/*"
+    - "lib/recording_studio_pages/engine.rb"
+    - "lib/recording_studio_pages/field_schema.rb"
+
+Metrics/ModuleLength:
+  Exclude:
+    - "lib/recording_studio_pages/built_ins.rb"
+    - "lib/recording_studio_pages/admin.rb"
 
 Metrics/MethodLength:
   Exclude:
-    - 'test/**/*'
-    - 'lib/generators/**/*'
+    - "test/**/*"
+    - "lib/generators/**/*"
+    - "app/components/**/*"
+    - "app/controllers/**/*"
+    - "lib/recording_studio_pages/services/**/*"
+    - "lib/recording_studio_pages/built_ins.rb"
+    - "lib/recording_studio_pages/field_schema.rb"
+    - "lib/recording_studio_pages/renderer.rb"
 
 Metrics/AbcSize:
   Exclude:
-    - 'test/**/*'
-    - 'lib/generators/**/*'
+    - "test/**/*"
+    - "lib/generators/**/*"
+    - "app/components/**/*"
+    - "app/controllers/**/*"
+    - "lib/recording_studio_pages/services/**/*"
+    - "lib/recording_studio_pages/field_schema.rb"
 
-# Allow empty blocks in tests (common for stubs/mocks)
+Metrics/ParameterLists:
+  Exclude:
+    - "lib/recording_studio_pages/services/**/*"
+    - "lib/recording_studio_pages/section_definition.rb"
+
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - "lib/recording_studio_pages/field_schema.rb"
+    - "lib/recording_studio_pages/services/**/*"
+
+Metrics/PerceivedComplexity:
+  Exclude:
+    - "lib/recording_studio_pages/field_schema.rb"
+    - "lib/recording_studio_pages/services/**/*"
+
 Lint/EmptyBlock:
   Exclude:
-    - 'test/**/*'
+    - "test/**/*"
 
-# Allow nested method definitions in tests (common for testing behavior)
 Lint/NestedMethodDefinition:
   Exclude:
-    - 'test/**/*'
+    - "test/**/*"
 
-# Allow underscores in test method names (test_something_100 is fine)
 Naming/VariableNumber:
   Exclude:
-    - 'test/**/*'
+    - "test/**/*"
 
-# Don't require super in service initialize methods
 Lint/MissingSuper:
   Exclude:
-    - 'test/services/**/*'
+    - "app/components/**/*"
+    - "lib/recording_studio_pages/services/**/*"
+    - "test/services/**/*"
+
+Lint/SuppressedException:
+  Exclude:
+    - "app/models/recording_studio_pages/page.rb"

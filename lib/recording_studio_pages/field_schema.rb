@@ -102,14 +102,31 @@ module RecordingStudioPages
       return ["#{key} is required"] if spec[:required] && blank_value?(spec, value)
 
       type = spec[:type].to_sym
-      return ["#{key} must be a URL"] if type == :url && value.present? && !safe_url?(value)
-      return ["#{key} must be true or false"] if type == :boolean && !(value.nil? || [true, false, "true", "false", "1", "0"].include?(value))
-      return ["#{key} must be an integer"] if type == :integer && value.present? && Integer(value, exception: false).nil?
+      return url_error(key) if type == :url && value.present? && !safe_url?(value)
+      return ["#{key} must be true or false"] unless boolean_ok?(spec, value)
+      return ["#{key} must be an integer"] unless integer_ok?(spec, value)
       return validate_link(key, value) if type == :link
       return validate_list(key, spec, value) if type == :list
       return validate_recording_ids(key, value) if type == :recording_ids
 
       []
+    end
+
+    def boolean_ok?(spec, value)
+      return true unless spec[:type].to_sym == :boolean
+
+      value.nil? || [true, false, "true", "false", "1", "0"].include?(value)
+    end
+
+    def integer_ok?(spec, value)
+      return true unless spec[:type].to_sym == :integer
+      return true if value.blank?
+
+      !Integer(value, exception: false).nil?
+    end
+
+    def url_error(key)
+      ["#{key} must be a URL"]
     end
 
     def blank_value?(spec, value)
@@ -151,6 +168,7 @@ module RecordingStudioPages
     def safe_url?(value)
       text = value.to_s.strip
       return true if text.start_with?("/")
+
       uri = URI.parse(text)
       %w[http https].include?(uri.scheme)
     rescue URI::InvalidURIError

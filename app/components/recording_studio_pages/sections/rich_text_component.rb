@@ -12,7 +12,12 @@ module RecordingStudioPages
           card.body do
             helpers.safe_join(
               [
-                helpers.render(FlatPack::PageTitle::Component.new(title: @rendered.content["title"].presence || "Notes", variant: :h2)),
+                helpers.render(
+                  FlatPack::PageTitle::Component.new(
+                    title: @rendered.content["title"].presence || "Notes",
+                    variant: :h2
+                  )
+                ),
                 helpers.content_tag(:div, helpers.sanitize(@rendered.content["body"].to_s), class: "prose")
               ]
             )

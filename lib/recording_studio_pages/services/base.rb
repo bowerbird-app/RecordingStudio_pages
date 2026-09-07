@@ -16,8 +16,8 @@ module RecordingStudioPages
 
       def with_rescue
         success(yield)
-      rescue RecordingStudioPages::Error, ArgumentError, ActiveRecord::RecordInvalid => error
-        failure(error, errors: Array(error.try(:record)&.errors&.full_messages))
+      rescue RecordingStudioPages::Error, ArgumentError, ActiveRecord::RecordInvalid => e
+        failure(e, errors: Array(e.try(:record)&.errors&.full_messages))
       end
     end
   end

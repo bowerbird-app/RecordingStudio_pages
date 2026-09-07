@@ -8,7 +8,7 @@ module RecordingStudioPages
 
     attr_reader(*ATTRIBUTES)
 
-    def initialize(key:, name:, category: "content", component:, fields: {}, settings: {}, variants: [],
+    def initialize(key:, name:, component:, category: "content", fields: {}, settings: {}, variants: [],
                    validations: [], data: nil, source: nil)
       @key = key.to_s
       @name = name.to_s
@@ -82,8 +82,8 @@ module RecordingStudioPages
     def run_custom_validations(content, settings)
       validations.filter_map do |validator|
         validator.call(content, settings)
-      rescue StandardError => error
-        error.message
+      rescue StandardError => e
+        e.message
       end
     end
 
