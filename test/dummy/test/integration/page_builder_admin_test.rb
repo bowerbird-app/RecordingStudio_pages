@@ -39,7 +39,11 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     sections = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
     assert_equal %w[hero rich_text], sections.map { |recording| recording.recordable.section_type }
 
-    post recording_studio_pages.move_admin_page_section_path(page_recording, sections.last, direction: "up")
+    patch recording_studio_pages.reorder_admin_page_sections_path(page_recording),
+          params: { moving_recording_id: sections.last.id, target_position: 1 },
+          headers: { "Accept" => "application/json" }
+    assert_response :success
+    assert_equal true, response.parsed_body["ok"]
     reordered = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
     assert_equal %w[rich_text hero], reordered.map { |recording| recording.recordable.section_type }
 
@@ -89,6 +93,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "page_editor"
     assert_includes response.body, "Section added."
     assert_includes response.body, "Hero"
+    assert_includes response.body, "More"
+    assert_includes response.body, "flat-pack--list-orderable"
     sections = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
     assert_equal %w[hero], sections.map { |recording| recording.recordable.section_type }
     assert_equal "Hero", sections.first.recordable.content["title"]
@@ -117,6 +123,41 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_redirected_to recording_studio_pages.admin_page_path(id: page_recording.id)
   end
 
+  test "staff can drag-reorder sections through the list endpoint" do
+    page_recording = create_page!(parent_recording: @root, title: "Order", actor: @actor)
+    first = add_section!(page_recording: page_recording, section_type: "hero", content: { title: "First" }, actor: @actor)
+    second = add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: { title: "Second" },
+      actor: @actor
+    )
+
+    get recording_studio_pages.admin_page_path(page_recording)
+    assert_includes response.body, first.id.to_s
+    assert_includes response.body, 'role="list"'
+    assert_includes response.body, "More"
+    assert_includes response.body, "data-controller=\"recording-studio-pages--section-list\""
+    assert_includes response.body, "flat-pack--list-orderable"
+    refute_includes response.body, "Move up"
+    refute_includes response.body, "Move down"
+
+    patch recording_studio_pages.reorder_admin_page_sections_path(page_recording),
+          params: { moving_recording_id: second.id, target_position: 1 },
+          headers: { "Accept" => "application/json" }
+
+    assert_response :success
+    assert_equal true, response.parsed_body["ok"]
+    ordered = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
+    assert_equal [second.id, first.id], ordered.map(&:id)
+
+    patch recording_studio_pages.reorder_admin_page_sections_path(page_recording),
+          params: { moving_recording_id: second.id, target_position: 0 },
+          headers: { "Accept" => "application/json" }
+    assert_response :unprocessable_content
+    assert_equal false, response.parsed_body["ok"]
+  end
+
   test "visitors cannot mutate pages" do
     sign_out @actor
     page_recording = create_page!(parent_recording: @root, title: "Locked", actor: @actor)
@@ -127,6 +168,11 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     post recording_studio_pages.admin_page_sections_path(page_recording), params: {
       section: { section_type: "hero", content: { title: "Nope" } }
     }
+    assert_includes [401, 302, 403], response.status
+
+    patch recording_studio_pages.reorder_admin_page_sections_path(page_recording),
+          params: { moving_recording_id: "missing", target_position: 1 },
+          headers: { "Accept" => "application/json" }
     assert_includes [401, 302, 403], response.status
   end
 

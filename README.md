@@ -127,7 +127,7 @@ Rich text is JSON plus `sanitize`. Action Text expects a mutable record, so this
 
 ## Admin
 
-RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. Reorder is Move up and Move down. Flatpack has no sortable-list primitive. Copy duplicates a section into another generic section recording.
+RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a Flatpack ordered, orderable list. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s More menu. Copy duplicates a section into another generic section recording.
 
 The editor is also the staff preview. Unpublished pages render there. They stay private on public routes. Add a section from the **Add section** dropdown on that editor. Picking a type posts immediately and Turbo updates the editor in place. Open **Edit** on a section to fill in its copy.
 
@@ -164,9 +164,8 @@ These are limits in sibling gems. This gem documents them instead of forking the
 1. **Publishable slugs cannot be `/`.** The slug regex is `[a-z0-9]+(?:-[a-z0-9]+)*`, and public path templates must include `:uuid`. Homepage routing lives in Page Builder.
 2. **Publishable slug uniqueness is not a hard unique constraint** across pages.
 3. **RS Admin is a hub of screens and widgets**, not a nested canvas for ordered sections.
-4. **Flatpack has no sortable-list primitive.** Admin uses Move up and Move down.
-5. **Action Text assumes mutable records.** Section copy is JSON plus `sanitize`.
-6. **Attachable is required by Publishable 0.2.1** even when you only want slug and status. Hero `image_url` is still a URL field, not an attachment recording.
+4. **Action Text assumes mutable records.** Section copy is JSON plus `sanitize`.
+5. **Attachable is required by Publishable 0.2.1** even when you only want slug and status. Hero `image_url` is still a URL field, not an attachment recording.
 
 ## Version
 

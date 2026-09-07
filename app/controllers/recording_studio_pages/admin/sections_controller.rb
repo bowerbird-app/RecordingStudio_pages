@@ -3,7 +3,7 @@
 module RecordingStudioPages
   module Admin
     class SectionsController < BaseController
-      before_action :require_admin_write_access!, only: %i[create update destroy move toggle duplicate]
+      before_action :require_admin_write_access!, only: %i[create update destroy reorder toggle duplicate]
       before_action :page_recording
 
       def new
@@ -56,20 +56,19 @@ module RecordingStudioPages
         redirect_to admin_page_path(id: page_recording.id), notice: "Section removed."
       end
 
-      def move
-        ids = Composition.section_recordings_for(page_recording).map { |recording| recording.id.to_s }
-        current_index = ids.index(section_recording.id.to_s)
-        direction = params[:direction].to_s
-        swap_index = direction == "up" ? current_index - 1 : current_index + 1
-        if current_index && swap_index.between?(0, ids.length - 1)
-          ids[current_index], ids[swap_index] = ids[swap_index], ids[current_index]
-          Services::ReorderSections.call(
-            page_recording: page_recording,
-            ordered_recording_ids: ids,
-            actor: current_admin_actor
-          ).value!
-        end
-        redirect_to admin_page_path(id: page_recording.id)
+      def reorder
+        position = params[:target_position].to_i
+        return reject_reorder("Choose a place in the list.") if position < 1
+
+        result = Services::MoveSection.call(
+          page_recording: page_recording,
+          section_recording: moving_section_recording,
+          to_index: position - 1,
+          actor: current_admin_actor
+        )
+        return reject_reorder(result.error.to_s) if result.failure?
+
+        render json: { ok: true }
       end
 
       def toggle
@@ -94,8 +93,16 @@ module RecordingStudioPages
       private
 
       def section_recording
-        @section_recording ||= page_recording.child_recordings.find_by!(
-          id: params[:id],
+        @section_recording ||= find_section_recording(params[:id])
+      end
+
+      def moving_section_recording
+        find_section_recording(params[:moving_recording_id])
+      end
+
+      def find_section_recording(recording_id)
+        page_recording.child_recordings.find_by!(
+          id: recording_id,
           recordable_type: "RecordingStudioPages::Section"
         )
       end
@@ -124,6 +131,10 @@ module RecordingStudioPages
         "Section added."
       end
       helper_method :added_notice
+
+      def reject_reorder(message)
+        render json: { ok: false, error: message }, status: :unprocessable_content
+      end
     end
   end
 end

@@ -39,72 +39,27 @@
     ) %>
   <% end %>
 
-  <% section_recordings.each do |recording| %>
-    <% recordable = recording.recordable %>
-    <% definition = RecordingStudioPages.find_section(recordable.section_type) %>
-    <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
-      <% card.header do %>
-        <%= render FlatPack::PageTitle::Component.new(
-          title: definition&.name || recordable.section_type,
-          subtitle: recordable.enabled? ? (recordable.settings["variant"].presence || definition&.category) : "Off",
-          variant: :h3
-        ) %>
+  <% if section_recordings.any? %>
+    <div
+      data-controller="recording-studio-pages--section-list"
+      data-recording-studio-pages--section-list-url-value="<%= reorder_admin_page_sections_path(page_id: page_recording.id) %>"
+      data-action="list:reordered->recording-studio-pages--section-list#persist"
+    >
+      <%= render FlatPack::List::Component.new(
+        ordered: true,
+        orderable: true,
+        orderable_url: reorder_admin_page_sections_path(page_id: page_recording.id),
+        orderable_method: :patch,
+        param_uuid_name: "moving_recording_id",
+        param_target_position_name: "target_position",
+        divider: true
+      ) do %>
+        <% section_recordings.each do |recording| %>
+          <%= render "recording_studio_pages/admin/pages/section_row", recording: recording %>
+        <% end %>
       <% end %>
-      <% card.body do %>
-        <p class="text-sm"><%= recordable.content["title"].presence || recordable.content["body"].to_s.truncate(120) %></p>
-      <% end %>
-      <% card.footer do %>
-        <div class="flex flex-wrap gap-2">
-          <%= render FlatPack::Button::Component.new(
-            text: "Move up",
-            href: move_admin_page_section_path(page_id: page_recording.id, id: recording.id, direction: "up"),
-            method: :post,
-            style: :secondary,
-            size: :sm
-          ) %>
-          <%= render FlatPack::Button::Component.new(
-            text: "Move down",
-            href: move_admin_page_section_path(page_id: page_recording.id, id: recording.id, direction: "down"),
-            method: :post,
-            style: :secondary,
-            size: :sm
-          ) %>
-          <% if definition %>
-            <%= render FlatPack::Button::Component.new(
-              text: "Edit",
-              href: edit_admin_page_section_path(page_id: page_recording.id, id: recording.id),
-              style: :secondary,
-              size: :sm,
-              data: { turbo_frame: "_top" }
-            ) %>
-          <% end %>
-          <%= render FlatPack::Button::Component.new(
-            text: "Copy",
-            href: duplicate_admin_page_section_path(page_id: page_recording.id, id: recording.id),
-            method: :post,
-            style: :secondary,
-            size: :sm
-          ) %>
-          <%= render FlatPack::Button::Component.new(
-            text: recordable.enabled? ? "Turn off" : "Turn on",
-            href: toggle_admin_page_section_path(page_id: page_recording.id, id: recording.id),
-            method: :post,
-            style: :secondary,
-            size: :sm
-          ) %>
-          <%= render FlatPack::Button::Component.new(
-            text: "Remove",
-            href: admin_page_section_path(page_id: page_recording.id, id: recording.id),
-            method: :delete,
-            style: :danger,
-            size: :sm
-          ) %>
-        </div>
-      <% end %>
-    <% end %>
-  <% end %>
-
-  <% if section_recordings.empty? %>
+    </div>
+  <% else %>
     <%= render FlatPack::Alert::Component.new(
       style: :info,
       title: "Nothing here yet",

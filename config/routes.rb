@@ -7,7 +7,7 @@ RecordingStudioPages::Engine.routes.draw do
     resources :pages, only: %i[index new create show edit update destroy] do
       post :apply_template, on: :member
       resources :sections, only: %i[new create edit update destroy] do
-        post :move, on: :member
+        patch :reorder, on: :collection
         post :toggle, on: :member
         post :duplicate, on: :member
       end

@@ -9,7 +9,7 @@ module RecordingStudioPages
       before_action :require_admin_access!
 
       helper_method :page_recording, :section_recordings, :page_builder_page_path, :section_definitions,
-                    :add_section_form_id
+                    :add_section_form_id, :section_action_form_id
 
       private
 
@@ -24,6 +24,10 @@ module RecordingStudioPages
 
       def add_section_form_id(definition)
         "add-section-#{page_recording.id}-#{definition.key}"
+      end
+
+      def section_action_form_id(recording, action)
+        "section-#{recording.id}-#{action}"
       end
 
       def load_editor

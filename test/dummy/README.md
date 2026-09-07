@@ -8,7 +8,7 @@ This Rails app exists to validate the Recording Studio Page Builder in a real ho
 - `Current.actor` wiring for Recording Studio events
 - Workspace roots plus seeded page and section recordings
 - Public homepage at `/` from a published page recording
-- Staff page composition at `/recording_studio_pages/admin/pages`. Add a section from the editor dropdown.
+- Staff page composition at `/recording_studio_pages/admin/pages`. Add a section from the editor dropdown. Drag sections to reorder.
 - RS Admin Pages section at `/admin`
 - Recording Studio default layout, FlatPack assets (including `flat_pack/application`), and Tailwind source scanning via `tmp/tailwind` mirrors. Public pages use a full-width layout; Devise sign-in stays `max-w-md`.
 - Dummy-only `/docs/*` and `/studio` pages for host-app sandboxing

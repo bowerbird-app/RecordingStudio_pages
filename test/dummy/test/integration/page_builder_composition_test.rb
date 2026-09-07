@@ -195,6 +195,27 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
     assert_not_equal original.id, copy.id
   end
 
+  test "moving a section uses Recording Studio Orderable position" do
+    page_recording = create_page!(parent_recording: @root, title: "Order", actor: @actor)
+    first = add_section!(page_recording: page_recording, section_type: "hero", content: { title: "First" }, actor: @actor)
+    second = add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: { title: "Second" },
+      actor: @actor
+    )
+
+    RecordingStudioPages::Services::MoveSection.call(
+      page_recording: page_recording,
+      section_recording: second,
+      to_index: 0,
+      actor: @actor
+    ).value!
+
+    ordered = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
+    assert_equal [second.id, first.id], ordered.map(&:id)
+  end
+
   test "page recordable does not store SEO fields" do
     page_recording = create_page!(parent_recording: @root, title: "SEO", actor: @actor)
     columns = page_recording.recordable.class.column_names
