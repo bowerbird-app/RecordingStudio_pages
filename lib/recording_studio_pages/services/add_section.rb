@@ -20,7 +20,11 @@ module RecordingStudioPages
           errors = definition.validate_payload(content: content, settings: settings)
           raise InvalidSectionPayload, errors.join(", ") if errors.any?
 
-          recording = @page_recording.record(RecordingStudioPages::Section, actor: actor) do |section|
+          recording = root_for(@page_recording).record(
+            RecordingStudioPages::Section,
+            actor: actor,
+            parent_recording: @page_recording
+          ) do |section|
             section.section_type = definition.key
             section.content = content
             section.settings = settings
@@ -38,11 +42,11 @@ module RecordingStudioPages
       end
 
       def append_order!(recording)
-        return unless @page_recording.respond_to?(:recording_studio_orderable_children)
+        return unless recording.has_attribute?(:recording_studio_orderable_position)
 
-        ids = @page_recording.recording_studio_orderable_children.map { |child| child.id.to_s }
-        ids << recording.id.to_s unless ids.include?(recording.id.to_s)
-        @page_recording.recording_studio_orderable_reorder!(ordered_recording_ids: ids, actor: actor)
+        siblings = @page_recording.child_recordings.where(recordable_type: "RecordingStudioPages::Section")
+        max_position = siblings.maximum(:recording_studio_orderable_position)
+        recording.update!(recording_studio_orderable_position: max_position ? max_position + 1 : 0)
       end
     end
   end

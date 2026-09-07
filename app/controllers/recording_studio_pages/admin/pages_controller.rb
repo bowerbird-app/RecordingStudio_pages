@@ -3,6 +3,8 @@
 module RecordingStudioPages
   module Admin
     class PagesController < BaseController
+      before_action :require_admin_write_access!, only: %i[create update destroy apply_template]
+
       def index
         @page_recordings = page_scope
       end
@@ -88,10 +90,27 @@ module RecordingStudioPages
       end
 
       def create_parent_recording
-        resolved = current_root_recording if respond_to?(:current_root_recording, true)
-        resolved || RecordingStudio::Recording.where(parent_recording_id: nil, trashed_at: nil)
-                                              .where.not(recordable_type: "AdminRoot")
-                                              .first
+        switched_content_root || first_workspace_root
+      end
+
+      def switched_content_root
+        return unless respond_to?(:current_root_recording, true)
+
+        recording = current_root_recording
+        return if recording.blank?
+        return recording if %w[Workspace Folder].include?(recording.recordable_type)
+
+        nil
+      rescue StandardError
+        nil
+      end
+
+      def first_workspace_root
+        RecordingStudio::Recording.find_by(
+          parent_recording_id: nil,
+          trashed_at: nil,
+          recordable_type: "Workspace"
+        )
       end
 
       def unknown_sections

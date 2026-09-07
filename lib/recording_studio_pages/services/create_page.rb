@@ -13,7 +13,8 @@ module RecordingStudioPages
 
       def perform
         with_rescue do
-          recording = @parent_recording.record(RecordingStudioPages::Page, actor: actor) do |page|
+          root = root_for(@parent_recording)
+          recording = root.record(RecordingStudioPages::Page, actor: actor, parent_recording: @parent_recording) do |page|
             page.title = @title.to_s
             page.homepage = @homepage
             page.template_key = @template_key.to_s.presence

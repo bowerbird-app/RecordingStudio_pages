@@ -7,6 +7,7 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
     @actor = create_actor!("composition@example.com")
     Current.actor = @actor
     @root = create_workspace_root!("Composition Workspace #{SecureRandom.hex(4)}")
+    grant_admin!(@root, @actor)
   end
 
   teardown do

@@ -21,10 +21,12 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
 
   test "staff can create a page, add a section, reorder, disable, and delete" do
     post recording_studio_pages.admin_pages_path, params: { page: { title: "Campaign", homepage: "0" } }
+    assert_response :redirect
 
     page_recording = RecordingStudio::Recording.order(:created_at).where(
       recordable_type: "RecordingStudioPages::Page"
     ).last
+    assert_not_nil page_recording
     assert_redirected_to recording_studio_pages.admin_page_path(page_recording)
 
     post recording_studio_pages.admin_page_sections_path(page_recording), params: {

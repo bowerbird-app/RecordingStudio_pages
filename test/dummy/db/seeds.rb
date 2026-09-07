@@ -56,6 +56,10 @@ begin
 
   folder_recording = find_or_record_child.call(folder, root_recording, root_recording)
 
+  [root_recording, accessible_root_recording, private_root_recording, admin_root_recording].each do |recording|
+    grant_admin_access.call(recording, user)
+  end
+
   homepage_recordable = RecordingStudioPages::Page.find_by(title: "Home")
   homepage_recording = homepage_recordable && RecordingStudio::Recording.find_by(
     recordable: homepage_recordable,
@@ -100,10 +104,6 @@ begin
   end
 
   publish_page.call(about_recording, "about", user)
-
-  [root_recording, accessible_root_recording, private_root_recording, admin_root_recording].each do |recording|
-    grant_admin_access.call(recording, user)
-  end
 
   puts "Seeded: admin@admin.com / Password"
   puts "Seeded: Workspace '#{workspace.name}' with homepage '#{homepage_recording.recordable.title}'"

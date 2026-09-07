@@ -7,7 +7,6 @@ module RecordingStudioPages
 
       before_action :authenticate_user!, raise: false
       before_action :require_admin_access!
-      before_action :require_admin_write_access!, only: %i[create update destroy apply_template move toggle]
 
       helper_method :page_recording, :section_recordings
 
@@ -59,16 +58,6 @@ module RecordingStudioPages
 
       def section_recordings
         Composition.section_recordings_for(page_recording)
-      end
-
-      def current_root_recording
-        return page_recording.root_recording || page_recording if params[:id].present? || params[:page_id].present?
-        return unless respond_to?(:current_workspace, true)
-
-        workspace = send(:current_workspace) if respond_to?(:current_workspace, true)
-        RecordingStudio.root_recording_for(workspace) if workspace
-      rescue StandardError
-        nil
       end
     end
   end

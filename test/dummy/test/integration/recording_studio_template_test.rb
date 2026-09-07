@@ -25,6 +25,8 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert connection.table_exists?(:recording_studio_pages_sections)
     assert connection.column_exists?(:recording_studio_recordings, :recording_studio_orderable_position)
     assert connection.table_exists?(:recording_studio_publishable_publishables)
+    assert connection.table_exists?(:recording_studio_attachable_attachments)
+    refute connection.table_exists?(:pages)
     refute connection.table_exists?(:recording_studio_access_boundaries)
     refute connection.table_exists?(:recording_studio_device_sessions)
   end

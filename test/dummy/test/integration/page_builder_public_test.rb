@@ -9,6 +9,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     @actor = create_actor!("public-pages@example.com")
     Current.actor = @actor
     @root = create_workspace_root!("Public Workspace #{SecureRandom.hex(4)}")
+    grant_admin!(@root, @actor)
   end
 
   teardown do

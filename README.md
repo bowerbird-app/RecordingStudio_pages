@@ -60,7 +60,9 @@ Workspace (root recording)
 
 There is no `HeroSection` table. `section_type: "hero"` is a key on the generic section recording. A new section type is a registry entry, not a migration.
 
-Order lives on `recording_studio_recordings.recording_studio_orderable_position` through RS Orderable. Publication, slug, and SEO live on the Publishable child. Do not add those columns to `recording_studio_pages_pages`.
+`Recording#record` parents a new child under the workspace root unless you pass `parent_recording:`. Page Builder services always pass it.
+
+Order lives on `recording_studio_recordings.recording_studio_orderable_position` through RS Orderable. Publication, slug, and SEO live on the RS Publishable child. Do not add those columns to `recording_studio_pages_pages`.
 
 ## Register a section
 
@@ -149,8 +151,8 @@ These are limits in sibling gems. This gem documents them instead of forking the
 3. **RS Admin is a hub of screens and widgets**, not a nested canvas for ordered sections.
 4. **Flatpack has no sortable-list primitive.** Admin uses Move up and Move down.
 5. **Action Text assumes mutable records.** Section copy is JSON plus `sanitize`.
-6. **Attachable is not wired.** Hero `image_url` is a URL, not an attachment recording.
+6. **Attachable is required by Publishable 0.2.1** even when you only want slug and status. Hero `image_url` is still a URL field, not an attachment recording.
 
 ## Version
 
-0.3.0. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.6.0`, Publishable `v0.2.1`, Orderable `v0.2.1`, Admin `v2.0.2`, FlatPack `v0.1.133`.
+0.3.0. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.6.0`, Attachable `0.4.0`, Publishable `v0.2.1`, Orderable `v0.2.1`, Admin `v2.0.2`, FlatPack `v0.1.133`.
