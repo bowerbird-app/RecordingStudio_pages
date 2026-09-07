@@ -86,10 +86,13 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
       content: { title: "Later" },
       actor: @actor
     )
-    unknown.recordable.update_columns(section_type: "from_the_future", content: { "title" => "Keep me" })
+    unknown.root_recording.revise(unknown, actor: @actor) do |section|
+      section.section_type = "from_the_future"
+      section.content = { "title" => "Keep me" }
+    end
 
     rendered = RecordingStudioPages::Renderer.call(page_recording.reload)
-    leftover = RecordingStudioPages::Section.find(unknown.recordable.id)
+    leftover = RecordingStudioPages::Section.find(unknown.reload.recordable_id)
 
     assert_equal [known.id], rendered.map { |item| item.recording.id }
     assert_equal "from_the_future", leftover.section_type

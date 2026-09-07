@@ -40,12 +40,16 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     accessible_workspace = Workspace.find_by!(name: "Client Workspace")
     private_workspace = Workspace.find_by!(name: "Private Workspace")
     folder = Folder.find_by!(name: "Product Docs")
-    homepage = RecordingStudioPages::Page.find_by!(title: "Home")
     root_recording = RecordingStudio::Recording.find_by!(recordable: workspace)
     accessible_root_recording = RecordingStudio::Recording.find_by!(recordable: accessible_workspace)
     private_root_recording = RecordingStudio::Recording.find_by!(recordable: private_workspace)
     folder_recording = RecordingStudio::Recording.find_by!(recordable: folder)
-    homepage_recording = RecordingStudio::Recording.find_by!(recordable: homepage)
+    homepage_recording = RecordingStudio::Recording.where(
+      recordable_type: "RecordingStudioPages::Page",
+      trashed_at: nil
+    ).includes(:recordable).find { |recording| recording.recordable&.title == "Home" }
+    assert_not_nil homepage_recording
+    homepage = homepage_recording.recordable
 
     assert_nil Current.actor
     assert_nil root_recording.parent_recording_id

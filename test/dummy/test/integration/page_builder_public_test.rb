@@ -35,7 +35,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     add_section!(
       page_recording: page_recording,
       section_type: "rich_text",
-      content: { title: "Off", body: "hidden" },
+      content: { title: "Off", body: "disabled_section_copy" },
       enabled: false,
       actor: @actor
     )
@@ -52,7 +52,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Welcome home"
     assert_includes response.body, "Publish when ready"
-    refute_includes response.body, "hidden"
+    refute_includes response.body, "disabled_section_copy"
   end
 
   test "published inner page is public at /pages/:uuid/:slug" do

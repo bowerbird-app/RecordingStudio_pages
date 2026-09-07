@@ -26,6 +26,12 @@ grant_admin_access = lambda do |recording, actor|
   end
 end
 
+find_page_recording = lambda do |title|
+  RecordingStudio::Recording.where(recordable_type: "RecordingStudioPages::Page", trashed_at: nil)
+                            .includes(:recordable)
+                            .find { |recording| recording.recordable&.title == title }
+end
+
 publish_page = lambda do |page_recording, slug, actor|
   RecordingStudioPublishable::Services::Publishables::Update.call(
     parent_recording: page_recording,
@@ -60,11 +66,7 @@ begin
     grant_admin_access.call(recording, user)
   end
 
-  homepage_recordable = RecordingStudioPages::Page.find_by(title: "Home")
-  homepage_recording = homepage_recordable && RecordingStudio::Recording.find_by(
-    recordable: homepage_recordable,
-    trashed_at: nil
-  )
+  homepage_recording = find_page_recording.call("Home")
 
   unless homepage_recording
     homepage_recording = RecordingStudioPages::Services::CreatePage.call(
@@ -82,11 +84,7 @@ begin
 
   publish_page.call(homepage_recording, "home", user)
 
-  about_recordable = RecordingStudioPages::Page.find_by(title: "About")
-  about_recording = about_recordable && RecordingStudio::Recording.find_by(
-    recordable: about_recordable,
-    trashed_at: nil
-  )
+  about_recording = find_page_recording.call("About")
 
   unless about_recording
     about_recording = RecordingStudioPages::Services::CreatePage.call(
