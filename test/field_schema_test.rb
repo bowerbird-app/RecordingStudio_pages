@@ -44,4 +44,15 @@ class FieldSchemaTest < Minitest::Test
     assert_empty schema.validate(image_url: "/hero.png")
     assert_empty schema.validate(image_url: "https://example.com/hero.png")
   end
+
+  def test_required_fields_and_recording_ids
+    schema = RecordingStudioPages::FieldSchema.new(
+      title: { type: :string, required: true },
+      projects: :recording_ids
+    )
+
+    assert_includes schema.validate({}), "title is required"
+    assert_equal %w[a b], schema.read(projects: "a\nb")["projects"]
+    assert_equal true, schema.catalog[:title][:required]
+  end
 end

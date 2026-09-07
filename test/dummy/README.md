@@ -35,7 +35,7 @@ Then open the app and sign in with:
 - `/studio` - dummy sandbox
 - `/recording_studio` - redirects to `/studio` while the mounted Recording Studio engine stays available under that prefix for non-root routes
 - `/recording_studio_pages/admin/pages` - page builder
-- `/admin` - RS Admin hub
+- `/admin` - RS Admin hub. Switch the current root to **Admin** first. The hub returns 403 while a workspace is selected.
 - `/users/sign_in` - Devise sign-in page
 - `/docs/install`, `/docs/config`, `/docs/recordable_types`, `/docs/recordings_tree`, `/docs/gem_views`, `/docs/methods` - dummy-only starter pages
 - `/up` - Rails health check

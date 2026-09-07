@@ -3,7 +3,7 @@
 module RecordingStudioPages
   module Admin
     class SectionsController < BaseController
-      before_action :require_admin_write_access!, only: %i[create update destroy move toggle]
+      before_action :require_admin_write_access!, only: %i[create update destroy move toggle duplicate]
 
       def new
         @definition = RecordingStudioPages.section(params[:section_type]) if params[:section_type].present?
@@ -80,6 +80,16 @@ module RecordingStudioPages
           actor: current_admin_actor
         ).value!
         redirect_to admin_page_path(page_recording)
+      end
+
+      def duplicate
+        result = Services::DuplicateSection.call(
+          section_recording: section_recording,
+          actor: current_admin_actor
+        )
+        return redirect_to(admin_page_path(page_recording), alert: result.error) if result.failure?
+
+        redirect_to admin_page_path(page_recording), notice: "Section copied."
       end
 
       private

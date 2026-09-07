@@ -69,7 +69,8 @@ module RecordingStudioPages
       when :list
         Array(value).map { |item| coerce_item(spec[:item] || {}, item) }
       when :recording_ids
-        Array(value).map(&:to_s).reject(&:blank?)
+        ids = value.is_a?(String) ? value.split(/[\s,]+/) : Array(value)
+        ids.map(&:to_s).reject(&:blank?)
       when :attachment
         value.to_s.presence
       else
@@ -98,12 +99,35 @@ module RecordingStudioPages
     end
 
     def validate_value(key, spec, value)
+      return ["#{key} is required"] if spec[:required] && blank_value?(spec, value)
+
       type = spec[:type].to_sym
       return ["#{key} must be a URL"] if type == :url && value.present? && !safe_url?(value)
       return ["#{key} must be true or false"] if type == :boolean && !(value.nil? || [true, false, "true", "false", "1", "0"].include?(value))
       return ["#{key} must be an integer"] if type == :integer && value.present? && Integer(value, exception: false).nil?
       return validate_link(key, value) if type == :link
       return validate_list(key, spec, value) if type == :list
+      return validate_recording_ids(key, value) if type == :recording_ids
+
+      []
+    end
+
+    def blank_value?(spec, value)
+      case spec[:type].to_sym
+      when :boolean
+        false
+      when :list, :recording_ids
+        Array(value).empty?
+      when :link
+        link = coerce_link(value)
+        link["text"].blank? && link["url"].blank?
+      else
+        value.nil? || value.to_s.strip.empty?
+      end
+    end
+
+    def validate_recording_ids(key, value)
+      return ["#{key} must be a list of recording ids"] unless value.nil? || value.is_a?(Array)
 
       []
     end
@@ -137,6 +161,7 @@ module RecordingStudioPages
       catalog = { type: spec[:type].to_s }
       catalog[:item] = self.class.new(spec[:item]).catalog if spec[:item]
       catalog[:default] = spec[:default] if spec.key?(:default)
+      catalog[:required] = true if spec[:required]
       catalog
     end
   end

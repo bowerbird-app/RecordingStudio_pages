@@ -51,6 +51,22 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_equal %w[hero], remaining.map { |recording| recording.recordable.section_type }
   end
 
+  test "staff can duplicate a section" do
+    page_recording = create_page!(parent_recording: @root, title: "Dup", actor: @actor)
+    section = add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Copy me" },
+      actor: @actor
+    )
+
+    post recording_studio_pages.duplicate_admin_page_section_path(page_recording, section)
+    assert_response :redirect
+
+    sections = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
+    assert_equal %w[hero hero], sections.map { |recording| recording.recordable.section_type }
+  end
+
   test "visitors cannot mutate pages" do
     sign_out @actor
     page_recording = create_page!(parent_recording: @root, title: "Locked", actor: @actor)
@@ -69,6 +85,37 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     sign_in stranger
 
     get recording_studio_pages.admin_pages_path
+    assert_response :forbidden
+  end
+
+  test "the RS Admin hub opens after switching to the Admin root" do
+    patch "/recording_studio_root_switchable/v1/root_switch", params: {
+      scope: "all_workspaces",
+      root_switch: {
+        root_recording_id: @admin_root.id,
+        return_to: "/studio"
+      }
+    }
+    follow_redirect!
+
+    get "/admin"
+
+    assert_response :success
+    assert_includes response.body, "Pages"
+  end
+
+  test "the RS Admin hub is forbidden while the current root is a workspace" do
+    patch "/recording_studio_root_switchable/v1/root_switch", params: {
+      scope: "all_workspaces",
+      root_switch: {
+        root_recording_id: @root.id,
+        return_to: "/studio"
+      }
+    }
+    follow_redirect!
+
+    get "/admin"
+
     assert_response :forbidden
   end
 end

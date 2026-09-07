@@ -9,6 +9,7 @@ RecordingStudioPages::Engine.routes.draw do
       resources :sections, only: %i[new create edit update destroy] do
         post :move, on: :member
         post :toggle, on: :member
+        post :duplicate, on: :member
       end
     end
   end

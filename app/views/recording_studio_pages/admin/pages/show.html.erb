@@ -3,7 +3,7 @@
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
     title: @page_recording.recordable.title,
-    subtitle: @page_recording.recordable.homepage? ? "This is the public home page." : nil,
+    subtitle: @editor_subtitle,
     variant: :h1
   ) %>
 
@@ -45,6 +45,7 @@
           <%= button_to "Move up", move_admin_page_section_path(@page_recording, recording, direction: "up"), method: :post, class: "inline-flex" %>
           <%= button_to "Move down", move_admin_page_section_path(@page_recording, recording, direction: "down"), method: :post, class: "inline-flex" %>
           <%= render FlatPack::Button::Component.new(text: "Edit", href: edit_admin_page_section_path(@page_recording, recording), style: :secondary, size: :sm) if definition %>
+          <%= button_to "Copy", duplicate_admin_page_section_path(@page_recording, recording), method: :post %>
           <%= button_to(recordable.enabled? ? "Turn off" : "Turn on", toggle_admin_page_section_path(@page_recording, recording), method: :post) %>
           <%= button_to "Remove", admin_page_section_path(@page_recording, recording), method: :delete, data: { turbo_confirm: "Remove this section?" } %>
         </div>

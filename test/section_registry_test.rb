@@ -89,6 +89,20 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "marketing_home", RecordingStudioPages.template(:marketing_home).key
   end
 
+  def test_catalog_exposes_sections_and_templates_for_agents
+    RecordingStudioPages::BuiltIns.register!
+
+    catalog = RecordingStudioPages.catalog
+    hero = catalog[:sections].find { |entry| entry[:key] == "hero" }
+
+    assert_equal "hero", hero[:key]
+    assert_equal "Hero", hero[:name]
+    assert_includes hero[:variants], "split_image"
+    assert_equal "string", hero[:fields][:title][:type]
+    assert_equal true, hero[:fields][:title][:required]
+    assert catalog[:templates].any? { |entry| entry[:key] == "marketing_home" }
+  end
+
   def test_duplicate_template_raises
     RecordingStudioPages.register_template(key: :probe, name: "Probe", sections: [], source: "pages")
 

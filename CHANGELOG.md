@@ -18,7 +18,9 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 - Services for create, revise, add, reorder, toggle, remove, apply template, and homepage uniqueness.
 - Engine admin under `/recording_studio_pages/admin/pages` plus an RS Admin Pages section.
 - Public homepage at `/` and Publishable public paths at `/pages/:uuid/:slug`.
-- Dummy host wiring for Publishable `v0.2.1`, Orderable `v0.2.1`, and Admin `v2.0.2`.
+- Duplicate a section into another generic section recording.
+- Required field flags and `recording_ids` in the section schema catalog.
+- Dummy root switcher includes the Admin root so `/admin` can open after switching to it.
 
 ### Changed
 - Gem identity is `recording_studio_pages` `0.3.0`. Homepage is `https://github.com/bowerbird-app/RecordingStudio_pages`.
@@ -89,9 +91,10 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/recording_studio_pages/compare/v0.2.1...HEAD
-[0.2.1]: https://github.com/bowerbird-app/recording_studio_pages/releases/tag/v0.2.1
-[0.2.0]: https://github.com/bowerbird-app/recording_studio_pages/releases/tag/v0.2.0
-[0.1.2]: https://github.com/bowerbird-app/recording_studio_pages/releases/tag/v0.1.2
-[0.1.1]: https://github.com/bowerbird-app/recording_studio_pages/releases/tag/v0.1.1
-[0.1.0]: https://github.com/bowerbird-app/recording_studio_pages/releases/tag/v0.1.0
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.2.1...v0.3.0
+[0.2.1]: https://github.com/bowerbird-app/RecordingStudio_pages/releases/tag/v0.2.1
+[0.2.0]: https://github.com/bowerbird-app/RecordingStudio_pages/releases/tag/v0.2.0
+[0.1.2]: https://github.com/bowerbird-app/RecordingStudio_pages/releases/tag/v0.1.2
+[0.1.1]: https://github.com/bowerbird-app/RecordingStudio_pages/releases/tag/v0.1.1
+[0.1.0]: https://github.com/bowerbird-app/RecordingStudio_pages/releases/tag/v0.1.0

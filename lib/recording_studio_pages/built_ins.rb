@@ -68,7 +68,7 @@ module RecordingStudioPages
         component: "RecordingStudioPages::Sections::HeroComponent",
         fields: {
           eyebrow: :string,
-          title: :string,
+          title: { type: :string, required: true },
           body: :rich_text,
           image_url: :url,
           primary_action: :link
@@ -90,7 +90,7 @@ module RecordingStudioPages
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::RichTextComponent",
         fields: {
-          title: :string,
+          title: { type: :string, required: true },
           body: :rich_text
         },
         settings: {
@@ -108,7 +108,7 @@ module RecordingStudioPages
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::ImageTextComponent",
         fields: {
-          title: :string,
+          title: { type: :string, required: true },
           body: :rich_text,
           image_url: :url,
           primary_action: :link
@@ -149,7 +149,7 @@ module RecordingStudioPages
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::FeatureGridComponent",
         fields: {
-          title: :string,
+          title: { type: :string, required: true },
           body: :text,
           items: {
             type: :list,
@@ -171,7 +171,7 @@ module RecordingStudioPages
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::CallToActionComponent",
         fields: {
-          title: :string,
+          title: { type: :string, required: true },
           body: :text,
           primary_action: :link
         },

@@ -79,8 +79,9 @@ RecordingStudioPages.configure do |config|
       source: "host",
       component: "Host::TeamGridComponent",
       fields: {
-        title: :string,
-        people: { type: :list, item: { name: :string, role: :string } }
+        title: { type: :string, required: true },
+        people: { type: :list, item: { name: :string, role: :string } },
+        members: :recording_ids
       },
       settings: { variant: :string },
       variants: %w[photos names_only],
@@ -92,9 +93,13 @@ RecordingStudioPages.configure do |config|
 end
 ```
 
+`fields.title` may be `:string` or `{ type: :string, required: true }`. `recording_ids` stores Recording ids. Resolve the actual records at render time, or with `data:`. Do not copy domain records into section JSON.
+
 Duplicate keys raise `RecordingStudioPages::DuplicateRegistration`. Unknown types do not crash render or delete data. They stay on the page until you register the type again.
 
 `data:` is a proc. Use it when the section reads live records instead of only JSON. If the proc raises, render skips that payload and still draws the saved content.
+
+`RecordingStudioPages.catalog` lists every registered section and template, including field types, required flags, settings, and variants. That catalog is the machine-readable surface for future API and MCP tooling.
 
 ## Register a template
 
@@ -122,9 +127,19 @@ Rich text is JSON plus `sanitize`. Action Text expects a mutable record, so this
 
 ## Admin
 
-RS Admin gets a Pages section. The actual editor is under `/recording_studio_pages/admin/pages`. Reorder is Move up and Move down. Flatpack has no sortable-list primitive.
+RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. Reorder is Move up and Move down. Flatpack has no sortable-list primitive. Copy duplicates a section into another generic section recording.
+
+The editor is also the staff preview. Unpublished pages render there. They stay private on public routes.
 
 Writes need Accessible `:edit` on the configured admin root. Reads need `:view`.
+
+`/admin` is the RS Admin hub. Switch the current root to **Admin** first. RS Admin forbids the hub while the current root is a workspace. The page builder editor does not require that switch.
+
+Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`.
+
+## Shared sections later
+
+A future shared section can be a Section recording owned outside the page, referenced by a local child. This gem does not add a second relationship system. Do not store a second copy of global CTA copy in every page. The current tree already allows a section to live under a different parent; a later `section_type` can point at that recording through Recordable relationships.
 
 ## Dummy app
 

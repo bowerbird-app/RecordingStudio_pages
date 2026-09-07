@@ -130,6 +130,57 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
     assert_equal second.id, RecordingStudioPages::Composition.homepage_recording(root_recording: @root).id
   end
 
+  test "data-backed sections resolve live records without copying them into content" do
+    RecordingStudioPages.register_section(
+      key: :recent_workspaces,
+      name: "Recent workspaces",
+      category: "data",
+      component: "RecordingStudioPages::Sections::RichTextComponent",
+      fields: { title: :string },
+      data: ->(_recording, _content, _settings, _context) { Workspace.order(:name).limit(2).to_a }
+    )
+    page_recording = create_page!(parent_recording: @root, title: "Data", actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "recent_workspaces",
+      content: { title: "Live workspaces" },
+      actor: @actor
+    )
+
+    rendered = RecordingStudioPages::Renderer.call(page_recording.reload)
+
+    assert_equal "recent_workspaces", rendered.first.recording.recordable.section_type
+    assert_empty rendered.first.recording.recordable.content["workspaces"] || []
+    assert rendered.first.data.is_a?(Array)
+    refute_empty rendered.first.data
+    assert rendered.first.data.all? { |record| record.is_a?(Workspace) }
+  ensure
+    RecordingStudioPages.reset!
+    RecordingStudioPages::BuiltIns.register!
+  end
+
+  test "duplicating a section creates another generic section recording" do
+    page_recording = create_page!(parent_recording: @root, title: "Copy", actor: @actor)
+    original = add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Original hero" },
+      settings: { variant: "centered" },
+      actor: @actor
+    )
+
+    copy = RecordingStudioPages::Services::DuplicateSection.call(
+      section_recording: original,
+      actor: @actor
+    ).value!
+
+    sections = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
+    assert_equal 2, sections.length
+    assert_equal "hero", copy.recordable.section_type
+    assert_equal "Original hero", copy.recordable.content["title"]
+    assert_not_equal original.id, copy.id
+  end
+
   test "page recordable does not store SEO fields" do
     page_recording = create_page!(parent_recording: @root, title: "SEO", actor: @actor)
     columns = page_recording.recordable.class.column_names

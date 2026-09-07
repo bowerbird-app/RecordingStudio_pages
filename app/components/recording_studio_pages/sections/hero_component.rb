@@ -14,6 +14,7 @@ module RecordingStudioPages
               [
                 eyebrow,
                 helpers.render(FlatPack::PageTitle::Component.new(title: title, subtitle: body, variant: :h1)),
+                image_tag,
                 action_button
               ].compact
             )
@@ -43,6 +44,13 @@ module RecordingStudioPages
         return if content["eyebrow"].blank?
 
         helpers.content_tag(:p, content["eyebrow"], class: "text-sm font-medium")
+      end
+
+      def image_tag
+        url = content["image_url"].to_s
+        return if url.blank?
+
+        helpers.image_tag(url, alt: title, class: "max-w-full")
       end
 
       def action_button
