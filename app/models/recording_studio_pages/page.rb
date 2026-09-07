@@ -15,10 +15,16 @@ module RecordingStudioPages
 
     self.table_name = "recording_studio_pages_pages"
 
+    parent_types = if RecordingStudioPages.respond_to?(:page_parent_types)
+                     RecordingStudioPages.page_parent_types
+                   else
+                     %w[Workspace Folder]
+                   end
+
     recording_studio_recordable label: "Page",
                                 plural_label: "Pages",
                                 root: false,
-                                allowed_parent_types: RecordingStudioPages.page_parent_types
+                                allowed_parent_types: parent_types
 
     if defined?(RecordingStudio::Capabilities::Publishable)
       include RecordingStudio::Capabilities::Publishable.to(

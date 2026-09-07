@@ -261,5 +261,8 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes index, "description:"
     refute_includes index, "message:"
     assert_includes edit, "Remove page"
+
+    page_model = File.read(File.expand_path("../app/models/recording_studio_pages/page.rb", __dir__))
+    assert_includes page_model, "respond_to?(:page_parent_types)"
   end
 end
