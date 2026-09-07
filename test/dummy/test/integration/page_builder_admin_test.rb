@@ -139,6 +139,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "More"
     assert_includes response.body, "data-controller=\"recording-studio-pages--section-list\""
     assert_includes response.body, "flat-pack--list-orderable"
+    assert_includes response.body, "list-decimal"
     refute_includes response.body, "Move up"
     refute_includes response.body, "Move down"
 

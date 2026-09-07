@@ -52,7 +52,8 @@
         orderable_method: :patch,
         param_uuid_name: "moving_recording_id",
         param_target_position_name: "target_position",
-        divider: true
+        divider: true,
+        class: "list-decimal pl-6"
       ) do %>
         <% section_recordings.each do |recording| %>
           <%= render "recording_studio_pages/admin/pages/section_row", recording: recording %>
