@@ -246,10 +246,14 @@ class RecordingStudioPagesTest < Minitest::Test
     editor = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/_editor.html.erb", __dir__))
     index = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/index.html.erb", __dir__))
     edit = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/edit.html.erb", __dir__))
+    template_dropdown = File.read(
+      File.expand_path("../app/views/recording_studio_pages/admin/pages/_add_template_dropdown.html.erb", __dir__)
+    )
 
     refute_includes editor, "orderable_url"
-    assert_includes editor, "Use a template"
+    assert_includes editor, "add_template_dropdown"
     assert_includes editor, 'title: "Preview"'
+    assert_includes template_dropdown, "Use a template"
 
     persist = File.read(File.expand_path("../app/javascript/recording_studio_pages/controllers/section_list_controller.js", __dir__))
     assert_includes persist, "!response.ok"

@@ -38,7 +38,9 @@ module RecordingStudioPages
         load_editor
       end
 
-      def edit; end
+      def edit
+        page_recording
+      end
 
       def update
         result = Services::RevisePage.call(

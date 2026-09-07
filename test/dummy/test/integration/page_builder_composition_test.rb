@@ -94,18 +94,19 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
       actor: @actor
     )
     warnings = []
+    previous_logger = Rails.logger
     logger = ActiveSupport::Logger.new(StringIO.new)
     logger.define_singleton_method(:warn) { |message| warnings << message.to_s }
+    Rails.logger = logger
 
-    rendered = Rails.stub(:logger, logger) do
-      RecordingStudioPages::Renderer.call(page_recording.reload)
-    end
+    rendered = RecordingStudioPages::Renderer.call(page_recording.reload)
 
     assert_equal 1, rendered.length
     assert_nil rendered.first.data
     assert_equal "Still draws", rendered.first.content["title"]
     assert(warnings.any? { |message| message.include?("broken_data") && message.include?("boom") })
   ensure
+    Rails.logger = previous_logger if previous_logger
     RecordingStudioPages.reset!
     RecordingStudioPages::BuiltIns.register!
   end
