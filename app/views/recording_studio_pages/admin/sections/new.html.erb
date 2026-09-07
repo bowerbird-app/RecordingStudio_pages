@@ -29,7 +29,7 @@
     </div>
   <% else %>
     <%= render "recording_studio_pages/admin/sections/form",
-               url: admin_page_sections_path(page_id: @page_recording.id),
+               url: admin_page_sections_path(page_id: page_recording.id),
                method: :post,
                definition: @definition,
                recordable: nil %>

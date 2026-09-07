@@ -4,6 +4,7 @@ module RecordingStudioPages
   module Admin
     class SectionsController < BaseController
       before_action :require_admin_write_access!, only: %i[create update destroy move toggle duplicate]
+      before_action :page_recording
 
       def new
         @definition = RecordingStudioPages.section(params[:section_type]) if params[:section_type].present?

@@ -78,6 +78,16 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Add section"
   end
 
+  test "staff can open a generated hero editor from the registry" do
+    page_recording = create_page!(parent_recording: @root, title: "Hero form", actor: @actor)
+
+    get recording_studio_pages.new_admin_page_section_path(page_id: page_recording.id, section_type: "hero")
+
+    assert_response :success
+    assert_includes response.body, "Title"
+    assert_includes response.body, "Layout"
+  end
+
   test "visitors cannot mutate pages" do
     sign_out @actor
     page_recording = create_page!(parent_recording: @root, title: "Locked", actor: @actor)
