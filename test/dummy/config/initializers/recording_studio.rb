@@ -6,7 +6,9 @@ RecordingStudio.configure do |config|
     "Folder",
     "AdminRoot",
     "RecordingStudioPages::Page",
-    "RecordingStudioPages::Section"
+    "RecordingStudioPages::Section",
+    "RecordingStudioPublishable::Publishable",
+    "RecordingStudioAttachable::Attachment"
   ]
   config.require_recordable_declarations = true
   config.app_name = "Page Builder" if config.respond_to?(:app_name=)

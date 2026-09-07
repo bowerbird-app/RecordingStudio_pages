@@ -6,10 +6,11 @@ module RecordingStudioPages
 
     initializer "recording_studio_pages.optional_dependencies", before: :set_routes_reloader do
       %w[
+        recording_studio_accessible
+        recording_studio_attachable
         recording_studio_publishable
         recording_studio_orderable
         recording_studio_admin
-        recording_studio_accessible
       ].each do |name|
         require name
       rescue LoadError

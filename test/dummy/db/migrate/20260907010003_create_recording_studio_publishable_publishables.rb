@@ -14,11 +14,14 @@ class CreateRecordingStudioPublishablePublishables < ActiveRecord::Migration[8.1
       t.string :meta_robots
       t.string :social_title
       t.text :social_description
+      t.uuid :social_image_attachment_recording_id
       t.datetime :created_at, null: false
     end
 
     add_index :recording_studio_publishable_publishables, :slug, name: "index_rs_publishables_on_slug"
     add_index :recording_studio_publishable_publishables, %i[status publish_at unpublish_at],
               name: "index_rs_publishables_on_state_window"
+    add_index :recording_studio_publishable_publishables, :social_image_attachment_recording_id,
+              name: "index_rs_publishables_on_social_image_attachment_recording_id"
   end
 end

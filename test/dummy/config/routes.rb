@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   mount RecordingStudio::Engine, at: "/recording_studio"
   mount RecordingStudioRootSwitchable::Engine, at: "/recording_studio_root_switchable"
   mount RecordingStudioAccessible::Engine, at: "/admin/access"
+  mount RecordingStudioAttachable::Engine, at: "/recording_studio_attachable"
   mount RecordingStudioPages::Engine, at: "/recording_studio_pages"
   mount RecordingStudioPublishable::Engine, at: "/"
   recording_studio_admin_for :admin, at: "/admin", root_section: :pages

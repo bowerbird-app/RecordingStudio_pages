@@ -26,6 +26,15 @@ GIT
       recording_studio_accessible (~> 0.6)
 
 GIT
+  remote: https://github.com/bowerbird-app/RecordingStudio_attachable.git
+  revision: d0a845eb1ad1fea8a562b81ecf3bd8f8b08676ef
+  tag: 0.4.0
+  specs:
+    recording_studio_attachable (0.4.0)
+      rails (~> 8.1.0)
+      recording_studio (~> 4.2)
+
+GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_orderable.git
   revision: dcbab729e7f3dd39fe6353517e0296b643ecb33e
   tag: v0.2.1
@@ -498,6 +507,7 @@ DEPENDENCIES
   recording_studio!
   recording_studio_accessible!
   recording_studio_admin!
+  recording_studio_attachable!
   recording_studio_orderable!
   recording_studio_pages!
   recording_studio_publishable!
@@ -629,6 +639,7 @@ CHECKSUMS
   recording_studio (4.2.0)
   recording_studio_accessible (0.6.0)
   recording_studio_admin (2.0.2)
+  recording_studio_attachable (0.4.0)
   recording_studio_orderable (0.2.1)
   recording_studio_pages (0.3.0)
   recording_studio_publishable (0.2.1)
