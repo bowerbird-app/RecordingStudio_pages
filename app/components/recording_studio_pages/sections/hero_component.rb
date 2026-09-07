@@ -14,9 +14,9 @@ module RecordingStudioPages
       end
 
       def call
-        render FlatPack::Hero::Component.new(**hero_attributes) do |hero|
+        hero = render FlatPack::Hero::Component.new(**hero_attributes) do |component|
           if action_present?
-            hero.slot do
+            component.slot do
               render FlatPack::Button::Component.new(
                 text: action["text"],
                 href: action["url"],
@@ -26,6 +26,12 @@ module RecordingStudioPages
             end
           end
         end
+        return hero unless fullscreen_image?
+
+        # Flatpack :centered_image is min-h-[560px] and TailwindMerge applies
+        # that after our classes, so a min-height on the section cannot win.
+        # A 100dvh wrap plus h-full on the section fills the public viewport.
+        helpers.content_tag(:div, hero, class: "h-dvh w-full overflow-hidden bg-black")
       end
 
       private
@@ -45,16 +51,18 @@ module RecordingStudioPages
           headline: title,
           description: description
         }
-        if variant == :centered_image
+        if fullscreen_image?
           attributes[:background_image_url] = image_url
-          # Flatpack Hero :centered_image sets min-h-[560px]. Height 100vh
-          # is a different property, so the photo fills the public viewport.
-          attributes[:class] = "h-screen"
+          attributes[:class] = "h-full"
         else
           attributes[:image_url] = image_url
           attributes[:image_alt] = title
         end
         attributes
+      end
+
+      def fullscreen_image?
+        variant == :centered_image
       end
 
       def variant

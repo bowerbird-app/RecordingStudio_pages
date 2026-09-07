@@ -3,7 +3,7 @@
   <% recording_studio_pages_nav(title: @page.title, back_url: RecordingStudioPages.homepage_path) %>
 <% end %>
 
-<div class="flex min-h-screen w-full flex-col">
+<div class="flex min-h-dvh w-full flex-col">
   <% if dummy_nav %>
     <div class="mx-auto w-full max-w-6xl px-6 pt-6">
       <%= render FlatPack::PageTitle::Component.new(

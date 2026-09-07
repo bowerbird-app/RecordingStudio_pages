@@ -32,6 +32,7 @@ Then open the app and sign in with:
 ## Useful Routes
 
 - `/` - published homepage
+- `/pages/:uuid/tonight` - seeded **Tonight** page: one fullscreen hero, public URL (not the editor preview)
 - `/studio` - dummy sandbox
 - `/recording_studio` - redirects to `/studio` while the mounted Recording Studio engine stays available under that prefix for non-root routes
 - `/recording_studio_pages/admin/pages` - page builder
