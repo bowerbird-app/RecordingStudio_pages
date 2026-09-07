@@ -8,27 +8,33 @@ module RecordingStudioPages
       end
 
       def call
-        render FlatPack::Card::Component.new(style: :outlined) do |card|
-          card.body do
-            helpers.safe_join(
-              [
-                helpers.render(FlatPack::PageTitle::Component.new(
-                                 title: @rendered.content["title"].presence || "Logos",
-                                 variant: :h2
-                               )),
-                helpers.content_tag(:ul, class: "flex flex-wrap gap-4") do
-                  helpers.safe_join(items.map { |item| helpers.content_tag(:li, item_label(item)) })
-                end
-              ]
-            )
-          end
-        end
+        helpers.safe_join(
+          [
+            helpers.render(FlatPack::PageTitle::Component.new(
+                             title: @rendered.content["title"].presence || "Logos",
+                             variant: :h2
+                           )),
+            logo_row
+          ].compact
+        )
       end
 
       private
 
       def items
         Array(@rendered.content["items"])
+      end
+
+      def logo_row
+        return if items.empty?
+
+        helpers.render(FlatPack::ChipGroup::Component.new(wrap: true, class: "mt-4")) do
+          helpers.safe_join(
+            items.map do |item|
+              helpers.render(FlatPack::Chip::Component.new(text: item_label(item), style: :default, size: :lg))
+            end
+          )
+        end
       end
 
       def item_label(item)

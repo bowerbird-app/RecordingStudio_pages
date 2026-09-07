@@ -21,7 +21,7 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 - Duplicate a section into another generic section recording.
 - Required field flags and `recording_ids` in the section schema catalog.
 - Dummy root switcher includes the Admin root so `/admin` can open after switching to it.
-- Public pages use `recording_studio_pages/public` (`max-w-6xl`, Flatpack tokens then Tailwind). Dummy overrides `recording_studio/default_layout` so `data-theme` sits on `html` and `flat_pack/application` loads.
+- Public pages use `recording_studio_pages/public` (Flatpack tokens then Tailwind, `data-theme` on `html`). Heroes use Flatpack Hero at full width; other sections use `max-w-6xl`. Dummy overrides `recording_studio/default_layout` so `data-theme` sits on `html` and `flat_pack/application` loads.
 
 ### Changed
 - Gem identity is `recording_studio_pages` `0.3.0`. Homepage is `https://github.com/bowerbird-app/RecordingStudio_pages`.

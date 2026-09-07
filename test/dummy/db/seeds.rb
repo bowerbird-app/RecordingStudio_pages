@@ -84,6 +84,23 @@ begin
 
   publish_page.call(homepage_recording, "home", user)
 
+  logo_recording = RecordingStudioPages::Composition.section_recordings_for(homepage_recording).find do |recording|
+    recording.recordable.section_type == "logo_cloud"
+  end
+  if logo_recording && Array(logo_recording.recordable.content["items"]).empty?
+    RecordingStudioPages::Services::ReviseSection.call(
+      section_recording: logo_recording,
+      content: logo_recording.recordable.content.merge(
+        "items" => [
+          { "name" => "Recording Studio" },
+          { "name" => "Publishable" },
+          { "name" => "Admin" }
+        ]
+      ),
+      actor: user
+    ).value!
+  end
+
   about_recording = find_page_recording.call("About")
 
   unless about_recording

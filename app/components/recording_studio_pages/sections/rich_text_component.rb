@@ -18,7 +18,11 @@ module RecordingStudioPages
                     variant: :h2
                   )
                 ),
-                helpers.content_tag(:div, helpers.sanitize(@rendered.content["body"].to_s), class: "prose")
+                helpers.content_tag(
+                  :div,
+                  helpers.sanitize(@rendered.content["body"].to_s),
+                  class: "mt-4 space-y-3 text-base leading-relaxed text-[var(--surface-content-color)]"
+                )
               ]
             )
           end

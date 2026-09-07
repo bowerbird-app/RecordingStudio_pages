@@ -27,7 +27,11 @@ module RecordingStudioPages
         trashed_at: nil
       )
       scope = scope.where(root_recording_id: root_recording.id) if root_recording
-      scope.includes(:recordable).find { |recording| recording.recordable&.homepage? }
+      candidates = scope.includes(:recordable).select { |recording| recording.recordable&.homepage? }
+      published, others = candidates.partition do |recording|
+        recording.respond_to?(:currently_published?) && recording.currently_published?
+      end
+      published.first || others.first
     end
 
     def ordered_children(page_recording)

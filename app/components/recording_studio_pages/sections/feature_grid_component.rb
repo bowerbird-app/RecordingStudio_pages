@@ -8,22 +8,18 @@ module RecordingStudioPages
       end
 
       def call
-        render FlatPack::Card::Component.new(style: :default) do |card|
-          card.body do
-            helpers.safe_join(
-              [
-                helpers.render(FlatPack::PageTitle::Component.new(
-                                 title: @rendered.content["title"].presence || "Features",
-                                 subtitle: @rendered.content["body"].to_s.presence,
-                                 variant: :h2
-                               )),
-                helpers.content_tag(:div, class: "grid gap-4 md:grid-cols-3") do
-                  helpers.safe_join(items.map { |item| feature_card(item) })
-                end
-              ]
-            )
-          end
-        end
+        helpers.safe_join(
+          [
+            helpers.render(FlatPack::PageTitle::Component.new(
+                             title: @rendered.content["title"].presence || "Features",
+                             subtitle: @rendered.content["body"].to_s.presence,
+                             variant: :h2
+                           )),
+            helpers.render(FlatPack::Grid::Component.new(cols: 3, gap: :md)) do
+              helpers.safe_join(items.map { |item| feature_card(item) })
+            end
+          ]
+        )
       end
 
       private

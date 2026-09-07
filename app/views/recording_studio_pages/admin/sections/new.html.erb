@@ -8,7 +8,7 @@
   ) %>
 
   <% unless @definition %>
-    <div class="grid gap-4 md:grid-cols-2">
+    <%= render FlatPack::Grid::Component.new(cols: 2, gap: :md) do %>
       <% @definitions.group_by(&:category).each do |category, definitions| %>
         <% definitions.each do |definition| %>
           <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
@@ -26,7 +26,7 @@
           <% end %>
         <% end %>
       <% end %>
-    </div>
+    <% end %>
   <% else %>
     <%= render "recording_studio_pages/admin/sections/form",
                url: admin_page_sections_path(page_id: page_recording.id),

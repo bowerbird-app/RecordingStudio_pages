@@ -66,6 +66,10 @@ module PageBuilderTestHelper
     ).value!
   end
 
+  def isolate_public_homepage!
+    RecordingStudioPages::Page.where(homepage: true).update_all(homepage: false)
+  end
+
   def record_child(recordable, root_recording, parent_recording)
     RecordingStudio.record!(
       action: "created",

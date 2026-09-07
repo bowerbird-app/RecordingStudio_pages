@@ -10,6 +10,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     Current.actor = @actor
     @root = create_workspace_root!("Public Workspace #{SecureRandom.hex(4)}")
     grant_admin!(@root, @actor)
+    isolate_public_homepage!
   end
 
   teardown do
@@ -52,6 +53,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Welcome home"
     assert_includes response.body, "Publish when ready"
+    assert_includes response.body, "text-4xl"
     refute_includes response.body, "disabled_section_copy"
     assert_includes response.body, 'data-theme="rounded"'
     assert_includes response.body, "max-w-6xl"

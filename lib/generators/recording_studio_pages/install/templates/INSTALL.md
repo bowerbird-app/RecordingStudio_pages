@@ -8,7 +8,7 @@ Next steps:
 4. Install the engine migrations with `bin/rails generate recording_studio_pages:migrations`.
 5. Apply the migrations with `bin/rails db:migrate`.
 6. Mount Publishable at `/` and set `root to: "recording_studio_pages/homepages#show"`. Do not mount this engine at `/` if RS Admin already owns `/admin`.
-7. Adjust auth, layout, and current actor integration to match your host app.
+7. Adjust auth, layout, and current actor integration to match your host app. Public pages must use a full-width layout that loads `flat_pack/variables` then `flat_pack/application` then Tailwind, with `data-theme="rounded"` on `html`. Do not reuse a sign-in layout (`max-w-md`).
 8. Register custom sections in the `:register_sections` hook. The engine resets registries on reload.
-9. Run `bin/rails tailwindcss:build` if you use Tailwind CSS.
+9. Point Tailwind `@source` at this gem's `app/views` and `app/components`, then run `bin/rails tailwindcss:build`.
 10. Keep strict recordable declarations enabled and add `recording_studio_recordable(...)` to every configured recordable before running `RecordingStudio.validate_recordable_declarations!`.

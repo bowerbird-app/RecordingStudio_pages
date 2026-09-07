@@ -12,9 +12,7 @@
     <%= yield :head %>
     <%= javascript_importmap_tags if respond_to?(:javascript_importmap_tags) %>
   </head>
-  <body class="m-0 min-h-screen bg-[var(--surface-page-background-color)] text-[var(--surface-content-color)]">
-    <main class="mx-auto min-h-screen w-full max-w-6xl p-6">
-      <%= yield %>
-    </main>
+  <body class="m-0 min-h-screen bg-(--surface-page-background-color) text-(--surface-content-color)">
+    <%= yield %>
   </body>
 </html>

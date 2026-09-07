@@ -11,5 +11,6 @@ Next:
 3. Point `/` at `recording_studio_pages/homepages#show`.
 4. Mount RecordingStudioPublishable::Engine at `/` for `/pages/:uuid/:slug`.
 5. Register extra sections in the `:register_sections` hook. The engine resets registries on reload.
+6. Load Flatpack CSS (`flat_pack/application`) with `data-theme` on `html` for public pages. Do not reuse a sign-in layout.
 
 ===============================================================================

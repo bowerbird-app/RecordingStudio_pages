@@ -3,16 +3,26 @@
   <% dummy_page_nav(title: @page.title, back_url: main_app.root_path) if defined?(dummy_page_nav) %>
 <% end %>
 
-<div class="flex w-full flex-col gap-8">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: @page.title,
-    variant: :h1
-  ) %>
+<div class="flex w-full flex-col">
+  <% if dummy_nav %>
+    <div class="mx-auto w-full max-w-6xl px-6 pt-6">
+      <%= render FlatPack::PageTitle::Component.new(
+        title: @page.title,
+        variant: :h1
+      ) %>
+    </div>
+  <% end %>
 
   <% @rendered_sections.each do |rendered| %>
     <% component_class = rendered.component_class %>
-    <% if component_class %>
+    <% next unless component_class %>
+    <% full_bleed = rendered.definition.key == "hero" %>
+    <% if full_bleed %>
       <%= render component_class.new(rendered: rendered) %>
+    <% else %>
+      <div class="mx-auto w-full max-w-6xl px-6 py-8">
+        <%= render component_class.new(rendered: rendered) %>
+      </div>
     <% end %>
   <% end %>
 </div>

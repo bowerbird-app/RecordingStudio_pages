@@ -32,9 +32,19 @@ module RecordingStudioPages
               body: "Compose a public page from approved sections. No freeform HTML, no parallel CMS tables.",
               primary_action: { text: "Get started", url: "/users/sign_in" }
             },
-            settings: { variant: "split_image", alignment: "left" }
+            settings: { variant: "centered", alignment: "left" }
           },
-          { type: :logo_cloud, content: { title: "Trusted by teams that already live in the tree" } },
+          {
+            type: :logo_cloud,
+            content: {
+              title: "Trusted by teams that already live in the tree",
+              items: [
+                { name: "Recording Studio" },
+                { name: "Publishable" },
+                { name: "Admin" }
+              ]
+            }
+          },
           {
             type: :feature_grid,
             content: {

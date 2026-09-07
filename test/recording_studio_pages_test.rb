@@ -90,6 +90,20 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes application_layout, "flat_pack_sidebar"
   end
 
+  def test_public_layout_loads_flatpack_without_the_sign_in_column
+    layout = File.read(File.expand_path("../app/views/layouts/recording_studio_pages/public.html.erb", __dir__))
+
+    assert_includes layout, '<html data-theme="rounded">'
+    assert_includes layout, 'stylesheet_link_tag "flat_pack/variables"'
+    assert_includes layout, 'stylesheet_link_tag "flat_pack/application"'
+    assert_includes layout, 'stylesheet_link_tag "tailwind"'
+    assert_includes layout, "bg-(--surface-page-background-color)"
+    refute_includes layout, "max-w-md"
+    variables_at = layout.index('stylesheet_link_tag "flat_pack/variables"')
+    tailwind_at = layout.index('stylesheet_link_tag "tailwind"')
+    assert_operator variables_at, :<, tailwind_at
+  end
+
   def test_dummy_tailwind_keeps_flatpack_theme_selection_in_flatpack
     tailwind_source = File.read(File.expand_path("dummy/app/assets/tailwind/application.css", __dir__))
 

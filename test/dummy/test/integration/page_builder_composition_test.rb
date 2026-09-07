@@ -130,6 +130,20 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
     assert_equal second.id, RecordingStudioPages::Composition.homepage_recording(root_recording: @root).id
   end
 
+  test "public homepage lookup prefers a published page" do
+    isolate_public_homepage!
+    draft_root = create_workspace_root!("Draft Home Workspace #{SecureRandom.hex(4)}")
+    live_root = create_workspace_root!("Live Home Workspace #{SecureRandom.hex(4)}")
+    grant_admin!(draft_root, @actor)
+    grant_admin!(live_root, @actor)
+    draft = create_page!(parent_recording: draft_root, title: "Draft site home", homepage: true, actor: @actor)
+    live = create_page!(parent_recording: live_root, title: "Live site home", homepage: true, actor: @actor)
+    publish_page!(live, slug: "live-site-home", actor: @actor)
+
+    assert_equal live.id, RecordingStudioPages::Composition.homepage_recording.id
+    assert_not_equal draft.id, RecordingStudioPages::Composition.homepage_recording.id
+  end
+
   test "data-backed sections resolve live records without copying them into content" do
     RecordingStudioPages.register_section(
       key: :recent_workspaces,
