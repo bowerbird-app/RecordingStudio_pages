@@ -17,13 +17,16 @@ require "recording_studio_pages/services/base"
 require "recording_studio_pages/services/clear_other_homepages"
 require "recording_studio_pages/services/create_page"
 require "recording_studio_pages/services/revise_page"
+require "recording_studio_pages/services/append_section_order"
 require "recording_studio_pages/services/add_section"
 require "recording_studio_pages/services/revise_section"
 require "recording_studio_pages/services/reorder_sections"
 require "recording_studio_pages/services/move_section"
 require "recording_studio_pages/services/toggle_section"
 require "recording_studio_pages/services/duplicate_section"
+require "recording_studio_pages/services/trash_recording"
 require "recording_studio_pages/services/remove_section"
+require "recording_studio_pages/services/remove_page"
 require "recording_studio_pages/services/apply_template"
 require "recording_studio_pages/engine"
 
@@ -88,6 +91,18 @@ module RecordingStudioPages
     def reset!
       section_registry.clear!
       template_registry.clear!
+    end
+
+    def page_parent_types
+      Array(configuration.page_parent_types).map(&:to_s)
+    end
+
+    def homepage_path
+      configuration.homepage_path.presence || "/"
+    end
+
+    def page_parent?(recording)
+      recording.present? && page_parent_types.include?(recording.recordable_type.to_s)
     end
   end
 end

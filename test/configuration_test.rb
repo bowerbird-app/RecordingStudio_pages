@@ -62,4 +62,23 @@ class ConfigurationTest < Minitest::Test
 
     assert_kind_of RecordingStudioPages::Configuration, RecordingStudioPages.configuration
   end
+
+  def test_page_parent_helpers_use_configuration
+    original = RecordingStudioPages.instance_variable_get(:@configuration)
+    RecordingStudioPages.instance_variable_set(:@configuration, RecordingStudioPages::Configuration.new)
+    RecordingStudioPages.configure do |config|
+      config.page_parent_types = %w[Workspace]
+      config.homepage_path = "/welcome"
+    end
+    workspace = Struct.new(:recordable_type).new("Workspace")
+    folder = Struct.new(:recordable_type).new("Folder")
+
+    assert_equal %w[Workspace], RecordingStudioPages.page_parent_types
+    assert_equal "/welcome", RecordingStudioPages.homepage_path
+    assert RecordingStudioPages.page_parent?(workspace)
+    refute RecordingStudioPages.page_parent?(folder)
+    refute RecordingStudioPages.page_parent?(nil)
+  ensure
+    RecordingStudioPages.instance_variable_set(:@configuration, original)
+  end
 end

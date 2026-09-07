@@ -18,7 +18,7 @@ module RecordingStudioPages
     recording_studio_recordable label: "Page",
                                 plural_label: "Pages",
                                 root: false,
-                                allowed_parent_types: %w[Workspace Folder]
+                                allowed_parent_types: RecordingStudioPages.page_parent_types
 
     if defined?(RecordingStudio::Capabilities::Publishable)
       include RecordingStudio::Capabilities::Publishable.to(

@@ -67,7 +67,7 @@ module RecordingStudioPages
       when :link
         coerce_link(value)
       when :list
-        Array(value).map { |item| coerce_item(spec[:item] || {}, item) }
+        Array(value).filter_map { |item| read_list_item(spec, item) }
       when :recording_ids
         ids = value.is_a?(String) ? value.split(/[\s,]+/) : Array(value)
         ids.map(&:to_s).reject(&:blank?)
@@ -86,6 +86,24 @@ module RecordingStudioPages
     def coerce_item(item_spec, value)
       schema = self.class.new(item_spec)
       schema.read(value)
+    end
+
+    def read_list_item(spec, value)
+      hash = stringify_keys(value)
+      return if destroyed_item?(hash)
+
+      item = coerce_item(spec[:item] || {}, hash.except("_destroy"))
+      return if blank_item?(item)
+
+      item
+    end
+
+    def destroyed_item?(hash)
+      %w[1 true yes].include?(hash["_destroy"].to_s.downcase)
+    end
+
+    def blank_item?(item)
+      item.values.all? { |value| value.nil? || value == "" || value == [] || value == { "text" => "", "url" => "" } }
     end
 
     def default_for(spec)
@@ -161,7 +179,13 @@ module RecordingStudioPages
       return ["#{key} must be a list"] unless value.nil? || value.is_a?(Array)
 
       Array(value).flat_map.with_index do |item, index|
-        self.class.new(spec[:item] || {}).validate(item).map { |error| "#{key}[#{index}].#{error}" }
+        hash = stringify_keys(item)
+        next [] if destroyed_item?(hash)
+
+        cleaned = hash.except("_destroy")
+        next [] if blank_item?(coerce_item(spec[:item] || {}, cleaned))
+
+        self.class.new(spec[:item] || {}).validate(cleaned).map { |error| "#{key}[#{index}].#{error}" }
       end
     end
 

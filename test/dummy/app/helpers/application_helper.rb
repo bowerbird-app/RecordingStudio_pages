@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ApplicationHelper
   def dummy_page_nav(title:, back_url: nil, back_label: "Home")
     recording_studio_page_nav(
@@ -18,5 +20,9 @@ module ApplicationHelper
         )
       )
     end
+  end
+
+  def recording_studio_pages_page_nav(title:, back_url: nil)
+    dummy_page_nav(title: title, back_url: back_url)
   end
 end

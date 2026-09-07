@@ -14,6 +14,8 @@
   ) %>
 
   <div class="flex flex-wrap items-center gap-3">
+    <%= render "recording_studio_pages/admin/pages/add_section_dropdown" %>
+    <%= render "recording_studio_pages/admin/pages/add_template_dropdown" %>
     <%= render FlatPack::Button::Component.new(
       text: "Edit page",
       href: edit_admin_page_path(id: page_recording.id),
@@ -21,7 +23,6 @@
       size: :md,
       data: { turbo_frame: "_top" }
     ) %>
-    <%= render "recording_studio_pages/admin/pages/add_section_dropdown" %>
     <%= render FlatPack::Button::Component.new(
       text: "Publish",
       href: "/recordings/#{@page_recording.id}/publishable/edit",
@@ -48,7 +49,6 @@
       <%= render FlatPack::List::Component.new(
         ordered: true,
         orderable: true,
-        orderable_url: reorder_admin_page_sections_path(page_id: page_recording.id),
         orderable_method: :patch,
         param_uuid_name: "moving_recording_id",
         param_target_position_name: "target_position",
@@ -66,5 +66,15 @@
       title: "Nothing here yet",
       description: "Open Add section and pick a type."
     ) %>
+  <% end %>
+
+  <% if @rendered_sections.present? %>
+    <%= render FlatPack::SectionTitle::Component.new(
+      title: "Preview",
+      subtitle: "Off sections stay off. This is how the page reads."
+    ) %>
+    <div class="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--surface-border-color)]">
+      <%= render "recording_studio_pages/pages/sections" %>
+    </div>
   <% end %>
 </div>

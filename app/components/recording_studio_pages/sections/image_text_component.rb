@@ -8,27 +8,32 @@ module RecordingStudioPages
       end
 
       def call
-        render FlatPack::Card::Component.new(style: :outlined) do |card|
-          card.body do
-            helpers.safe_join(
-              [
-                helpers.render(FlatPack::PageTitle::Component.new(
-                                 title: @rendered.content["title"].presence || "Image and text",
-                                 subtitle: helpers.sanitize(@rendered.content["body"].to_s),
-                                 variant: :h2
-                               )),
-                image_tag,
-                action_button
-              ].compact
-            )
-          end
+        helpers.render(FlatPack::Grid::Component.new(cols: 2, gap: :lg, align: :center)) do
+          helpers.safe_join(image_right? ? [copy_column, image_column] : [image_column, copy_column])
         end
       end
 
       private
 
-      def image_tag
-        url = @rendered.content["image_url"].to_s
+      def image_right?
+        @rendered.settings["variant"].to_s == "image_right"
+      end
+
+      def copy_column
+        helpers.safe_join(
+          [
+            helpers.render(FlatPack::PageTitle::Component.new(
+                             title: @rendered.content["title"].presence || "Image and text",
+                             subtitle: helpers.sanitize(@rendered.content["body"].to_s),
+                             variant: :h2
+                           )),
+            action_button
+          ].compact
+        )
+      end
+
+      def image_column
+        url = @rendered.content["image_url"].to_s.strip
         return if url.blank?
 
         helpers.image_tag(url, alt: @rendered.content["title"].to_s, class: "max-w-full")

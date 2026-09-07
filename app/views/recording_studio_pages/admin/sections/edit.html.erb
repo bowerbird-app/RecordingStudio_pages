@@ -1,4 +1,4 @@
-<% dummy_page_nav(title: "Edit section", back_url: page_builder_page_path) if defined?(dummy_page_nav) %>
+<% recording_studio_pages_nav(title: "Edit section", back_url: page_builder_page_path) %>
 
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
@@ -14,9 +14,9 @@
                recordable: @section_recording.recordable %>
   <% else %>
     <%= render FlatPack::Alert::Component.new(
-      type: :warning,
+      style: :warning,
       title: "This section type is not registered",
-      message: "The saved content is still here. Register #{@section_recording.recordable.section_type} to edit it."
+      description: "The saved content is still here. Register #{@section_recording.recordable.section_type} to edit it."
     ) %>
   <% end %>
 </div>

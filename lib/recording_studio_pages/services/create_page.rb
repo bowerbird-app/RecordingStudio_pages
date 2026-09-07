@@ -13,6 +13,11 @@ module RecordingStudioPages
 
       def perform
         with_rescue do
+          raise Error, "Choose a workspace for this page." if @parent_recording.blank?
+          unless RecordingStudioPages.page_parent?(@parent_recording)
+            raise Error, "Pages belong in a workspace or folder."
+          end
+
           root = root_for(@parent_recording)
           recording = root.record(
             RecordingStudioPages::Page,

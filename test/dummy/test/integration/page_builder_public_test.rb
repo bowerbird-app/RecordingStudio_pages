@@ -62,6 +62,33 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "data-recording-studio-default-layout"
   end
 
+  test "section variants change public markup" do
+    page_recording = create_page!(parent_recording: @root, title: "Variant home", homepage: true, actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: { title: "Narrow notes", body: "Keep this column tight." },
+      settings: { variant: "narrow" },
+      actor: @actor
+    )
+    add_section!(
+      page_recording: page_recording,
+      section_type: "call_to_action",
+      content: { title: "Banner next", body: "A full-width ask." },
+      settings: { variant: "banner" },
+      actor: @actor
+    )
+    publish_page!(page_recording, slug: "variant-home", actor: @actor)
+
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, "Narrow notes"
+    assert_includes response.body, "max-w-prose"
+    assert_includes response.body, "Banner next"
+    assert_includes response.body, "bg-[var(--surface-muted-background-color)]"
+  end
+
   test "published inner page is public at /pages/:uuid/:slug" do
     page_recording = create_page!(parent_recording: @root, title: "About", actor: @actor)
     add_section!(

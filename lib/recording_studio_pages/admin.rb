@@ -29,7 +29,7 @@ module RecordingStudioPages
     class PagesScreen < RecordingStudioAdmin::Screen
       key "pages"
       title "Pages"
-      subtitle "Every page is a recording. Sections hang under it."
+      subtitle "Compose public pages from sections."
       blast_radius :site
       button :new_page, text: "New page", url: ->(_context) { "/recording_studio_pages/admin/pages/new" },
                         style: :primary
@@ -59,12 +59,10 @@ module RecordingStudioPages
 
     PublishedPagesWidget = RecordingStudioAdmin::Widget.new("widgets.pages.published_pages") do
       title "Live pages"
-      info "Pages RS Publishable currently treats as public."
+      info "Pages that are live on the public site."
       blast_radius :site
       value do |_context|
-        RecordingStudio::Recording.where(recordable_type: "RecordingStudioPages::Page", trashed_at: nil)
-                                  .includes(:recordable)
-                                  .count { |recording| recording.respond_to?(:currently_published?) && recording.currently_published? }
+        RecordingStudioPages::Composition.published_pages_count
       end
     end
 
@@ -73,9 +71,7 @@ module RecordingStudioPages
       info "Pages that exist but are not live yet."
       blast_radius :site
       value do |_context|
-        RecordingStudio::Recording.where(recordable_type: "RecordingStudioPages::Page", trashed_at: nil)
-                                  .includes(:recordable)
-                                  .count { |recording| !recording.respond_to?(:currently_published?) || !recording.currently_published? }
+        RecordingStudioPages::Composition.draft_pages_count
       end
     end
   end

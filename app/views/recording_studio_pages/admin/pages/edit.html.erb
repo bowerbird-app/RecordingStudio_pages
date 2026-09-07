@@ -1,4 +1,4 @@
-<% dummy_page_nav(title: "Edit page", back_url: page_builder_page_path) if defined?(dummy_page_nav) %>
+<% recording_studio_pages_nav(title: "Edit page", back_url: page_builder_page_path) %>
 
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(title: "Edit page", variant: :h1) %>
@@ -17,5 +17,14 @@
       ) %>
       <%= render FlatPack::Button::Component.new(text: "Save", style: :primary, size: :md, type: :submit) %>
     </div>
+  <% end %>
+
+  <%= form_with url: admin_page_path(@page_recording), method: :delete, local: true do %>
+    <%= render FlatPack::Button::Component.new(
+      text: "Remove page",
+      style: :danger,
+      size: :md,
+      type: :submit
+    ) %>
   <% end %>
 </div>

@@ -30,7 +30,11 @@ module RecordingStudioPages
             section.settings = settings
             section.enabled = @enabled
           end
-          append_order!(recording)
+          AppendSectionOrder.call(
+            page_recording: @page_recording,
+            section_recording: recording,
+            actor: actor
+          ).value!
           recording
         end
       end
@@ -39,14 +43,6 @@ module RecordingStudioPages
 
       def actor
         @actor || current_actor
-      end
-
-      def append_order!(recording)
-        return unless recording.has_attribute?(:recording_studio_orderable_position)
-
-        siblings = @page_recording.child_recordings.where(recordable_type: "RecordingStudioPages::Section")
-        max_position = siblings.maximum(:recording_studio_orderable_position)
-        recording.update!(recording_studio_orderable_position: max_position ? max_position + 1 : 0)
       end
     end
   end

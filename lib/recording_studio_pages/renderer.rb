@@ -56,7 +56,8 @@ module RecordingStudioPages
       return unless definition.data.respond_to?(:call)
 
       definition.data.call(recording, content, settings, @context)
-    rescue StandardError
+    rescue StandardError => e
+      Rails.logger.warn("[recording_studio_pages] section data failed for #{definition.key}: #{e.class}: #{e.message}")
       nil
     end
   end

@@ -1,4 +1,4 @@
-<% dummy_page_nav(title: "Pages", back_url: "/admin") if defined?(dummy_page_nav) %>
+<% recording_studio_pages_nav(title: "Pages", back_url: "/admin") %>
 
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
@@ -16,15 +16,22 @@
 
   <% if @page_recordings.empty? %>
     <%= render FlatPack::Alert::Component.new(
-      type: :info,
+      style: :info,
       title: "Nothing here yet",
-      message: "Add a page to get going."
+      description: "Add a page to get going."
     ) %>
   <% else %>
     <%= render FlatPack::Table::Component.new(data: @page_recordings, class: "text-sm") do |table| %>
       <% table.column(title: "Page") { |recording| recording.recordable&.title } %>
       <% table.column(title: "Home") { |recording| recording.recordable&.homepage? ? "Home" : "" } %>
-      <% table.column(title: "") { |recording| link_to("Open", admin_page_path(recording)) } %>
+      <% table.column(title: "") { |recording|
+        render FlatPack::Button::Component.new(
+          text: "Open",
+          href: admin_page_path(recording),
+          style: :secondary,
+          size: :sm
+        )
+      } %>
     <% end %>
   <% end %>
 </div>

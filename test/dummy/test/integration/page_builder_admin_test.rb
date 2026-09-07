@@ -165,6 +165,92 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_equal false, response.parsed_body["ok"]
   end
 
+  test "the editor previews sections and can apply a template" do
+    page_recording = create_page!(parent_recording: @root, title: "Preview me", actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: { title: "Visible notes", body: "Staff can read this." },
+      settings: { variant: "narrow" },
+      actor: @actor
+    )
+    add_section!(
+      page_recording: page_recording,
+      section_type: "image_text",
+      content: { title: "Photo on the right", image_url: "https://example.com/photo.png" },
+      settings: { variant: "image_right" },
+      actor: @actor
+    )
+
+    get recording_studio_pages.admin_page_path(page_recording)
+
+    assert_response :success
+    assert_includes response.body, "Preview"
+    assert_includes response.body, "Visible notes"
+    assert_includes response.body, "Staff can read this."
+    assert_includes response.body, "max-w-prose"
+    assert_includes response.body, "Use a template"
+    assert_includes response.body, "apply-template-#{page_recording.id}-marketing_home"
+    refute_includes response.body, "orderable-url-value"
+    refute_includes response.body, "Staff preview"
+
+    post recording_studio_pages.apply_template_admin_page_path(page_recording),
+         params: { template_key: "marketing_home" },
+         as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, "turbo-stream"
+    assert_includes response.body, "Template sections added."
+    types = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
+                                             .map { |recording| recording.recordable.section_type }
+    assert_includes types, "hero"
+    assert_includes types, "call_to_action"
+  end
+
+  test "copied sections stay last in the orderable list" do
+    page_recording = create_page!(parent_recording: @root, title: "Copy last", actor: @actor)
+    first = add_section!(page_recording: page_recording, section_type: "hero", content: { title: "First" }, actor: @actor)
+    second = add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: { title: "Second" },
+      actor: @actor
+    )
+
+    post recording_studio_pages.duplicate_admin_page_section_path(page_recording, first)
+    follow_redirect!
+
+    ordered = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
+    assert_equal [first.id, second.id, ordered.last.id], ordered.map(&:id)
+    assert_equal "First", ordered.last.recordable.content["title"]
+    refute_equal first.id, ordered.last.id
+  end
+
+  test "staff can remove a page from edit" do
+    page_recording = create_page!(parent_recording: @root, title: "Throw away", actor: @actor)
+
+    get recording_studio_pages.edit_admin_page_path(page_recording)
+    assert_response :success
+    assert_includes response.body, "Remove page"
+
+    delete recording_studio_pages.admin_page_path(page_recording)
+    assert_redirected_to recording_studio_pages.admin_pages_path
+    follow_redirect!
+    assert_includes response.body, "Page removed."
+    assert_nil RecordingStudio::Recording.find_by(id: page_recording.id, trashed_at: nil)
+  end
+
+  test "empty pages index uses a Flatpack alert description" do
+    RecordingStudioPages::Page.update_all(title: "Not empty #{SecureRandom.hex(4)}")
+    RecordingStudio::Recording.where(recordable_type: "RecordingStudioPages::Page").update_all(trashed_at: Time.current)
+
+    get recording_studio_pages.admin_pages_path
+
+    assert_response :success
+    assert_includes response.body, "Nothing here yet"
+    assert_includes response.body, "Add a page to get going."
+  end
+
   test "visitors cannot mutate pages" do
     sign_out @actor
     page_recording = create_page!(parent_recording: @root, title: "Locked", actor: @actor)

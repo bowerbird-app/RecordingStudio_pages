@@ -34,6 +34,35 @@ module RecordingStudioPages
       published.first || others.first
     end
 
+    def page_recordings
+      RecordingStudio::Recording.where(
+        recordable_type: "RecordingStudioPages::Page",
+        trashed_at: nil
+      )
+    end
+
+    def published_pages_count
+      live_ids = currently_live_publishable_ids
+      return 0 if live_ids.blank?
+
+      RecordingStudio::Recording.where(
+        recordable_type: "RecordingStudioPublishable::Publishable",
+        recordable_id: live_ids,
+        trashed_at: nil,
+        parent_recording_id: page_recordings.select(:id)
+      ).distinct.count(:parent_recording_id)
+    end
+
+    def draft_pages_count
+      [page_recordings.count - published_pages_count, 0].max
+    end
+
+    def currently_live_publishable_ids
+      return [] unless defined?(RecordingStudioPublishable::Publishable)
+
+      RecordingStudioPublishable::Publishable.currently_published.select(:id)
+    end
+
     def ordered_children(page_recording)
       if page_recording.respond_to?(:recording_studio_orderable_children)
         page_recording.recording_studio_orderable_children

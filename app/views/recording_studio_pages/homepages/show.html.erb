@@ -1,6 +1,6 @@
 <% dummy_nav = local_assigns[:admin] %>
 <% if dummy_nav %>
-  <% dummy_page_nav(title: @page.title, back_url: main_app.root_path) if defined?(dummy_page_nav) %>
+  <% recording_studio_pages_nav(title: @page.title, back_url: RecordingStudioPages.homepage_path) %>
 <% end %>
 
 <div class="flex w-full flex-col">
@@ -13,16 +13,5 @@
     </div>
   <% end %>
 
-  <% @rendered_sections.each do |rendered| %>
-    <% component_class = rendered.component_class %>
-    <% next unless component_class %>
-    <% full_bleed = rendered.definition.key == "hero" %>
-    <% if full_bleed %>
-      <%= render component_class.new(rendered: rendered) %>
-    <% else %>
-      <div class="mx-auto w-full max-w-6xl px-6 py-8">
-        <%= render component_class.new(rendered: rendered) %>
-      </div>
-    <% end %>
-  <% end %>
+  <%= render "recording_studio_pages/pages/sections" %>
 </div>

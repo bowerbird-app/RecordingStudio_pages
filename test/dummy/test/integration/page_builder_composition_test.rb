@@ -77,6 +77,39 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
     refute hidden.recordable.enabled?
   end
 
+  test "data procs that raise are skipped and logged" do
+    RecordingStudioPages.register_section(
+      key: :broken_data,
+      name: "Broken data",
+      category: "data",
+      component: "RecordingStudioPages::Sections::RichTextComponent",
+      fields: { title: :string },
+      data: ->(_recording, _content, _settings, _context) { raise "boom" }
+    )
+    page_recording = create_page!(parent_recording: @root, title: "Broken", actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "broken_data",
+      content: { title: "Still draws" },
+      actor: @actor
+    )
+    warnings = []
+    logger = ActiveSupport::Logger.new(StringIO.new)
+    logger.define_singleton_method(:warn) { |message| warnings << message.to_s }
+
+    rendered = Rails.stub(:logger, logger) do
+      RecordingStudioPages::Renderer.call(page_recording.reload)
+    end
+
+    assert_equal 1, rendered.length
+    assert_nil rendered.first.data
+    assert_equal "Still draws", rendered.first.content["title"]
+    assert(warnings.any? { |message| message.include?("broken_data") && message.include?("boom") })
+  ensure
+    RecordingStudioPages.reset!
+    RecordingStudioPages::BuiltIns.register!
+  end
+
   test "unknown section types fail safe and keep their data" do
     page_recording = create_page!(parent_recording: @root, title: "Unknown", actor: @actor)
     known = add_section!(page_recording: page_recording, section_type: "hero", content: { title: "Known" }, actor: @actor)
@@ -198,6 +231,36 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
     assert_equal original.parent_recording_id, copy.parent_recording_id
     assert_equal sections.last.id, copy.id
     assert copy.events.exists?(action: "duplicated")
+  end
+
+  test "creating a page rejects a parent that is not a workspace or folder" do
+    result = RecordingStudioPages::Services::CreatePage.call(
+      parent_recording: nil,
+      title: "Orphan",
+      actor: @actor
+    )
+
+    assert result.failure?
+    assert_match(/workspace/i, result.error.to_s)
+
+    admin_root = create_admin_root!(name: "Not A Page Parent #{SecureRandom.hex(4)}")
+    result = RecordingStudioPages::Services::CreatePage.call(
+      parent_recording: admin_root,
+      title: "Wrong parent",
+      actor: @actor
+    )
+
+    assert result.failure?
+    assert_match(/workspace or folder/i, result.error.to_s)
+  end
+
+  test "published and draft page counts use live publishable children" do
+    live = create_page!(parent_recording: @root, title: "Live count", actor: @actor)
+    create_page!(parent_recording: @root, title: "Draft count", actor: @actor)
+    publish_page!(live, slug: "live-count-#{SecureRandom.hex(4)}", actor: @actor)
+
+    assert RecordingStudioPages::Composition.published_pages_count >= 1
+    assert RecordingStudioPages::Composition.draft_pages_count >= 1
   end
 
   test "duplicating a section requires edit access" do

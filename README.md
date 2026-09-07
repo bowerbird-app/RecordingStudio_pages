@@ -73,6 +73,8 @@ The engine resets registries on reload, then registers built-ins, then runs `:re
 ```ruby
 # config/initializers/recording_studio_pages.rb
 RecordingStudioPages.configure do |config|
+  config.page_parent_types = %w[Workspace Folder]
+  config.homepage_path = "/"
   config.hooks.on(:register_sections) do
     RecordingStudioPages.register_section(
       key: :team_grid,
@@ -95,11 +97,13 @@ RecordingStudioPages.configure do |config|
 end
 ```
 
+`page_parent_types` is the allow list for new pages. `CreatePage` rejects anything else, including a blank parent. `homepage_path` is the public home URL shown in the editor when the page is marked as home.
+
 `fields.title` may be `:string` or `{ type: :string, required: true }`. `recording_ids` stores Recording ids. Resolve the actual records at render time, or with `data:`. Do not copy domain records into section JSON.
 
 Duplicate keys raise `RecordingStudioPages::DuplicateRegistration`. Unknown types do not crash render or delete data. They stay on the page until you register the type again.
 
-`data:` is a proc. Use it when the section reads live records instead of only JSON. If the proc raises, render skips that payload and still draws the saved content.
+`data:` is a proc. Use it when the section reads live records instead of only JSON. If the proc raises, render logs a warning, skips that payload, and still draws the saved content.
 
 `RecordingStudioPages.catalog` lists every registered section and template, including field types, required flags, settings, and variants. That catalog is the machine-readable surface for future API and MCP tooling.
 
@@ -121,23 +125,29 @@ RecordingStudioPages.register_template(
 
 ## Built-in sections
 
-hero, rich_text, image_text, logo_cloud, feature_grid, call_to_action.
+hero, rich_text, image_text, logo_cloud, feature_grid, call_to_action. Registered variants change layout: image left/right, narrow rich text, compact logos, feature column counts, and CTA banner vs card.
 
 Built-in template: `marketing_home`.
 
 Rich text is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero images are URL fields until Attachable is wired.
 
+List fields skip blank extra slots and items marked `_destroy`.
+
 ## Admin
 
-RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a Flatpack ordered, orderable list. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s More menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page.
+RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a Flatpack ordered, orderable list. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s More menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page, then Orderable moves it to the end.
 
-The editor is also the staff preview. Unpublished pages render there. They stay private on public routes. Add a section from the **Add section** dropdown on that editor. Picking a type posts immediately and Turbo updates the editor in place. Open **Edit** on a section to fill in its copy.
+The editor is also the staff preview. Enabled sections render there with the same components as the public page. Unpublished pages stay private on public routes. Add a section from **Add section**. Apply **Use a template** to append that template’s sections. Open **Edit page** to rename, set home, or remove the page.
+
+Gem screens call `recording_studio_pages_nav`. Hosts that need extra chrome (root switcher, sign out) define `recording_studio_pages_page_nav`. Dummy does that and wraps `dummy_page_nav`. Otherwise the helper falls back to Recording Studio `recording_studio_page_nav`.
 
 Writes need Accessible `:edit` on the configured admin root. Reads need `:view`.
 
 `/admin` is the RS Admin hub. Switch the current root to **Admin** first. RS Admin forbids the hub while the current root is a workspace. The page builder editor does not require that switch.
 
 Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`.
+
+Drag-reorder persists through `recording-studio-pages--section-list`. Do not also set Flatpack `orderable_url` on the list: Flatpack’s orderable save still checks `hasOrderablePathValue` after the value was renamed to `orderableUrl`, so a later Flatpack fix would double-PATCH.
 
 ## Shared sections later
 
@@ -168,6 +178,9 @@ These are limits in sibling gems. This gem documents them instead of forking the
 3. **RS Admin is a hub of screens and widgets**, not a nested canvas for ordered sections.
 4. **Action Text assumes mutable records.** Section copy is JSON plus `sanitize`.
 5. **Attachable is required by Publishable 0.2.1** even when you only want slug and status. Hero `image_url` is still a URL field, not an attachment recording.
+6. **Flatpack list orderable save is a no-op.** `saveOrder` checks `hasOrderablePathValue` after the value was renamed to `orderableUrl`. Page Builder persists drag itself. List item `display:flex` also hides native `<ol>` markers.
+7. **Orderable has no public append-to-end helper.** Page Builder calls `recording_studio_orderable_move!` with the last index.
+8. **Core has no `trash!`.** Page Builder calls `trash!` when Trashable is present; otherwise it logs `trashed` and sets `trashed_at`. Install Trashable for a real trash path.
 
 ## Version
 
@@ -179,4 +192,6 @@ These are limits in sibling gems. This gem documents them instead of forking the
 2. Mount Pages, Duplicatable, and Publishable. Keep Pages off `/`.
 3. `RecordingStudioPages::Section` already opts into Duplicatable when that gem is loaded. Do not add a second copy path.
 4. Public pages must load `flat_pack/application` with `data-theme` on `html`.
-5. Pin the Pages Stimulus controllers (`recording-studio-pages--section-list`) so drag-reorder persists.
+5. Pin the Pages Stimulus controllers (`recording-studio-pages--section-list`) so drag-reorder persists. Do not set Flatpack `orderable_url` on the section list.
+6. Define `recording_studio_pages_page_nav` if gem screens should share host chrome. Otherwise they use Recording Studio page nav.
+7. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.

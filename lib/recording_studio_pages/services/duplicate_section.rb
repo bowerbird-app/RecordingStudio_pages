@@ -15,7 +15,11 @@ module RecordingStudioPages
           end
 
           copy = duplicate_in_place
-          append_order!(copy)
+          AppendSectionOrder.call(
+            page_recording: copy.parent_recording,
+            section_recording: copy,
+            actor: actor
+          ).value!
           copy
         end
       end
@@ -54,14 +58,6 @@ module RecordingStudioPages
         else
           "Enable Recording Studio Duplicatable on the section type before copying sections"
         end
-      end
-
-      def append_order!(recording)
-        return unless recording.has_attribute?(:recording_studio_orderable_position)
-
-        siblings = recording.parent_recording.child_recordings.where(recordable_type: "RecordingStudioPages::Section")
-        max_position = siblings.maximum(:recording_studio_orderable_position)
-        recording.update!(recording_studio_orderable_position: max_position ? max_position + 1 : 0)
       end
     end
   end

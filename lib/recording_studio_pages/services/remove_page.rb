@@ -2,14 +2,14 @@
 
 module RecordingStudioPages
   module Services
-    class RemoveSection < Base
-      def initialize(section_recording:, actor: nil)
-        @section_recording = section_recording
+    class RemovePage < Base
+      def initialize(page_recording:, actor: nil)
+        @page_recording = page_recording
         @actor = actor
       end
 
       def perform
-        TrashRecording.call(recording: @section_recording, actor: actor)
+        TrashRecording.call(recording: @page_recording, actor: actor)
       end
 
       private

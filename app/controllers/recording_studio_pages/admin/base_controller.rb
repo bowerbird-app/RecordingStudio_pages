@@ -33,6 +33,7 @@ module RecordingStudioPages
       def load_editor
         @unknown_sections = unknown_sections
         @editor_subtitle = editor_subtitle
+        @rendered_sections = Renderer.call(page_recording, context: self)
       end
 
       def unknown_sections
@@ -43,9 +44,11 @@ module RecordingStudioPages
 
       def editor_subtitle
         parts = []
-        parts << "This is the public home page." if page_recording.recordable.homepage?
+        if page_recording.recordable.homepage?
+          parts << "Public home is #{RecordingStudioPages.homepage_path}."
+        end
         unpublished = !page_recording.respond_to?(:currently_published?) || !page_recording.currently_published?
-        parts << "Staff preview. This page is not public yet." if unpublished
+        parts << "Not public yet." if unpublished
         parts.join(" ").presence
       end
 

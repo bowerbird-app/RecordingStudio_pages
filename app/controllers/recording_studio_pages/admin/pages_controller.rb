@@ -53,11 +53,9 @@ module RecordingStudioPages
       end
 
       def destroy
-        if page_recording.respond_to?(:trash!)
-          page_recording.trash!(actor: current_admin_actor)
-        else
-          page_recording.update!(trashed_at: Time.current)
-        end
+        result = Services::RemovePage.call(page_recording: page_recording, actor: current_admin_actor)
+        return redirect_to(admin_pages_path, alert: result.error) if result.failure?
+
         redirect_to admin_pages_path, notice: "Page removed."
       end
 
@@ -69,7 +67,11 @@ module RecordingStudioPages
         )
         return redirect_to(admin_page_path(page_recording), alert: result.error) if result.failure?
 
-        redirect_to admin_page_path(page_recording), notice: "Template sections added."
+        load_editor
+        respond_to do |format|
+          format.turbo_stream
+          format.html { redirect_to admin_page_path(page_recording), notice: "Template sections added." }
+        end
       end
 
       private
@@ -97,7 +99,7 @@ module RecordingStudioPages
 
         recording = current_root_recording
         return if recording.blank?
-        return recording if %w[Workspace Folder].include?(recording.recordable_type)
+        return recording if RecordingStudioPages.page_parent?(recording)
 
         nil
       rescue StandardError

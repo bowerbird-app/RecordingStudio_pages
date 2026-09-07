@@ -55,4 +55,39 @@ class FieldSchemaTest < Minitest::Test
     assert_equal %w[a b], schema.read(projects: "a\nb")["projects"]
     assert_equal true, schema.catalog[:title][:required]
   end
+
+  def test_list_read_drops_blank_and_destroyed_items
+    schema = RecordingStudioPages::FieldSchema.new(
+      items: { type: :list, item: { name: :string, url: :url } }
+    )
+
+    result = schema.read(
+      items: [
+        { name: "Keep", url: "https://example.com" },
+        { name: "", url: "" },
+        { name: "Gone", url: "https://example.com/gone", "_destroy" => "1" },
+        { name: "Also gone", "_destroy" => "true" }
+      ]
+    )
+
+    assert_equal [{ "name" => "Keep", "url" => "https://example.com" }], result["items"]
+  end
+
+  def test_list_validate_skips_blank_and_destroyed_items
+    schema = RecordingStudioPages::FieldSchema.new(
+      items: { type: :list, item: { name: :string, url: :url } }
+    )
+
+    errors = schema.validate(
+      items: [
+        { name: "Keep", url: "javascript:alert(1)" },
+        { name: "", url: "" },
+        { name: "Gone", url: "javascript:alert(1)", "_destroy" => "1" }
+      ]
+    )
+
+    assert(errors.any? { |error| error.include?("items[0]") })
+    refute(errors.any? { |error| error.include?("items[1]") })
+    refute(errors.any? { |error| error.include?("items[2]") })
+  end
 end

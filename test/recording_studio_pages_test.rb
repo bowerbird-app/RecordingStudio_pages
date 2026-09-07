@@ -232,4 +232,30 @@ class RecordingStudioPagesTest < Minitest::Test
 
     refute File.exist?(view_path)
   end
+
+  def test_gem_admin_views_use_engine_nav_not_dummy_nav
+    views = Dir[File.expand_path("../app/views/recording_studio_pages/**/*.erb", __dir__)]
+    refute_empty views
+
+    views.each do |view_path|
+      source = File.read(view_path)
+
+      refute_includes source, "dummy_page_nav", "#{view_path} must not call dummy_page_nav"
+    end
+
+    editor = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/_editor.html.erb", __dir__))
+    index = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/index.html.erb", __dir__))
+    edit = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/edit.html.erb", __dir__))
+
+    refute_includes editor, "orderable_url"
+    assert_includes editor, "Use a template"
+    assert_includes editor, 'title: "Preview"'
+
+    persist = File.read(File.expand_path("../app/javascript/recording_studio_pages/controllers/section_list_controller.js", __dir__))
+    assert_includes persist, "!response.ok"
+    assert_includes persist, "list:error"
+    assert_includes index, "description:"
+    refute_includes index, "message:"
+    assert_includes edit, "Remove page"
+  end
 end

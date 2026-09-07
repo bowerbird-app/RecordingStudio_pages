@@ -15,7 +15,7 @@ module RecordingStudioPages
                              subtitle: @rendered.content["body"].to_s.presence,
                              variant: :h2
                            )),
-            helpers.render(FlatPack::Grid::Component.new(cols: 3, gap: :md)) do
+            helpers.render(FlatPack::Grid::Component.new(cols: grid_columns, gap: :md)) do
               helpers.safe_join(items.map { |item| feature_card(item) })
             end
           ]
@@ -28,8 +28,17 @@ module RecordingStudioPages
         Array(@rendered.content["items"])
       end
 
+      def grid_columns
+        case @rendered.settings["variant"].to_s
+        when "alternating_rows" then 1
+        when "icon_grid" then 4
+        else
+          3
+        end
+      end
+
       def feature_card(item)
-        helpers.render(FlatPack::Card::Component.new(style: :outlined)) do |card|
+        helpers.render(FlatPack::Card::Component.new(style: card_style)) do |card|
           card.body do
             helpers.render(
               FlatPack::PageTitle::Component.new(
@@ -40,6 +49,10 @@ module RecordingStudioPages
             )
           end
         end
+      end
+
+      def card_style
+        @rendered.settings["variant"].to_s == "icon_grid" ? :default : :outlined
       end
     end
   end

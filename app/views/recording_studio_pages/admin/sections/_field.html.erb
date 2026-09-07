@@ -14,27 +14,40 @@
   <%= render FlatPack::TextInput::Component.new(name: "#{name}[text]", label: "#{label} text", value: value.is_a?(Hash) ? value["text"] : nil) %>
   <%= render FlatPack::UrlInput::Component.new(name: "#{name}[url]", label: "#{label} URL", value: value.is_a?(Hash) ? value["url"] : nil) %>
 <% elsif type == :list %>
-  <% Array(value).each_with_index do |item, index| %>
-    <% (spec[:item] || {}).each do |item_key, item_spec| %>
-      <%= render "recording_studio_pages/admin/sections/field",
-                 prefix: "#{name}[#{index}]",
-                 key: item_key,
-                 spec: item_spec.is_a?(Hash) ? item_spec : { type: item_spec },
-                 value: item.is_a?(Hash) ? item[item_key.to_s] : nil %>
+  <div class="flex flex-col gap-4">
+    <% Array(value).each_with_index do |item, index| %>
+      <div class="flex flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--surface-border-color)] p-4">
+        <p class="text-sm font-medium"><%= "#{label} #{index + 1}" %></p>
+        <% (spec[:item] || {}).each do |item_key, item_spec| %>
+          <%= render "recording_studio_pages/admin/sections/field",
+                     prefix: "#{name}[#{index}]",
+                     key: item_key,
+                     spec: item_spec.is_a?(Hash) ? item_spec : { type: item_spec },
+                     value: item.is_a?(Hash) ? item[item_key.to_s] : nil %>
+        <% end %>
+        <%= render FlatPack::Checkbox::Component.new(
+          name: "#{name}[#{index}][_destroy]",
+          label: "Remove this item",
+          checked: false
+        ) %>
+      </div>
     <% end %>
-  <% end %>
-  <% empty_index = Array(value).length %>
-  <% (spec[:item] || {}).each do |item_key, item_spec| %>
-    <%= render "recording_studio_pages/admin/sections/field",
-               prefix: "#{name}[#{empty_index}]",
-               key: item_key,
-               spec: item_spec.is_a?(Hash) ? item_spec : { type: item_spec },
-               value: nil %>
-  <% end %>
+    <% empty_index = Array(value).length %>
+    <div class="flex flex-col gap-3 rounded-[var(--radius-md)] border border-dashed border-[var(--surface-border-color)] p-4">
+      <p class="text-sm font-medium">Add <%= label.downcase.sub(/s$/, "") %></p>
+      <% (spec[:item] || {}).each do |item_key, item_spec| %>
+        <%= render "recording_studio_pages/admin/sections/field",
+                   prefix: "#{name}[#{empty_index}]",
+                   key: item_key,
+                   spec: item_spec.is_a?(Hash) ? item_spec : { type: item_spec },
+                   value: nil %>
+      <% end %>
+    </div>
+  </div>
 <% elsif type == :recording_ids %>
   <%= render FlatPack::TextArea::Component.new(
     name: name,
-    label: "#{label} (one recording id per line)",
+    label: "#{label} (one id per line)",
     value: Array(value).join("\n")
   ) %>
 <% else %>
