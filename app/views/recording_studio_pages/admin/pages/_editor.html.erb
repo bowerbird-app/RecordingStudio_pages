@@ -55,8 +55,8 @@
         divider: true,
         class: "list-decimal pl-6"
       ) do %>
-        <% section_recordings.each do |recording| %>
-          <%= render "recording_studio_pages/admin/pages/section_row", recording: recording %>
+        <% section_recordings.each_with_index do |recording, index| %>
+          <%= render "recording_studio_pages/admin/pages/section_row", recording: recording, position: index + 1 %>
         <% end %>
       <% end %>
     </div>

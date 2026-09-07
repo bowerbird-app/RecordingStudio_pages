@@ -3,7 +3,7 @@
 <% subtitle = recordable.enabled? ? (recordable.settings["variant"].presence || definition&.category) : "Off" %>
 <% preview = recordable.content["title"].presence || recordable.content["body"].to_s.truncate(120) %>
 
-<%= render FlatPack::List::Item.new(id: recording.id, class: "!items-center") do %>
+<%= render FlatPack::List::Item.new(id: recording.id, leading: position.to_s, class: "!items-center") do %>
   <div class="flex w-full items-center justify-between gap-3">
     <div class="min-w-0">
       <p class="font-medium"><%= definition&.name || recordable.section_type %></p>
