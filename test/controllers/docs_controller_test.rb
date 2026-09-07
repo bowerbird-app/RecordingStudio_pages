@@ -76,7 +76,7 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     root_recording = RecordingStudio.root_recording_for(workspace)
     folder = Folder.create!(name: "Reference")
     folder_recording = record_child(folder, root_recording, root_recording)
-    page = Page.create!(title: "API")
+    page = RecordingStudioPages::Page.create!(title: "API", homepage: false)
     record_child(page, root_recording, folder_recording)
 
     get docs_recordings_tree_path
@@ -99,7 +99,7 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", text: "Gem Views"
     assert_select "table", minimum: 1
-    refute_includes response.body, "app/views/gem_template/home/index.html.erb"
+    refute_includes response.body, "app/views/recording_studio_pages/home/index.html.erb"
   end
 
   test "methods page renders successfully" do

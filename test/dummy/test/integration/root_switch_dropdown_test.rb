@@ -29,7 +29,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
     workspace = Workspace.create!(name: "Dropdown Workspace")
     RecordingStudio.root_recording_for(workspace)
 
-    get root_path
+    get studio_path
 
     assert_response :success
     assert_includes response.body, workspace.name

@@ -1,0 +1,22 @@
+<% dummy_page_nav(title: "Edit section", back_url: admin_page_path(@page_recording)) if defined?(dummy_page_nav) %>
+
+<div class="flex w-full flex-col gap-6">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: @definition&.name || "Unknown section",
+    variant: :h1
+  ) %>
+
+  <% if @definition %>
+    <%= render "recording_studio_pages/admin/sections/form",
+               url: admin_page_section_path(@page_recording, @section_recording),
+               method: :patch,
+               definition: @definition,
+               recordable: @section_recording.recordable %>
+  <% else %>
+    <%= render FlatPack::Alert::Component.new(
+      type: :warning,
+      title: "This section type is not registered",
+      message: "The saved content is still here. Register #{@section_recording.recordable.section_type} to edit it."
+    ) %>
+  <% end %>
+</div>

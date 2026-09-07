@@ -12,15 +12,19 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
 
   test "dummy app validates recordable declarations" do
     assert RecordingStudio.validate_recordable_declarations!
-    assert_equal [ "Workspace" ], RecordingStudio.root_recordable_types
-    assert_equal [ "Workspace", "Folder" ], RecordingStudio.allowed_parent_types_for("Page")
+    assert_equal %w[AdminRoot Workspace].sort, RecordingStudio.root_recordable_types.sort
+    assert_equal %w[Workspace Folder], RecordingStudio.allowed_parent_types_for("RecordingStudioPages::Page")
   end
 
-  test "dummy app schema keeps accessible grants and excludes removed core tables" do
+  test "dummy app schema keeps accessible grants and page builder tables" do
     connection = ActiveRecord::Base.connection
 
     assert connection.column_exists?(:recording_studio_recordings, :root_recording_id)
     assert connection.table_exists?(:recording_studio_accesses)
+    assert connection.table_exists?(:recording_studio_pages_pages)
+    assert connection.table_exists?(:recording_studio_pages_sections)
+    assert connection.column_exists?(:recording_studio_recordings, :recording_studio_orderable_position)
+    assert connection.table_exists?(:recording_studio_publishable_publishables)
     refute connection.table_exists?(:recording_studio_access_boundaries)
     refute connection.table_exists?(:recording_studio_device_sessions)
   end
@@ -34,12 +38,12 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     accessible_workspace = Workspace.find_by!(name: "Client Workspace")
     private_workspace = Workspace.find_by!(name: "Private Workspace")
     folder = Folder.find_by!(name: "Product Docs")
-    page = Page.find_by!(title: "Getting Started")
+    homepage = RecordingStudioPages::Page.find_by!(title: "Home")
     root_recording = RecordingStudio::Recording.find_by!(recordable: workspace)
     accessible_root_recording = RecordingStudio::Recording.find_by!(recordable: accessible_workspace)
     private_root_recording = RecordingStudio::Recording.find_by!(recordable: private_workspace)
     folder_recording = RecordingStudio::Recording.find_by!(recordable: folder)
-    page_recording = RecordingStudio::Recording.find_by!(recordable: page)
+    homepage_recording = RecordingStudio::Recording.find_by!(recordable: homepage)
 
     assert_nil Current.actor
     assert_nil root_recording.parent_recording_id
@@ -47,8 +51,9 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_nil private_root_recording.parent_recording_id
     assert_equal root_recording, folder_recording.parent_recording
     assert_equal root_recording, folder_recording.root_recording
-    assert_equal folder_recording, page_recording.parent_recording
-    assert_equal root_recording, page_recording.root_recording
+    assert_equal root_recording, homepage_recording.parent_recording
+    assert_equal root_recording, homepage_recording.root_recording
+    assert homepage.homepage?
     assert_equal 3, Workspace.count
 
     assert_no_difference -> { User.count } do
@@ -61,23 +66,15 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     Current.actor = nil
   end
 
-  test "workspace opts into accessible and the example mixin without enabling them globally" do
+  test "workspace opts into accessible without enabling it globally" do
     workspace_source = File.read(Rails.root.join("app/models/workspace.rb"))
-    example_source = File.read(GemTemplate::Engine.root.join("lib/gem_template/capabilities/example.rb"))
 
-    assert_includes workspace_source, "include RecordingStudio::Capabilities::Example.to(label: \"dummy workspace\")"
-    assert_includes example_source, "RecordingStudio::Capabilities.include_for(:example, **)"
-    refute_includes example_source, "enable_capability"
-    refute_includes example_source, "set_capability_options"
+    assert_includes workspace_source, "enable_capability(:accessible, on: self)"
+    refute File.exist?(RecordingStudioPages::Engine.root.join("lib/recording_studio_pages/capabilities/example.rb"))
 
     assert RecordingStudio.capability_enabled?(:accessible, for: Workspace)
-    assert RecordingStudio.capability_enabled?(:example, for: Workspace)
-    assert_equal({ label: "dummy workspace" }, RecordingStudio.capability_options(:example, for: Workspace))
     refute RecordingStudio.capability_enabled?(:accessible, for: Folder)
-    refute RecordingStudio.capability_enabled?(:accessible, for: Page)
-    refute RecordingStudio.capability_enabled?(:example, for: Folder)
-    refute RecordingStudio.capability_enabled?(:example, for: Page)
-    assert_equal [ "Workspace" ], RecordingStudio.configuration.enabled_recordable_types_for(:example)
+    refute RecordingStudio.capability_enabled?(:accessible, for: RecordingStudioPages::Page)
     assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
   end
 end

@@ -1,0 +1,18 @@
+<% dummy_nav = local_assigns[:admin] %>
+<% if dummy_nav %>
+  <% dummy_page_nav(title: @page.title, back_url: main_app.root_path) if defined?(dummy_page_nav) %>
+<% end %>
+
+<div class="flex w-full flex-col">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: @page.title,
+    variant: :h1
+  ) %>
+
+  <% @rendered_sections.each do |rendered| %>
+    <% component_class = rendered.component_class %>
+    <% if component_class %>
+      <%= render component_class.new(rendered: rendered) %>
+    <% end %>
+  <% end %>
+</div>

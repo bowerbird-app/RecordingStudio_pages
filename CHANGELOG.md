@@ -7,12 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-- Extra Cloud Agent skills now come from the plugin catalog (`skill-sources.json`) instead of a hardcoded extra URL. A missing or invalid catalog is skipped so Recording Studio skills still fetch. Failures still warn and exit 0.
+## [0.3.0] - 2026-09-07
+
+Recording Studio Page Builder. Pages and sections are recordings. `section_type` plus a registry pick the implementation. There is no parallel CMS schema.
 
 ### Added
-- After skills, the Cloud Agent fetch hook lists plugin `*.mdc` rules from `RecordingStudio_cursor_plugin` into `.cursor/rules/` (gitignored, not packaged). A missing rules directory warns and skips. Failures still exit 0.
-- Cloud Agent skill-fetch hook so copied addons load Recording Studio skills at Build time. `.cursor/environment.json` names the environment `recording-studio-gem-template`. `install` is `.cursor/install.sh`, which runs `.cursor/fetch-skills.sh` after provisioning. `snapshot` is omitted on purpose so Builds run install instead of reusing a laptop Personal snapshot. The script lists `recording-studio-*` skill ids from the public GitHub contents API and writes each `SKILL.md` into `.cursor/skills/` (gitignored, not packaged). Failures warn and still exit 0.
+- `RecordingStudioPages::Page` and `RecordingStudioPages::Section` recordables. Page columns are `title`, `homepage`, and `template_key`. Section columns are `section_type`, `content`, `settings`, and `enabled`.
+- Section and template registries. Duplicate keys raise. Unknown section types skip render and keep their rows.
+- Built-in sections: `hero`, `rich_text`, `image_text`, `logo_cloud`, `feature_grid`, `call_to_action`. Built-in template: `marketing_home`.
+- Services for create, revise, add, reorder, toggle, remove, apply template, and homepage uniqueness.
+- Engine admin under `/recording_studio_pages/admin/pages` plus an RS Admin Pages section.
+- Public homepage at `/` and Publishable public paths at `/pages/:uuid/:slug`.
+- Dummy host wiring for Publishable `v0.2.1`, Orderable `v0.2.1`, and Admin `v2.0.2`.
+
+### Changed
+- Gem identity is `recording_studio_pages` `0.3.0`. Homepage is `https://github.com/bowerbird-app/RecordingStudio_pages`.
+- Dummy `/` is the published homepage. Dummy sandbox moved to `/studio`.
+
+### Notes
+- Publishable cannot own `/` because slugs cannot be empty and public paths require `:uuid`. Page Builder owns homepage routing. See the README upstream gaps.
 
 ## [0.2.1] - 2026-09-01
 
@@ -32,7 +45,7 @@ New addons copied from this template are born on Recording Studio 4.x.
 ### Added
 - Gemspec dependency `recording_studio`, `~> 4.1`
 - Dummy host wiring for Accessible (`enable_capability(:accessible, on: Workspace)`) and an opt-in `RecordingStudio::Capabilities::Example.to` mixin. `.to` wraps core 4.2.0 `include_for` (not a fourth verb, and not a raw `enable_capability` / `set_capability_options` path). Installing the gem does not enable the mixin globally; only dummy Workspace opts in.
-- `bin/rename_gem` leftover-identity rewrite/verification for README, homepage, and changelog URLs that still say `GemTemplate` or point at `bowerbird-app/gem_template`
+- `bin/rename_gem` leftover-identity rewrite/verification for README, homepage, and changelog URLs that still say `RecordingStudioPages` or point at `bowerbird-app/recording_studio_pages`
 
 ### Changed
 - Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.6.0`, Root Switchable `v0.5.0`, FlatPack `v0.1.133`
@@ -41,7 +54,7 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Require `RecordingStudio::Hooks` and `RecordingStudio::Services::BaseService` from core instead of shipping copies
 
 ### Removed
-- Copied `lib/gem_template/hooks.rb` and `lib/gem_template/services/base_service.rb`
+- Copied `lib/recording_studio_pages/hooks.rb` and `lib/recording_studio_pages/services/base_service.rb`
 - Product-shipped `ExampleService`
 - Custom `flat_pack_sidebar` authenticated shell
 
@@ -76,9 +89,9 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_gem_template/compare/v0.2.1...HEAD
-[0.2.1]: https://github.com/bowerbird-app/RecordingStudio_gem_template/releases/tag/v0.2.1
-[0.2.0]: https://github.com/bowerbird-app/RecordingStudio_gem_template/releases/tag/v0.2.0
-[0.1.2]: https://github.com/bowerbird-app/RecordingStudio_gem_template/releases/tag/v0.1.2
-[0.1.1]: https://github.com/bowerbird-app/RecordingStudio_gem_template/releases/tag/v0.1.1
-[0.1.0]: https://github.com/bowerbird-app/RecordingStudio_gem_template/releases/tag/v0.1.0
+[Unreleased]: https://github.com/bowerbird-app/recording_studio_pages/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/bowerbird-app/recording_studio_pages/releases/tag/v0.2.1
+[0.2.0]: https://github.com/bowerbird-app/recording_studio_pages/releases/tag/v0.2.0
+[0.1.2]: https://github.com/bowerbird-app/recording_studio_pages/releases/tag/v0.1.2
+[0.1.1]: https://github.com/bowerbird-app/recording_studio_pages/releases/tag/v0.1.1
+[0.1.0]: https://github.com/bowerbird-app/recording_studio_pages/releases/tag/v0.1.0

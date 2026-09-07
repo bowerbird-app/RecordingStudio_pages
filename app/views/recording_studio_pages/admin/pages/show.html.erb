@@ -1,0 +1,62 @@
+<% dummy_page_nav(title: @page_recording.recordable.title, back_url: admin_pages_path) if defined?(dummy_page_nav) %>
+
+<div class="flex w-full flex-col gap-6">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: @page_recording.recordable.title,
+    subtitle: @page_recording.recordable.homepage? ? "This is the public home page." : nil,
+    variant: :h1
+  ) %>
+
+  <div class="flex flex-wrap gap-3">
+    <%= render FlatPack::Button::Component.new(text: "Edit page", href: edit_admin_page_path(@page_recording), style: :secondary, size: :md) %>
+    <%= render FlatPack::Button::Component.new(text: "Add section", href: new_admin_page_section_path(@page_recording), style: :primary, size: :md) %>
+    <%= render FlatPack::Button::Component.new(
+      text: "Publish",
+      href: "/recordings/#{@page_recording.id}/publishable/edit",
+      style: :secondary,
+      size: :md
+    ) %>
+  </div>
+
+  <% if @unknown_sections.any? %>
+    <%= render FlatPack::Alert::Component.new(
+      type: :warning,
+      title: "Some sections are waiting on a missing type",
+      message: "Their content is still saved. Register the section type to edit them again."
+    ) %>
+  <% end %>
+
+  <% section_recordings.each do |recording| %>
+    <% recordable = recording.recordable %>
+    <% definition = RecordingStudioPages.find_section(recordable.section_type) %>
+    <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+      <% card.header do %>
+        <%= render FlatPack::PageTitle::Component.new(
+          title: definition&.name || recordable.section_type,
+          subtitle: recordable.enabled? ? (recordable.settings["variant"].presence || definition&.category) : "Off",
+          variant: :h3
+        ) %>
+      <% end %>
+      <% card.body do %>
+        <p class="text-sm"><%= recordable.content["title"].presence || recordable.content["body"].to_s.truncate(120) %></p>
+      <% end %>
+      <% card.footer do %>
+        <div class="flex flex-wrap gap-2">
+          <%= button_to "Move up", move_admin_page_section_path(@page_recording, recording, direction: "up"), method: :post, class: "inline-flex" %>
+          <%= button_to "Move down", move_admin_page_section_path(@page_recording, recording, direction: "down"), method: :post, class: "inline-flex" %>
+          <%= render FlatPack::Button::Component.new(text: "Edit", href: edit_admin_page_section_path(@page_recording, recording), style: :secondary, size: :sm) if definition %>
+          <%= button_to(recordable.enabled? ? "Turn off" : "Turn on", toggle_admin_page_section_path(@page_recording, recording), method: :post) %>
+          <%= button_to "Remove", admin_page_section_path(@page_recording, recording), method: :delete, data: { turbo_confirm: "Remove this section?" } %>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% if section_recordings.empty? %>
+    <%= render FlatPack::Alert::Component.new(
+      type: :info,
+      title: "No sections yet",
+      message: "Add a hero, some features, or a call to action."
+    ) %>
+  <% end %>
+</div>

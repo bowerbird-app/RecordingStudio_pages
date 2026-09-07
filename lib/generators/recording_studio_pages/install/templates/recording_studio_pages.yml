@@ -1,0 +1,13 @@
+development:
+  page_parent_types:
+    - Workspace
+    - Folder
+  homepage_path: "/"
+  register_built_in_sections: true
+
+production:
+  page_parent_types:
+    - Workspace
+    - Folder
+  homepage_path: "/"
+  register_built_in_sections: true

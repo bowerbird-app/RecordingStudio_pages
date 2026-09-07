@@ -1,0 +1,31 @@
+<%= form_with url: url, method: method, local: true do %>
+  <%= hidden_field_tag "section[section_type]", definition.key %>
+  <div class="flex flex-col gap-4">
+    <% definition.fields.fields.each do |key, spec| %>
+      <%= render "recording_studio_pages/admin/sections/field",
+                 prefix: "section[content]",
+                 key: key,
+                 spec: spec,
+                 value: recordable&.content&.dig(key.to_s) %>
+    <% end %>
+
+    <% if definition.variants.any? %>
+      <%= render FlatPack::Select::Component.new(
+        name: "section[settings][variant]",
+        label: "Layout",
+        value: recordable&.settings&.dig("variant") || definition.variants.first,
+        options: definition.variants.map { |variant| [variant.humanize, variant] }
+      ) %>
+    <% end %>
+
+    <% definition.settings.fields.except(:variant).each do |key, spec| %>
+      <%= render "recording_studio_pages/admin/sections/field",
+                 prefix: "section[settings]",
+                 key: key,
+                 spec: spec,
+                 value: recordable&.settings&.dig(key.to_s) %>
+    <% end %>
+
+    <%= render FlatPack::Button::Component.new(text: "Save section", style: :primary, size: :md, type: :submit) %>
+  </div>
+<% end %>

@@ -1,0 +1,37 @@
+<% dummy_page_nav(title: "Add section", back_url: admin_page_path(@page_recording)) if defined?(dummy_page_nav) %>
+
+<div class="flex w-full flex-col gap-6">
+  <%= render FlatPack::PageTitle::Component.new(
+    title: "Add section",
+    subtitle: "Pick an approved type. The form follows its schema.",
+    variant: :h1
+  ) %>
+
+  <% unless @definition %>
+    <div class="grid gap-4 md:grid-cols-2">
+      <% @definitions.group_by(&:category).each do |category, definitions| %>
+        <% definitions.each do |definition| %>
+          <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
+            <% card.body do %>
+              <%= render FlatPack::PageTitle::Component.new(title: definition.name, subtitle: category, variant: :h3) %>
+            <% end %>
+            <% card.footer do %>
+              <%= render FlatPack::Button::Component.new(
+                text: "Use #{definition.name}",
+                href: new_admin_page_section_path(@page_recording, section_type: definition.key),
+                style: :secondary,
+                size: :sm
+              ) %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render "recording_studio_pages/admin/sections/form",
+               url: admin_page_sections_path(@page_recording),
+               method: :post,
+               definition: @definition,
+               recordable: nil %>
+  <% end %>
+</div>
