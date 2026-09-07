@@ -1,4 +1,4 @@
-<% dummy_page_nav(title: "Edit section", back_url: admin_page_path(@page_recording)) if defined?(dummy_page_nav) %>
+<% dummy_page_nav(title: "Edit section", back_url: page_builder_page_path) if defined?(dummy_page_nav) %>
 
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
@@ -8,7 +8,7 @@
 
   <% if @definition %>
     <%= render "recording_studio_pages/admin/sections/form",
-               url: admin_page_section_path(@page_recording, @section_recording),
+               url: admin_page_section_path(page_id: @page_recording.id, id: @section_recording.id),
                method: :patch,
                definition: @definition,
                recordable: @section_recording.recordable %>

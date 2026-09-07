@@ -8,9 +8,21 @@ module RecordingStudioPages
       before_action :authenticate_user!, raise: false
       before_action :require_admin_access!
 
-      helper_method :page_recording, :section_recordings
+      helper_method :page_recording, :section_recordings, :page_builder_page_path, :page_builder_new_section_path
 
       private
+
+      def page_builder_page_path(recording = nil)
+        recording ||= page_recording
+        admin_page_path(id: recording.id)
+      end
+
+      def page_builder_new_section_path(recording = nil, section_type: nil)
+        recording ||= page_recording
+        options = { page_id: recording.id }
+        options[:section_type] = section_type if section_type.present?
+        new_admin_page_section_path(options)
+      end
 
       def require_admin_access!
         return if admin_authorized?(:view)

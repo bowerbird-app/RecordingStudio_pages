@@ -9,7 +9,7 @@
 
   <div class="flex flex-wrap gap-3">
     <%= render FlatPack::Button::Component.new(text: "Edit page", href: edit_admin_page_path(@page_recording), style: :secondary, size: :md) %>
-    <%= render FlatPack::Button::Component.new(text: "Add section", href: new_admin_page_section_path(@page_recording), style: :primary, size: :md) %>
+    <%= render FlatPack::Button::Component.new(text: "Add section", href: page_builder_new_section_path, style: :primary, size: :md) %>
     <%= render FlatPack::Button::Component.new(
       text: "Publish",
       href: "/recordings/#{@page_recording.id}/publishable/edit",

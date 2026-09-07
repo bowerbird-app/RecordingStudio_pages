@@ -67,6 +67,17 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_equal %w[hero hero], sections.map { |recording| recording.recordable.section_type }
   end
 
+  test "staff can open the add section library from the registry" do
+    page_recording = create_page!(parent_recording: @root, title: "Library", actor: @actor)
+
+    get recording_studio_pages.new_admin_page_section_path(page_recording)
+
+    assert_response :success
+    assert_includes response.body, "Hero"
+    assert_includes response.body, "Call to action"
+    assert_includes response.body, "Add section"
+  end
+
   test "visitors cannot mutate pages" do
     sign_out @actor
     page_recording = create_page!(parent_recording: @root, title: "Locked", actor: @actor)
