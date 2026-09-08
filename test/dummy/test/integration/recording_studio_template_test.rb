@@ -12,7 +12,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
 
   test "dummy app validates recordable declarations" do
     assert RecordingStudio.validate_recordable_declarations!
-    assert_equal %w[AdminRoot Workspace].sort, RecordingStudio.root_recordable_types.sort
+    assert_equal %w[AdminRoot RecordingStudioUser::People Workspace].sort, RecordingStudio.root_recordable_types.sort
     assert_equal %w[Workspace Folder], RecordingStudio.allowed_parent_types_for("RecordingStudioPages::Page")
   end
 
@@ -26,6 +26,10 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert connection.column_exists?(:recording_studio_recordings, :recording_studio_orderable_position)
     assert connection.table_exists?(:recording_studio_publishable_publishables)
     assert connection.table_exists?(:recording_studio_attachable_attachments)
+    assert connection.table_exists?(:recording_studio_user_people)
+    assert connection.table_exists?(:recording_studio_user_profiles)
+    assert connection.table_exists?(:recording_studio_user_identities)
+    assert connection.column_exists?(:recording_studio_accesses, :depends_on_recording_id)
     refute connection.table_exists?(:pages)
     refute connection.table_exists?(:recording_studio_access_boundaries)
     refute connection.table_exists?(:recording_studio_device_sessions)
@@ -100,6 +104,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal "/images/hero-tonight.jpg", tonight_hero.content["image_url"]
     assert_equal "The floor is already warm", tonight_hero.content["title"]
     assert_equal 3, Workspace.count
+    assert_not_nil RecordingStudioUser.profile_for(User.find_by!(email: "admin@admin.com"))
 
     assert_no_difference -> { User.count } do
       assert_no_difference -> { RecordingStudio::Recording.count } do
@@ -142,5 +147,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     routes = File.read(Rails.root.join("config/routes.rb"))
 
     assert_includes routes, 'get "/start"'
+    assert_includes routes, "recording_studio_user_auth_for :users"
+    assert_includes routes, "RecordingStudioUser::Engine"
   end
 end

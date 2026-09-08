@@ -140,7 +140,7 @@ Hero content looks like `cta: { type: "button", text: "Come in", url: "/users/si
 
 New page still starts from a **template**. The template names the CTA. Editing the hero is where you change Button / Social logins / URL field. Add section does not list CTAs.
 
-Dummy registers `social_logins` and `url_form`, plus **Join** and **Start from a URL** templates, so a one-section landing can be a button, sign-in buttons, or a paste-a-link field.
+Dummy registers `social_logins` and `url_form`, plus **Join** and **Start from a URL** templates, so a one-section landing can be a button, sign-in buttons, or a paste-a-link field. Dummy `social_logins` renders Recording Studio Users `recording_studio_user/omniauth/continue_with_providers` — Continue-with buttons for providers whose secrets are in Rails credentials under `omniauth:`. Dummy test and development credentials enable Google and Apple so Join can show those buttons. Hosts leave `omniauth_providers` empty and put real secrets in credentials; do not copy dummy client ids.
 
 ## Register a template
 
@@ -222,7 +222,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.0. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.6.0`, Attachable `0.4.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
+0.3.0. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
 
 ## Upgrade
 
@@ -234,3 +234,4 @@ These are limits in sibling gems. This gem documents them instead of forking the
 6. Define `recording_studio_pages_page_nav` if gem screens should share host chrome. Otherwise they use Recording Studio page nav.
 7. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.
 8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.
+9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and render `recording_studio_user/omniauth/continue_with_providers`. Dummy Join does that. Continue-with buttons follow Rails credentials under `omniauth:`.

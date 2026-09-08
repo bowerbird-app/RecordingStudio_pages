@@ -207,7 +207,9 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Come as you are"
     assert_includes response.body, "Continue with Google"
     assert_includes response.body, "Continue with Apple"
-    assert_includes response.body, "/users/sign_in"
+    assert_includes response.body, "/users/auth/google_oauth2"
+    assert_includes response.body, "/users/auth/apple"
+    refute_includes response.body, 'href="/users/sign_in"'
     refute_includes response.body, "Take a seat"
   end
 

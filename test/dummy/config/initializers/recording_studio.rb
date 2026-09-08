@@ -5,6 +5,8 @@ RecordingStudio.configure do |config|
     "Workspace",
     "Folder",
     "AdminRoot",
+    "RecordingStudioUser::People",
+    "RecordingStudioUser::Profile",
     "RecordingStudioPages::Page",
     "RecordingStudioPages::Section",
     "RecordingStudioPublishable::Publishable",

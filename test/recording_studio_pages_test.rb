@@ -47,13 +47,14 @@ class RecordingStudioPagesTest < Minitest::Test
     gemfile = File.read(File.expand_path("dummy/Gemfile", __dir__))
 
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v4.2.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.6.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.9.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.5.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_attachable", tag: "0.4.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_attachable", tag: "v0.5.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_publishable", tag: "v0.2.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_orderable", tag: "v0.2.2"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_duplicatable", tag: "v0.4.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.0.2"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_users", tag: "v0.11.0"'
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.162"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.134"'
@@ -123,7 +124,9 @@ class RecordingStudioPagesTest < Minitest::Test
 
     assert_includes tailwind_source, "tmp/tailwind/flat_pack_components/**/*.rb"
     assert_includes tailwind_source, "tmp/tailwind/flat_pack_components/**/*.erb"
+    assert_includes tailwind_source, "tmp/tailwind/recording_studio_user_views/**/*.erb"
     assert_includes tailwind_source, "RecordingStudio-*/app/views/**/*.erb"
+    assert_includes tailwind_source, "RecordingStudio_users-*/app/views/**/*.erb"
     assert_includes tailwind_source, "../../../../../app/components/**/*.rb"
     assert_includes tailwind_source, "../../../../../app/components/**/*.erb"
     assert_includes tailwind_source, "../../components/**/*.rb"
@@ -154,6 +157,8 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes initializer_source, "config.require_recordable_declarations = true"
     assert_includes initializer_source, "RecordingStudioPages::Page"
     assert_includes initializer_source, "RecordingStudioPages::Section"
+    assert_includes initializer_source, "RecordingStudioUser::People"
+    assert_includes initializer_source, "RecordingStudioUser::Profile"
     refute_includes initializer_source, "config.include_children"
     refute_includes initializer_source, "config.features."
     refute_includes initializer_source, "v3"
@@ -298,6 +303,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes dummy_initializer, "register_cta"
     assert_includes dummy_initializer, ":social_logins"
     assert_includes dummy_initializer, ":url_form"
+    social = File.read(File.expand_path("dummy/app/components/dummy/ctas/social_logins_component.rb", __dir__))
+    assert_includes social, "recording_studio_user/omniauth/continue_with_providers"
+    refute_includes social, "/users/sign_in"
     engine = File.read(File.expand_path("../lib/recording_studio_pages/engine.rb", __dir__))
     assert_includes engine, "restore_registries!"
   end

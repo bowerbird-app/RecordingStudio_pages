@@ -10,6 +10,7 @@ class AdminRoot < ApplicationRecord
   if defined?(RecordingStudioAdmin)
     recording_studio_admin_sections do
       section :pages
+      section :users
     end
   end
 end

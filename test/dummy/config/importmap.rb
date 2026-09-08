@@ -13,3 +13,8 @@ pin_all_from RecordingStudioPages::Engine.root.join("app/javascript/recording_st
              under: "controllers/recording_studio_pages",
              to: "recording_studio_pages/controllers",
              preload: false
+
+pin "@rails/activestorage", to: "activestorage.esm.js"
+pin_all_from RecordingStudioAttachable::Engine.root.join("app/javascript/controllers/recording_studio_attachable"),
+  under: "controllers/recording_studio_attachable",
+  to: "controllers/recording_studio_attachable"

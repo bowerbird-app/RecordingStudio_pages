@@ -17,13 +17,18 @@ end
 grant_admin_access = lambda do |recording, actor|
   next if RecordingStudioAccessible.role_for(actor: actor, recording: recording) == :admin
 
-  RecordingStudioAccessible::AccessCreationContext.allow do
-    root_recording = RecordingStudio.root_recording_or_self(recording)
-    root_recording.record(RecordingStudio::Access, parent_recording: recording) do |access|
-      access.actor = actor
-      access.role = :admin
-    end
-  end
+  result = RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: actor)
+  next if result.success?
+
+  manager = User.where.not(id: actor.id).first
+  result = RecordingStudioAccessible.grant_access(
+    recording: recording,
+    actor: actor,
+    role: :admin,
+    manager_actor: manager
+  ) if manager
+
+  raise result.error if result.failure?
 end
 
 find_page_recording = lambda do |title|
@@ -66,9 +71,21 @@ restore_template_sections = lambda do |page_recording, template_key, actor|
   ).value!
 end
 
-user = User.find_or_create_by!(email: "admin@admin.com") do |record|
-  record.password = "Password"
-  record.password_confirmation = "Password"
+user = User.find_or_initialize_by(email: "admin@admin.com")
+if user.new_record?
+  user.password = "Password"
+  user.password_confirmation = "Password"
+  user.save!
+end
+
+if RecordingStudioUser.profile_for(user).nil?
+  RecordingStudioUser.record_profile!(
+    user,
+    first_name: "Ada",
+    last_name: "Admin",
+    time_zone: "UTC",
+    actor: user
+  )
 end
 
 workspace = Workspace.find_or_create_by!(name: "Studio Workspace")

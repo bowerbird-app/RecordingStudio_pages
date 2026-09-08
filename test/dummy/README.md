@@ -4,13 +4,14 @@ This Rails app exists to validate the Recording Studio Page Builder in a real ho
 
 ## What It Covers
 
-- Devise authentication with a seeded admin user
+- Recording Studio Users for sign-in, People, Profile, and Continue-with social buttons
+- A seeded admin person (`admin@admin.com` / `Password`) with a Profile under the shared People root
 - `Current.actor` wiring for Recording Studio events
 - Workspace roots plus seeded page and section recordings
 - Public homepage at `/` from a published page recording. Dummy seed restores the sample Home template if sections drift.
 - Staff page composition at `/recording_studio_pages/admin/pages`. Add a section from the editor dropdown. Use a template. Preview enabled sections on the same screen. Drag sections to reorder. Copy a section from More (Recording Studio Duplicatable). Remove a page from Edit page.
-- RS Admin Pages section at `/admin`
-- Recording Studio default layout, FlatPack assets (including `flat_pack/application`), and Tailwind source scanning via `tmp/tailwind` mirrors. Public pages use a full-width layout and the host Flatpack theme (`rounded` here). Devise sign-in stays `max-w-md`.
+- RS Admin Pages section at `/admin`. Switch to the Admin root first. The hub also lists **Users**.
+- Recording Studio default layout, FlatPack assets (including `flat_pack/application`), and Tailwind source scanning via `tmp/tailwind` mirrors. Public pages use a full-width layout and the host Flatpack theme (`rounded` here). Users auth uses the gem's centered layout, not the dummy `max-w-md` application layout.
 - Dummy-only `/docs/*` and `/studio` pages for host-app sandboxing
 
 ## Quick Start
@@ -29,18 +30,21 @@ Then open the app and sign in with:
 - Email: `admin@admin.com`
 - Password: `Password`
 
+Sign-in is email first (**Continue with email**), then password. Google and Apple Continue-with buttons show because dummy test/development credentials include placeholder `omniauth:` keys. Those ids are not real OAuth clients. Hosts put live secrets in Rails credentials and leave `omniauth_providers` empty.
+
 ## Useful Routes
 
 - `/` - published homepage
 - `/pages/:uuid/tonight` - seeded **Tonight** page: one fullscreen hero, public URL (not the editor preview)
-- `/pages/:uuid/join` - seeded **Join** page: one hero with sign-in buttons
+- `/pages/:uuid/join` - seeded **Join** page: one hero whose call to action is Users Continue-with buttons
 - `/pages/:uuid/start-from-a-url` - seeded **Start from a URL** page: one hero with a paste-a-link field
 - `/start` - dummy catcher for that URL field
 - `/studio` - dummy sandbox
 - `/recording_studio` - redirects to `/studio` while the mounted Recording Studio engine stays available under that prefix for non-root routes
 - `/recording_studio_pages/admin/pages` - page builder
+- `/recording_studio_users/profile` - My Profile
 - `/admin` - RS Admin hub. Switch the current root to **Admin** first. The hub returns 403 while a workspace is selected.
-- `/users/sign_in` - Devise sign-in page
+- `/users/sign_in` - Users email-first sign-in
 - `/docs/install`, `/docs/config`, `/docs/recordable_types`, `/docs/recordings_tree`, `/docs/gem_views`, `/docs/methods` - dummy-only starter pages
 - `/up` - Rails health check
 

@@ -29,13 +29,22 @@ module PageBuilderTestHelper
   def grant_admin!(recording, actor)
     return if RecordingStudioAccessible.role_for(actor: actor, recording: recording) == :admin
 
-    RecordingStudioAccessible::AccessCreationContext.allow do
-      root_recording = RecordingStudio.root_recording_or_self(recording)
-      root_recording.record(RecordingStudio::Access, parent_recording: recording) do |access|
-        access.actor = actor
-        access.role = :admin
-      end
+    result = RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: actor)
+    return result.value if result.success?
+
+    manager = User.where.not(id: actor.id).first
+    if manager
+      result = RecordingStudioAccessible.grant_access(
+        recording: recording,
+        actor: actor,
+        role: :admin,
+        manager_actor: manager
+      )
     end
+
+    raise result.error if result.failure?
+
+    result.value
   end
 
   def create_page!(parent_recording:, title:, homepage: false, actor:)

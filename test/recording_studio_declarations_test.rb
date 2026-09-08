@@ -9,7 +9,7 @@ require "rails/test_help"
 class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
   test "dummy recordable declarations validate and expose parent/root introspection" do
     assert RecordingStudio.validate_recordable_declarations!
-    assert_equal %w[AdminRoot Workspace].sort, RecordingStudio.root_recordable_types.sort
+    assert_equal %w[AdminRoot RecordingStudioUser::People Workspace].sort, RecordingStudio.root_recordable_types.sort
     assert_equal %w[Workspace Folder], RecordingStudio.allowed_parent_types_for("Folder")
     assert_equal %w[Workspace Folder], RecordingStudio.allowed_parent_types_for("RecordingStudioPages::Page")
     assert_equal ["RecordingStudioPages::Page"], RecordingStudio.allowed_parent_types_for("RecordingStudioPages::Section")
@@ -100,6 +100,8 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
     assert RecordingStudio.capability_enabled?(:accessible, for: "AdminRoot")
     refute RecordingStudio.capability_enabled?(:accessible, for: "Folder")
     refute RecordingStudio.capability_enabled?(:accessible, for: "RecordingStudioPages::Page")
+    assert RecordingStudio.capability_enabled?(:accessible, for: "RecordingStudioUser::Profile")
+    refute RecordingStudio.capability_enabled?(:accessible, for: "RecordingStudioUser::People")
     assert RecordingStudio.capability_enabled?(:duplicatable, for: "RecordingStudioPages::Section")
     refute RecordingStudio.capability_enabled?(:duplicatable, for: "RecordingStudioPages::Page")
   end
