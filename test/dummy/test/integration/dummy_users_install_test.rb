@@ -17,7 +17,9 @@ class DummyUsersInstallTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'action="/users/auth/google_oauth2"'
 
     actor = create_actor!("join-cta@example.com")
+    Current.actor = actor
     root = create_workspace_root!("Join CTA #{SecureRandom.hex(4)}")
+    grant_admin!(root, actor)
     page_recording = create_page!(parent_recording: root, title: "Join", actor: actor)
     RecordingStudioPages::Services::ApplyTemplate.call(
       page_recording: page_recording,
