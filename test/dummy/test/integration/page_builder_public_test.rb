@@ -191,4 +191,118 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
 
     assert_response :not_found
   end
+
+  test "a hero can render a host social login CTA" do
+    page_recording = create_page!(parent_recording: @root, title: "Join", actor: @actor)
+    RecordingStudioPages::Services::ApplyTemplate.call(
+      page_recording: page_recording,
+      template_key: "join",
+      actor: @actor
+    ).value!
+    publishable = publish_page!(page_recording, slug: "join-us", actor: @actor)
+
+    get "/pages/#{publishable.id}/join-us"
+
+    assert_response :success
+    assert_includes response.body, "Come as you are"
+    assert_includes response.body, "Continue with Google"
+    assert_includes response.body, "Continue with Apple"
+    assert_includes response.body, "/users/sign_in"
+    refute_includes response.body, "Take a seat"
+  end
+
+  test "a hero can render a host URL field CTA" do
+    page_recording = create_page!(parent_recording: @root, title: "Start", actor: @actor)
+    RecordingStudioPages::Services::ApplyTemplate.call(
+      page_recording: page_recording,
+      template_key: "start_from_url",
+      actor: @actor
+    ).value!
+    publishable = publish_page!(page_recording, slug: "start-here", actor: @actor)
+
+    get "/pages/#{publishable.id}/start-here"
+
+    assert_response :success
+    assert_includes response.body, "Got a link?"
+    assert_includes response.body, 'action="/start"'
+    assert_includes response.body, "Open it"
+    assert_includes response.body, 'name="url"'
+  end
+
+  test "a saved primary_action hero still renders a button" do
+    page_recording = create_page!(parent_recording: @root, title: "Legacy", actor: @actor)
+    hero = add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Old door" },
+      actor: @actor
+    )
+    hero.root_recording.revise(hero, actor: @actor) do |section|
+      section.content = {
+        "title" => "Old door",
+        "primary_action" => { "text" => "Walk in", "url" => "/users/sign_in" }
+      }
+    end
+    rendered = RecordingStudioPages::Renderer.call(page_recording.reload)
+    publishable = publish_page!(page_recording, slug: "legacy-hero", actor: @actor)
+
+    get "/pages/#{publishable.id}/legacy-hero"
+
+    assert_equal "button", rendered.first.content.dig("cta", "type")
+    assert_equal "Walk in", rendered.first.content.dig("cta", "text")
+    assert_response :success
+    assert_includes response.body, "Old door"
+    assert_includes response.body, "Walk in"
+    assert_includes response.body, "/users/sign_in"
+  end
+
+  test "revising a legacy hero persists the cta shape" do
+    page_recording = create_page!(parent_recording: @root, title: "Upgrade", actor: @actor)
+    hero = add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Old door" },
+      actor: @actor
+    )
+    hero.root_recording.revise(hero, actor: @actor) do |section|
+      section.content = {
+        "title" => "Old door",
+        "primary_action" => { "text" => "Walk in", "url" => "/users/sign_in" }
+      }
+    end
+
+    RecordingStudioPages::Services::ReviseSection.call(
+      section_recording: hero.reload,
+      content: hero.recordable.content.merge("title" => "Old door"),
+      actor: @actor
+    ).value!
+
+    saved = hero.reload.recordable.content
+    assert_equal "button", saved.dig("cta", "type")
+    assert_equal "Walk in", saved.dig("cta", "text")
+    refute saved.key?("primary_action")
+  end
+
+  test "an unknown CTA type skips the slot and keeps the hero" do
+    page_recording = create_page!(parent_recording: @root, title: "Mystery", actor: @actor)
+    hero = add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Still here", cta: { type: "button", text: "Stay", url: "/users/sign_in" } },
+      actor: @actor
+    )
+    hero.root_recording.revise(hero, actor: @actor) do |section|
+      section.content = {
+        "title" => "Still here",
+        "cta" => { "type" => "missing_widget", "text" => "Hidden ask" }
+      }
+    end
+    publishable = publish_page!(page_recording, slug: "mystery-hero", actor: @actor)
+
+    get "/pages/#{publishable.id}/mystery-hero"
+
+    assert_response :success
+    assert_includes response.body, "Still here"
+    refute_includes response.body, "Hidden ask"
+  end
 end

@@ -68,7 +68,7 @@ Order lives on `recording_studio_recordings.recording_studio_orderable_position`
 
 ## Register a section
 
-The engine resets registries on reload, then registers built-ins, then runs `:register_sections`. Hosts and other gems must re-register in that hook or in `to_prepare`:
+The engine resets registries on reload, then registers built-ins, then runs `:register_sections` and `:register_ctas`. Hosts and other gems must re-register in those hooks or in `to_prepare`:
 
 ```ruby
 # config/initializers/recording_studio_pages.rb
@@ -105,7 +105,42 @@ Duplicate keys raise `RecordingStudioPages::DuplicateRegistration`. Unknown type
 
 `data:` is a proc. Use it when the section reads live records instead of only JSON. If the proc raises, render logs a warning, skips that payload, and still draws the saved content.
 
-`RecordingStudioPages.catalog` lists every registered section and template, including field types, required flags, settings, and variants. That catalog is the machine-readable surface for future API and MCP tooling.
+`RecordingStudioPages.catalog` lists every registered section, template, and call to action, including field types, required flags, settings, and variants. That catalog is the machine-readable surface for future API and MCP tooling.
+
+## Register a call to action
+
+A hero has one slot under the copy. Pages fills it from a **CTA registry**, not by forking the hero. The built-in filling is a button (`text` + `url`). Hosts and other gems register more fillings — social logins, a URL field, a waitlist form — and pick them on the hero, or bake them into a template.
+
+```ruby
+RecordingStudioPages.configure do |config|
+  config.hooks.on(:register_ctas) do
+    RecordingStudioPages.register_cta(
+      key: :social_logins,
+      name: "Social logins",
+      source: "host",
+      component: "Host::SocialLoginsComponent"
+    )
+    RecordingStudioPages.register_cta(
+      key: :url_form,
+      name: "URL field",
+      source: "host",
+      component: "Host::UrlFormComponent",
+      fields: {
+        placeholder: { type: :string, label: "Placeholder" },
+        button_text: { type: :string, label: "Button text" }
+      }
+    )
+  end
+end
+```
+
+The component receives `cta:` — the saved hash, including `type`. Duplicate keys raise. Unknown CTA types skip the slot and keep the JSON, same as unknown sections.
+
+Hero content looks like `cta: { type: "button", text: "Come in", url: "/users/sign_in" }`. Saved rows that still have `primary_action` upgrade on read; the next save writes `cta`. Image-and-text and call-to-action sections still use `primary_action` as a single link.
+
+New page still starts from a **template**. The template names the CTA. Editing the hero is where you change Button / Social logins / URL field. Add section does not list CTAs.
+
+Dummy registers `social_logins` and `url_form`, plus **Join** and **Start from a URL** templates, so a one-section landing can be a button, sign-in buttons, or a paste-a-link field.
 
 ## Register a template
 
@@ -127,7 +162,7 @@ RecordingStudioPages.register_template(
 
 hero, rich_text, image_text, logo_cloud, feature_grid, call_to_action. Registered variants change layout: image left/right, narrow rich text, compact logos, feature column counts, and CTA banner vs card.
 
-- Built-in templates: `marketing_home` (hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero). Dummy seeds a published **Tonight** page from `full_bleed_hero` with a local background photo at `/images/hero-tonight.jpg`. Open Tonight at `/pages/:uuid/tonight` — that public URL is only the hero, not the editor preview. A fullscreen hero fills the viewport (`100dvh`); Flatpack’s image hero is otherwise `min-h-[560px]`. Dummy Home is the `marketing_home` sample; seed restores that template if the sections drift (a second hero from **Use a template**, old copy, and so on).
+- Built-in templates: `marketing_home` (hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero). Dummy also registers `join` (hero with social logins) and `start_from_url` (hero with a URL field). Dummy seeds published **Tonight**, **Join**, and **Start from a URL** pages. Open Tonight at `/pages/:uuid/tonight`, Join at `/pages/:uuid/join`, and the URL landing at `/pages/:uuid/start-from-a-url`. Those public URLs are the page, not the editor preview. A fullscreen hero fills the viewport (`100dvh`); Flatpack’s image hero is otherwise `min-h-[560px]`. Dummy Home is the `marketing_home` sample; seed restores that template if the sections drift (a second hero from **Use a template**, old copy, and so on).
 
 Rich text is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero images are URL fields until Attachable is wired.
 
@@ -166,6 +201,9 @@ Sign in with `admin@admin.com` / `Password`.
 
 - `/` published homepage
 - `/pages/:uuid/tonight` one fullscreen hero (seeded **Tonight**)
+- `/pages/:uuid/join` one hero with sign-in buttons (seeded **Join**)
+- `/pages/:uuid/start-from-a-url` one hero with a URL field (seeded **Start from a URL**)
+- `/start` dummy catcher for that URL field
 - `/studio` dummy sandbox
 - `/recording_studio_pages/admin/pages` page builder
 - `/admin` RS Admin hub
@@ -195,3 +233,4 @@ These are limits in sibling gems. This gem documents them instead of forking the
 5. Pin Flatpack `v0.1.162` (or later) so List `orderable_url` persists drag. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`.
 6. Define `recording_studio_pages_page_nav` if gem screens should share host chrome. Otherwise they use Recording Studio page nav.
 7. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.
+8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.

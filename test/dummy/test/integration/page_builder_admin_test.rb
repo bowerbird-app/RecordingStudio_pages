@@ -118,6 +118,40 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Title"
     assert_includes response.body, "Layout"
+    assert_includes response.body, "Call to action"
+    assert_includes response.body, "Button"
+    assert_includes response.body, "Social logins"
+    assert_includes response.body, "URL field"
+  end
+
+  test "staff can change a hero call to action" do
+    page_recording = create_page!(parent_recording: @root, title: "Swap CTA", actor: @actor)
+    section = add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: {
+        title: "Come as you are",
+        cta: { type: "button", text: "Come in", url: "/users/sign_in" }
+      },
+      actor: @actor
+    )
+
+    patch recording_studio_pages.admin_page_section_path(page_id: page_recording.id, id: section.id),
+          params: {
+            section: {
+              content: {
+                title: "Come as you are",
+                cta: { type: "social_logins" }
+              }
+            }
+          }
+
+    assert_redirected_to recording_studio_pages.admin_page_path(id: page_recording.id)
+    saved = section.reload.recordable.content
+    assert_equal "social_logins", saved.dig("cta", "type")
+    follow_redirect!
+    assert_includes response.body, "Come as you are"
+    assert_includes response.body, "Continue with Google"
   end
 
   test "the add section library redirects to the page editor" do
@@ -193,6 +227,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Use a template"
     assert_includes response.body, "apply-template-#{page_recording.id}-marketing_home"
     assert_includes response.body, "apply-template-#{page_recording.id}-full_bleed_hero"
+    assert_includes response.body, "apply-template-#{page_recording.id}-join"
+    assert_includes response.body, "apply-template-#{page_recording.id}-start_from_url"
     assert_includes response.body, "orderable-url-value"
     refute_includes response.body, "Staff preview"
 

@@ -21,6 +21,7 @@ Rails.application.routes.draw do
   get "docs/methods", to: "docs#methods", as: :docs_methods
 
   get "/studio", to: "home#index", as: :studio
+  get "/start", to: "starts#show", as: :start
 
   root to: "recording_studio_pages/homepages#show"
 end

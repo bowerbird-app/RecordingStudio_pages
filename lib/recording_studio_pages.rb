@@ -8,6 +8,9 @@ require "recording_studio_pages/configuration"
 require "recording_studio_pages/field_schema"
 require "recording_studio_pages/section_definition"
 require "recording_studio_pages/section_registry"
+require "recording_studio_pages/cta_definition"
+require "recording_studio_pages/cta_registry"
+require "recording_studio_pages/cta_renderer"
 require "recording_studio_pages/page_template"
 require "recording_studio_pages/template_registry"
 require "recording_studio_pages/composition"
@@ -49,8 +52,16 @@ module RecordingStudioPages
       @template_registry ||= TemplateRegistry.new
     end
 
+    def cta_registry
+      @cta_registry ||= CtaRegistry.new
+    end
+
     def register_section(**attributes)
       section_registry.register(**attributes)
+    end
+
+    def register_cta(**attributes)
+      cta_registry.register(**attributes)
     end
 
     def section(key)
@@ -69,6 +80,22 @@ module RecordingStudioPages
       section_registry.all
     end
 
+    def cta(key)
+      cta_registry.fetch(key)
+    end
+
+    def find_cta(key)
+      cta_registry.find(key)
+    end
+
+    def cta?(key)
+      find_cta(key).present?
+    end
+
+    def ctas
+      cta_registry.all
+    end
+
     def register_template(**attributes)
       template_registry.register(**attributes)
     end
@@ -84,13 +111,22 @@ module RecordingStudioPages
     def catalog
       {
         sections: section_registry.catalog,
-        templates: template_registry.catalog
+        templates: template_registry.catalog,
+        ctas: cta_registry.catalog
       }
     end
 
     def reset!
       section_registry.clear!
       template_registry.clear!
+      cta_registry.clear!
+    end
+
+    def restore_registries!
+      reset!
+      BuiltIns.register! if configuration.register_built_in_sections
+      configuration.hooks.run(:register_sections, self)
+      configuration.hooks.run(:register_ctas, self)
     end
 
     def page_parent_types

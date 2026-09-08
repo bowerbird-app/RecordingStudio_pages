@@ -74,6 +74,26 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
                                                      &.recordable
     assert_equal %w[hero logo_cloud feature_grid call_to_action], homepage_types
     assert_equal "The page is the front door", homepage_hero.content["title"]
+    assert_equal "button", homepage_hero.content.dig("cta", "type")
+    assert_equal "Come in", homepage_hero.content.dig("cta", "text")
+    join_recording = RecordingStudio::Recording.where(
+      recordable_type: "RecordingStudioPages::Page",
+      trashed_at: nil
+    ).includes(:recordable).find { |recording| recording.recordable&.title == "Join" }
+    start_recording = RecordingStudio::Recording.where(
+      recordable_type: "RecordingStudioPages::Page",
+      trashed_at: nil
+    ).includes(:recordable).find { |recording| recording.recordable&.title == "Start from a URL" }
+    assert_not_nil join_recording
+    assert_not_nil start_recording
+    join_hero = RecordingStudioPages::Composition.section_recordings_for(join_recording)
+                                                 .find { |recording| recording.recordable.section_type == "hero" }
+                                                 &.recordable
+    start_hero = RecordingStudioPages::Composition.section_recordings_for(start_recording)
+                                                  .find { |recording| recording.recordable.section_type == "hero" }
+                                                  &.recordable
+    assert_equal "social_logins", join_hero.content.dig("cta", "type")
+    assert_equal "url_form", start_hero.content.dig("cta", "type")
     assert_equal 1, tonight_sections.size
     assert_equal "hero", tonight_hero.section_type
     assert_equal "fullscreen_image", tonight_hero.settings["variant"]
@@ -111,5 +131,16 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert defined?(RecordingStudioDuplicatable)
     assert_includes routes, "RecordingStudioDuplicatable::Engine"
     assert RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Section)
+  end
+
+  test "dummy host registers extra hero CTAs and templates" do
+    assert RecordingStudioPages.cta?(:button)
+    assert RecordingStudioPages.cta?(:social_logins)
+    assert RecordingStudioPages.cta?(:url_form)
+    assert_equal "join", RecordingStudioPages.template(:join).key
+    assert_equal "start_from_url", RecordingStudioPages.template(:start_from_url).key
+    routes = File.read(Rails.root.join("config/routes.rb"))
+
+    assert_includes routes, 'get "/start"'
   end
 end

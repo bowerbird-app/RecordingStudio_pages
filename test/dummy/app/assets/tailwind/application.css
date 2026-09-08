@@ -3,6 +3,7 @@
 /* Dummy host views. This file lives at test/dummy/app/assets/tailwind/. */
 @source "../../views/**/*.erb";
 @source "../../helpers/**/*.rb";
+@source "../../components/**/*.rb";
 
 /* This engine's views and components. Brace globs are unreliable — scan separately. */
 @source "../../../../../app/views/**/*.erb";

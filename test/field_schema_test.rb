@@ -90,4 +90,35 @@ class FieldSchemaTest < Minitest::Test
     refute(errors.any? { |error| error.include?("items[1]") })
     refute(errors.any? { |error| error.include?("items[2]") })
   end
+
+  def test_cta_coerces_legacy_link_shape_and_validates_registered_fields
+    RecordingStudioPages.reset!
+    RecordingStudioPages.register_cta(
+      key: :button,
+      name: "Button",
+      component: "RecordingStudioPages::Ctas::ButtonComponent",
+      fields: { text: :string, url: :url }
+    )
+    schema = RecordingStudioPages::FieldSchema.new(cta: :cta)
+
+    result = schema.read(cta: { text: "Go", url: "/next" })
+
+    assert_equal({ "type" => "button", "text" => "Go", "url" => "/next" }, result["cta"])
+    assert_empty schema.validate(cta: { type: "button", text: "Go", url: "/next" })
+    assert(schema.validate(cta: { type: "button", url: "javascript:alert(1)" }).any? { |error| error.include?("cta") })
+    assert_empty schema.validate(cta: { type: "missing_widget", extra: "keep" })
+  ensure
+    RecordingStudioPages.reset!
+    RecordingStudioPages::BuiltIns.register!
+  end
+
+  def test_cta_catalog_type
+    schema = RecordingStudioPages::FieldSchema.new(
+      cta: :cta,
+      title: { type: :string, label: "Headline" }
+    )
+
+    assert_equal "cta", schema.catalog[:cta][:type]
+    assert_equal "Headline", schema.catalog[:title][:label]
+  end
 end

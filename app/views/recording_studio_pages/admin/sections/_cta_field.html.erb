@@ -1,0 +1,34 @@
+<% cta = value.is_a?(Hash) ? value : {} %>
+<% selected_type = cta["type"].to_s %>
+<% cta_name = "#{prefix}[#{key}]" %>
+
+<div class="flex flex-col gap-4" data-controller="recording-studio-pages--cta-fields">
+  <%= render FlatPack::Select::Component.new(
+    name: "#{cta_name}[type]",
+    label: "Call to action",
+    value: selected_type,
+    placeholder: "None",
+    options: RecordingStudioPages.ctas.map { |definition| [definition.name, definition.key] }
+  ) %>
+
+  <% RecordingStudioPages.ctas.each do |definition| %>
+    <% active = definition.key == selected_type %>
+    <div class="flex flex-col gap-4"
+         data-recording-studio-pages--cta-fields-target="panel"
+         data-cta-key="<%= definition.key %>"
+         <% unless active %>hidden<% end %>>
+      <% if definition.fields.fields.any? %>
+        <% definition.fields.fields.each do |field_key, field_spec| %>
+          <%= render "recording_studio_pages/admin/sections/field",
+                     prefix: cta_name,
+                     key: field_key,
+                     spec: field_spec,
+                     value: cta[field_key.to_s],
+                     disabled: !active %>
+        <% end %>
+      <% else %>
+        <p class="text-sm text-[var(--surface-muted-content-color)]">This one draws itself. Nothing to fill in.</p>
+      <% end %>
+    </div>
+  <% end %>
+</div>

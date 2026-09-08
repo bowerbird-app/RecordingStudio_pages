@@ -23,7 +23,7 @@ module RecordingStudioPages
     end
 
     def read_content(raw)
-      fields.read(raw)
+      fields.read(upgrade_legacy_cta(raw))
     end
 
     def read_settings(raw)
@@ -97,7 +97,22 @@ module RecordingStudioPages
     end
 
     def stringify_keys(raw)
+      return {} if raw.nil?
+
       raw.to_h.transform_keys(&:to_s)
+    end
+
+    def upgrade_legacy_cta(raw)
+      source = stringify_keys(raw)
+      return source unless fields.fields.key?(:cta)
+
+      current = stringify_keys(source["cta"])
+      return source if current.present?
+
+      legacy = source["primary_action"]
+      return source if legacy.blank?
+
+      source.merge("cta" => legacy)
     end
   end
 end

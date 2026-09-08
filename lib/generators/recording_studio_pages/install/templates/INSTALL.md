@@ -11,6 +11,6 @@ Next steps:
 7. Bundle and mount RecordingStudioDuplicatable. Copy on a section uses `duplicate_in_place!`.
 8. Adjust auth, layout, and current actor integration to match your host app. Public pages must use a full-width layout that loads `flat_pack/variables` then `flat_pack/application` then Tailwind, with the host Flatpack theme on `html` (`FlatPack.configuration.default_theme`). Do not reuse a sign-in layout (`max-w-md`).
 9. Define `recording_studio_pages_page_nav` if gem screens should share host chrome. Install Trashable if remove should use `trash!`.
-10. Register custom sections in the `:register_sections` hook. The engine resets registries on reload.
+10. Register custom sections in the `:register_sections` hook and custom hero fillings in `:register_ctas`. The engine resets registries on reload.
 11. Point Tailwind `@source` at this gem's `app/views` and `app/components`, then run `bin/rails tailwindcss:build`.
 12. Keep strict recordable declarations enabled and add `recording_studio_recordable(...)` to every configured recordable before running `RecordingStudio.validate_recordable_declarations!`.

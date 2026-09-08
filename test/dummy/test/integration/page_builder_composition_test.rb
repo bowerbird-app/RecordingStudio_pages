@@ -107,8 +107,7 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
     assert(warnings.any? { |message| message.include?("broken_data") && message.include?("boom") })
   ensure
     Rails.logger = previous_logger if previous_logger
-    RecordingStudioPages.reset!
-    RecordingStudioPages::BuiltIns.register!
+    RecordingStudioPages.restore_registries!
   end
 
   test "unknown section types fail safe and keep their data" do
@@ -203,8 +202,7 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
     refute_empty rendered.first.data
     assert rendered.first.data.all? { |record| record.is_a?(Workspace) }
   ensure
-    RecordingStudioPages.reset!
-    RecordingStudioPages::BuiltIns.register!
+    RecordingStudioPages.restore_registries!
   end
 
   test "duplicating a section creates another generic section recording" do

@@ -1,18 +1,25 @@
 <% type = spec[:type].to_sym %>
 <% name = "#{prefix}[#{key}]" %>
-<% label = key.to_s.humanize %>
+<% label = spec[:label].presence || key.to_s.humanize %>
+<% disabled = local_assigns[:disabled] == true %>
 
-<% if type == :text || type == :rich_text %>
-  <%= render FlatPack::TextArea::Component.new(name: name, label: label, value: value) %>
+<% if type == :cta %>
+  <%= render "recording_studio_pages/admin/sections/cta_field",
+             prefix: prefix,
+             key: key,
+             spec: spec,
+             value: value %>
+<% elsif type == :text || type == :rich_text %>
+  <%= render FlatPack::TextArea::Component.new(name: name, label: label, value: value, disabled: disabled) %>
 <% elsif type == :boolean %>
-  <%= render FlatPack::Checkbox::Component.new(name: name, label: label, checked: value == true || value.to_s == "true") %>
+  <%= render FlatPack::Checkbox::Component.new(name: name, label: label, checked: value == true || value.to_s == "true", disabled: disabled) %>
 <% elsif type == :integer %>
-  <%= render FlatPack::NumberInput::Component.new(name: name, label: label, value: value) %>
+  <%= render FlatPack::NumberInput::Component.new(name: name, label: label, value: value, disabled: disabled) %>
 <% elsif type == :url %>
-  <%= render FlatPack::UrlInput::Component.new(name: name, label: label, value: value) %>
+  <%= render FlatPack::UrlInput::Component.new(name: name, label: label, value: value, disabled: disabled) %>
 <% elsif type == :link %>
-  <%= render FlatPack::TextInput::Component.new(name: "#{name}[text]", label: "#{label} text", value: value.is_a?(Hash) ? value["text"] : nil) %>
-  <%= render FlatPack::UrlInput::Component.new(name: "#{name}[url]", label: "#{label} URL", value: value.is_a?(Hash) ? value["url"] : nil) %>
+  <%= render FlatPack::TextInput::Component.new(name: "#{name}[text]", label: "#{label} text", value: value.is_a?(Hash) ? value["text"] : nil, disabled: disabled) %>
+  <%= render FlatPack::UrlInput::Component.new(name: "#{name}[url]", label: "#{label} URL", value: value.is_a?(Hash) ? value["url"] : nil, disabled: disabled) %>
 <% elsif type == :list %>
   <div class="flex flex-col gap-4">
     <% Array(value).each_with_index do |item, index| %>
@@ -23,12 +30,14 @@
                      prefix: "#{name}[#{index}]",
                      key: item_key,
                      spec: item_spec.is_a?(Hash) ? item_spec : { type: item_spec },
-                     value: item.is_a?(Hash) ? item[item_key.to_s] : nil %>
+                     value: item.is_a?(Hash) ? item[item_key.to_s] : nil,
+                     disabled: disabled %>
         <% end %>
         <%= render FlatPack::Checkbox::Component.new(
           name: "#{name}[#{index}][_destroy]",
           label: "Remove this item",
-          checked: false
+          checked: false,
+          disabled: disabled
         ) %>
       </div>
     <% end %>
@@ -40,7 +49,8 @@
                    prefix: "#{name}[#{empty_index}]",
                    key: item_key,
                    spec: item_spec.is_a?(Hash) ? item_spec : { type: item_spec },
-                   value: nil %>
+                   value: nil,
+                   disabled: disabled %>
       <% end %>
     </div>
   </div>
@@ -48,8 +58,9 @@
   <%= render FlatPack::TextArea::Component.new(
     name: name,
     label: "#{label} (one id per line)",
-    value: Array(value).join("\n")
+    value: Array(value).join("\n"),
+    disabled: disabled
   ) %>
 <% else %>
-  <%= render FlatPack::TextInput::Component.new(name: name, label: label, value: value) %>
+  <%= render FlatPack::TextInput::Component.new(name: name, label: label, value: value, disabled: disabled) %>
 <% end %>

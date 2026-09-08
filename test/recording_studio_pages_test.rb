@@ -126,6 +126,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes tailwind_source, "RecordingStudio-*/app/views/**/*.erb"
     assert_includes tailwind_source, "../../../../../app/components/**/*.rb"
     assert_includes tailwind_source, "../../../../../app/components/**/*.erb"
+    assert_includes tailwind_source, "../../components/**/*.rb"
     refute_includes tailwind_source, "@theme"
     refute_includes tailwind_source, ":root {"
     refute_includes tailwind_source, "--color-fp-primary"
@@ -179,6 +180,7 @@ class RecordingStudioPagesTest < Minitest::Test
 
     assert_includes readme, "RecordingStudioPages"
     assert_includes readme, "register_section"
+    assert_includes readme, "register_cta"
     assert_includes readme, "RS Publishable"
     refute_includes readme, "internal template"
     refute_includes readme, "ExampleService"
@@ -286,6 +288,17 @@ class RecordingStudioPagesTest < Minitest::Test
     hero = File.read(File.expand_path("../app/components/recording_studio_pages/sections/hero_component.rb", __dir__))
     assert_includes hero, "h-dvh"
     assert_includes hero, '"h-full"'
+    assert_includes hero, "CtaRenderer"
     refute_includes hero, "h-screen"
+
+    cta_js = File.read(File.expand_path("../app/javascript/recording_studio_pages/controllers/cta_fields_controller.js", __dir__))
+    assert_includes cta_js, "panelTargets"
+    assert_includes cta_js, "field.disabled"
+    dummy_initializer = File.read(File.expand_path("dummy/config/initializers/recording_studio_pages.rb", __dir__))
+    assert_includes dummy_initializer, "register_cta"
+    assert_includes dummy_initializer, ":social_logins"
+    assert_includes dummy_initializer, ":url_form"
+    engine = File.read(File.expand_path("../lib/recording_studio_pages/engine.rb", __dir__))
+    assert_includes engine, "restore_registries!"
   end
 end

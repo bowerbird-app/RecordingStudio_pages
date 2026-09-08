@@ -14,17 +14,9 @@ module RecordingStudioPages
       end
 
       def call
+        cta = rendered_cta
         hero = render FlatPack::Hero::Component.new(**hero_attributes) do |component|
-          if action_present?
-            component.slot do
-              render FlatPack::Button::Component.new(
-                text: action["text"],
-                href: action["url"],
-                style: :primary,
-                size: :md
-              )
-            end
-          end
+          component.slot { cta } if cta
         end
         return hero unless fullscreen_image?
 
@@ -84,12 +76,8 @@ module RecordingStudioPages
         content["image_url"].to_s.presence
       end
 
-      def action
-        content["primary_action"] || {}
-      end
-
-      def action_present?
-        action["text"].present? && action["url"].present?
+      def rendered_cta
+        RecordingStudioPages::CtaRenderer.call(self, content["cta"])
       end
     end
   end

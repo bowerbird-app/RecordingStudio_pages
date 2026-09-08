@@ -114,6 +114,8 @@ class SectionRegistryTest < Minitest::Test
 
     assert_equal %w[hero logo_cloud feature_grid call_to_action], types
     assert_equal "The page is the front door", hero_copy.fetch("title")
+    assert_equal "button", hero_copy.fetch("cta").to_h.stringify_keys.fetch("type")
+    refute hero_copy.key?("primary_action")
     refute_includes blob, "recording"
     refute_includes blob, "recordable"
     refute_includes blob, "section_type"
@@ -132,8 +134,25 @@ class SectionRegistryTest < Minitest::Test
     assert_includes hero[:variants], "split_image"
     assert_equal "string", hero[:fields][:title][:type]
     assert_equal true, hero[:fields][:title][:required]
+    assert_equal "cta", hero[:fields][:cta][:type]
     assert(catalog[:templates].any? { |entry| entry[:key] == "marketing_home" })
     assert(catalog[:templates].any? { |entry| entry[:key] == "full_bleed_hero" })
+    assert(catalog[:ctas].any? { |entry| entry[:key] == "button" })
+  end
+
+  def test_hero_upgrades_legacy_primary_action_on_read
+    RecordingStudioPages::BuiltIns.register!
+    definition = RecordingStudioPages.section(:hero)
+
+    content = definition.read_content(
+      title: "Old door",
+      primary_action: { text: "Walk in", url: "/users/sign_in" }
+    )
+
+    assert_equal "button", content.dig("cta", "type")
+    assert_equal "Walk in", content.dig("cta", "text")
+    assert_equal "/users/sign_in", content.dig("cta", "url")
+    refute content.key?("primary_action")
   end
 
   def test_duplicate_template_raises

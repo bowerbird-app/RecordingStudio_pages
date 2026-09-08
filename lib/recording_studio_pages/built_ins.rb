@@ -5,8 +5,13 @@ module RecordingStudioPages
     module_function
 
     def register!
+      register_ctas!
       register_sections!
       register_templates!
+    end
+
+    def register_ctas!
+      register_button_cta!
     end
 
     def register_sections!
@@ -35,7 +40,7 @@ module RecordingStudioPages
               eyebrow: "Open tonight",
               title: "The page is the front door",
               body: "Stack a few pieces. Move them around. Put it live when it feels like a site.",
-              primary_action: { text: "Come in", url: "/users/sign_in" }
+              cta: { type: "button", text: "Come in", url: "/users/sign_in" }
             },
             settings: { variant: "centered", alignment: "left" }
           },
@@ -86,11 +91,24 @@ module RecordingStudioPages
               eyebrow: "Doors at eight",
               title: "The floor is already warm",
               body: "One picture. One line. Come in if you want a seat.",
-              primary_action: { text: "Take a seat", url: "/users/sign_in" }
+              cta: { type: "button", text: "Take a seat", url: "/users/sign_in" }
             },
             settings: { variant: "fullscreen_image" }
           }
         ]
+      )
+    end
+
+    def register_button_cta!
+      RecordingStudioPages.register_cta(
+        key: :button,
+        name: "Button",
+        source: "recording_studio_pages",
+        component: "RecordingStudioPages::Ctas::ButtonComponent",
+        fields: {
+          text: { type: :string, label: "Button text" },
+          url: { type: :url, label: "Button URL" }
+        }
       )
     end
 
@@ -106,7 +124,7 @@ module RecordingStudioPages
           title: { type: :string, required: true },
           body: :rich_text,
           image_url: :url,
-          primary_action: :link
+          cta: :cta
         },
         settings: {
           variant: :string,

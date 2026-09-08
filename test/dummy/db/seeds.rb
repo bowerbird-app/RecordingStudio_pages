@@ -44,12 +44,17 @@ restore_template_sections = lambda do |page_recording, template_key, actor|
   template = RecordingStudioPages.template(template_key)
   expected_types = template.sections.map { |entry| entry.fetch("type").to_s }
   hero_entry = template.sections.find { |entry| entry.fetch("type").to_s == "hero" }
-  expected_hero_title = (hero_entry&.fetch("content") || {}).to_h.stringify_keys["title"]
+  expected_hero = (hero_entry&.fetch("content") || {}).to_h.stringify_keys
+  expected_hero_title = expected_hero["title"]
+  expected_cta_type = expected_hero.dig("cta", "type")
   sections = RecordingStudioPages::Composition.section_recordings_for(page_recording)
   types = sections.map { |recording| recording.recordable.section_type }
-  hero_title = sections.find { |recording| recording.recordable.section_type == "hero" }
-                       &.recordable&.content&.[]("title")
-  return if types == expected_types && hero_title == expected_hero_title
+  hero = sections.find { |recording| recording.recordable.section_type == "hero" }&.recordable
+  hero_title = hero&.content&.[]("title")
+  hero_cta_type = hero&.content&.dig("cta", "type")
+  legacy_cta = hero&.content&.[]("primary_action").present? && hero_cta_type.blank?
+  cta_drift = expected_cta_type.present? && hero_cta_type != expected_cta_type
+  return if types == expected_types && hero_title == expected_hero_title && !legacy_cta && !cta_drift
 
   sections.each do |recording|
     RecordingStudioPages::Services::RemoveSection.call(section_recording: recording, actor: actor).value!
@@ -129,12 +134,9 @@ begin
       homepage: false,
       actor: user
     ).value!
-    RecordingStudioPages::Services::ApplyTemplate.call(
-      page_recording: tonight_recording,
-      template_key: "full_bleed_hero",
-      actor: user
-    ).value!
   end
+
+  restore_template_sections.call(tonight_recording, "full_bleed_hero", user)
 
   hero_recording = RecordingStudioPages::Composition.section_recordings_for(tonight_recording).find do |recording|
     recording.recordable.section_type == "hero"
@@ -149,6 +151,30 @@ begin
   end
 
   publish_page.call(tonight_recording, "tonight", user)
+
+  join_recording = find_page_recording.call("Join")
+  unless join_recording
+    join_recording = RecordingStudioPages::Services::CreatePage.call(
+      parent_recording: root_recording,
+      title: "Join",
+      homepage: false,
+      actor: user
+    ).value!
+  end
+  restore_template_sections.call(join_recording, "join", user)
+  publish_page.call(join_recording, "join", user)
+
+  start_recording = find_page_recording.call("Start from a URL")
+  unless start_recording
+    start_recording = RecordingStudioPages::Services::CreatePage.call(
+      parent_recording: root_recording,
+      title: "Start from a URL",
+      homepage: false,
+      actor: user
+    ).value!
+  end
+  restore_template_sections.call(start_recording, "start_from_url", user)
+  publish_page.call(start_recording, "start-from-a-url", user)
 
   puts "Seeded: admin@admin.com / Password"
   puts "Seeded: Workspace '#{workspace.name}' with homepage '#{homepage_recording.recordable.title}'"

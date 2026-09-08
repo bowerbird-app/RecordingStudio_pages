@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Recording Studio Page Builder. Pages and sections are recordings. `section_type` plus a registry pick the implementation. There is no parallel CMS schema.
 
 ### Added
+- CTA registry. `register_cta` fills the hero slot. Built-in filling is `button`. Hosts register social logins, URL fields, and other fillings. Unknown CTA types skip the slot and keep the JSON.
+- Dummy `social_logins` and `url_form` CTAs, plus **Join** and **Start from a URL** templates and seeded pages.
 - `RecordingStudioPages::Page` and `RecordingStudioPages::Section` recordables. Page columns are `title`, `homepage`, and `template_key`. Section columns are `section_type`, `content`, `settings`, and `enabled`.
 - Section and template registries. Duplicate keys raise. Unknown section types skip render and keep their rows.
 - Built-in sections: `hero`, `rich_text`, `image_text`, `logo_cloud`, `feature_grid`, `call_to_action`. Built-in templates: `marketing_home` and `full_bleed_hero`. Dummy seeds a published **Tonight** page that is only the fullscreen hero.
@@ -32,6 +34,7 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 - The editor lists sections in a Flatpack ordered list. Drag a row to reorder. Row actions live in a More menu.
 - Public pages use the host Flatpack theme (`FlatPack.configuration.default_theme`) instead of hardcoding `rounded`. Dummy sets `rounded`.
 - Built-in `marketing_home` copy is public-page language. Dummy seed restores Home to that template if the sections drift.
+- Hero content uses `cta` (`type` plus that CTA’s fields). The editor picks the filling on the hero. Add section still lists section types only.
 
 ### Fixed
 - Empty-state Flatpack Alerts use `style` and `description`.
@@ -56,6 +59,8 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 - Public pages use `min-h-dvh`. A fullscreen hero is a `100dvh` wrap around Flatpack Hero (`h-full` on the section). If you copied `recording_studio_pages/public`, take those classes; do not keep `h-full` on `html`/`body` mixed with `min-h-screen`.
 - Set `FlatPack.configuration.default_theme` to your named theme. Public pages read that for `data-theme` on `html`. Dummy uses `rounded`. Do not hardcode `data-theme="rounded"` in a copied public layout.
 - Built-in `marketing_home` copy changed. Pages that already used the template keep their saved words until you apply it again. Dummy `db:seed` restores Home to the current template.
+- Hero JSON moves from `primary_action` to `cta: { type: "button", text:, url: }`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action still use `primary_action`.
+- Register extra hero fillings in `:register_ctas`. The engine resets CTA registries on reload, same as sections.
 
 ### Notes
 - Publishable cannot own `/` because slugs cannot be empty and public paths require `:uuid`. Page Builder owns homepage routing. See the README upstream gaps.

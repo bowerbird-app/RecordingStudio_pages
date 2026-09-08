@@ -31,9 +31,7 @@ module RecordingStudioPages
     end
 
     config.to_prepare do
-      RecordingStudioPages.reset!
-      RecordingStudioPages::BuiltIns.register! if RecordingStudioPages.configuration.register_built_in_sections
-      RecordingStudioPages.configuration.hooks.run(:register_sections, RecordingStudioPages)
+      RecordingStudioPages.restore_registries!
       RecordingStudioPages::Admin.register! if defined?(RecordingStudioPages::Admin) && defined?(RecordingStudioAdmin)
     end
 

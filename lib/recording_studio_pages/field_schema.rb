@@ -3,7 +3,7 @@
 module RecordingStudioPages
   class FieldSchema
     SIMPLE_TYPES = %i[string text rich_text url boolean integer attachment].freeze
-    COMPOSITE_TYPES = %i[link list recording_ids].freeze
+    COMPOSITE_TYPES = %i[link list recording_ids cta].freeze
 
     def initialize(fields)
       @fields = normalize(fields)
@@ -66,6 +66,8 @@ module RecordingStudioPages
         value.nil? || value == "" ? nil : Integer(value, exception: false)
       when :link
         coerce_link(value)
+      when :cta
+        coerce_cta(value)
       when :list
         Array(value).filter_map { |item| read_list_item(spec, item) }
       when :recording_ids
@@ -110,6 +112,7 @@ module RecordingStudioPages
       case spec[:type].to_sym
       when :list, :recording_ids then []
       when :link then { "text" => "", "url" => "" }
+      when :cta then { "type" => "" }
       when :boolean then false
       else
         spec[:default]
@@ -124,6 +127,7 @@ module RecordingStudioPages
       return ["#{key} must be true or false"] unless boolean_ok?(spec, value)
       return ["#{key} must be an integer"] unless integer_ok?(spec, value)
       return validate_link(key, value) if type == :link
+      return validate_cta(key, value) if type == :cta
       return validate_list(key, spec, value) if type == :list
       return validate_recording_ids(key, value) if type == :recording_ids
 
@@ -156,6 +160,8 @@ module RecordingStudioPages
       when :link
         link = coerce_link(value)
         link["text"].blank? && link["url"].blank?
+      when :cta
+        coerce_cta(value)["type"].blank?
       else
         value.nil? || value.to_s.strip.empty?
       end
@@ -165,6 +171,35 @@ module RecordingStudioPages
       return ["#{key} must be a list of recording ids"] unless value.nil? || value.is_a?(Array)
 
       []
+    end
+
+    def coerce_cta(value)
+      hash = stringify_keys(value)
+      type = hash["type"].to_s
+      type = "button" if type.blank? && (hash["text"].present? || hash["url"].present?)
+      payload = { "type" => type }
+      return payload if type.blank?
+
+      definition = RecordingStudioPages.find_cta(type)
+      unless definition
+        hash.each do |nested_key, nested|
+          payload[nested_key] = nested unless nested_key == "type"
+        end
+        return payload
+      end
+
+      payload.merge(definition.fields.read(hash))
+    end
+
+    def validate_cta(key, value)
+      hash = coerce_cta(value)
+      type = hash["type"].to_s
+      return [] if type.blank?
+
+      definition = RecordingStudioPages.find_cta(type)
+      return [] unless definition
+
+      definition.fields.validate(hash.except("type")).map { |error| "#{key}.#{error}" }
     end
 
     def validate_link(key, value)
@@ -204,6 +239,7 @@ module RecordingStudioPages
       catalog[:item] = self.class.new(spec[:item]).catalog if spec[:item]
       catalog[:default] = spec[:default] if spec.key?(:default)
       catalog[:required] = true if spec[:required]
+      catalog[:label] = spec[:label] if spec[:label]
       catalog
     end
   end

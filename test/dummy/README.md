@@ -33,6 +33,9 @@ Then open the app and sign in with:
 
 - `/` - published homepage
 - `/pages/:uuid/tonight` - seeded **Tonight** page: one fullscreen hero, public URL (not the editor preview)
+- `/pages/:uuid/join` - seeded **Join** page: one hero with sign-in buttons
+- `/pages/:uuid/start-from-a-url` - seeded **Start from a URL** page: one hero with a paste-a-link field
+- `/start` - dummy catcher for that URL field
 - `/studio` - dummy sandbox
 - `/recording_studio` - redirects to `/studio` while the mounted Recording Studio engine stays available under that prefix for non-root routes
 - `/recording_studio_pages/admin/pages` - page builder
