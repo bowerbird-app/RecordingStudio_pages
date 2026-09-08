@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Flatpack List save runs when orderable_url is set. This controller only
-// stops More-menu drags and reloads if that save fails.
+// stops row-menu drags and reloads if that save fails.
 export default class extends Controller {
   connect() {
     this.preventMenuDrag = this.preventMenuDrag.bind(this)

@@ -290,6 +290,19 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes editor, 'title: "Nothing live yet"'
     assert_includes template_dropdown, "Use a template"
 
+    section_row = File.read(
+      File.expand_path("../app/views/recording_studio_pages/admin/pages/_section_row.html.erb", __dir__)
+    )
+    section_actions = File.read(
+      File.expand_path("../app/views/recording_studio_pages/admin/pages/_section_actions.html.erb", __dir__)
+    )
+    refute_includes section_row, "subtitle"
+    refute_includes section_row, "preview"
+    refute_includes section_row, "leading:"
+    assert_includes section_actions, 'icon: "ellipsis-horizontal"'
+    assert_includes section_actions, "show_chevron: false"
+    refute_includes section_actions, 'text: "More"'
+
     list_js = File.read(File.expand_path("../app/javascript/recording_studio_pages/controllers/section_list_controller.js", __dir__))
     refute_includes list_js, "persist"
     refute_includes list_js, "moving_recording_id"

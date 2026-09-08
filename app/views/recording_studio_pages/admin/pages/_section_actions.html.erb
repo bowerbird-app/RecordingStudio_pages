@@ -13,10 +13,16 @@
   <% end %>
 
   <%= render FlatPack::Button::Dropdown::Component.new(
-    text: "More",
+    text: "",
+    icon: "ellipsis-horizontal",
     style: :ghost,
     size: :sm,
-    placement: :bottom_right
+    show_chevron: false,
+    placement: :bottom_right,
+    trigger_attributes: {
+      title: "Actions",
+      aria: { label: "Actions" }
+    }
   ) do |dropdown| %>
     <% if definition %>
       <% dropdown.menu_item(

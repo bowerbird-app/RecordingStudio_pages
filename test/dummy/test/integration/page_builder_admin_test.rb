@@ -104,7 +104,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "page_editor"
     assert_includes response.body, "Section added."
     assert_includes response.body, "Hero"
-    assert_includes response.body, "More"
+    refute_includes response.body, "More"
+    assert_includes response.body, "ellipsis-horizontal"
     assert_includes response.body, "flat-pack--list-orderable"
     assert_includes response.body, "--card-padding-md"
     sections = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
@@ -184,7 +185,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     get recording_studio_pages.admin_page_path(page_recording)
     assert_includes response.body, first.id.to_s
     assert_includes response.body, 'role="list"'
-    assert_includes response.body, "More"
+    refute_includes response.body, "More"
+    assert_includes response.body, "ellipsis-horizontal"
     assert_includes response.body, "Copy"
     assert_includes response.body, "data-controller=\"recording-studio-pages--section-list\""
     assert_includes response.body, "flat-pack--list-orderable"
