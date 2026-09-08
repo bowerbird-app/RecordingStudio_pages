@@ -87,6 +87,9 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Call to action"
     assert_includes response.body, "add-section-#{page_recording.id}-hero"
     assert_includes response.body, 'id="page_editor"'
+    assert_includes response.body, "md:grid-cols-2"
+    assert_includes response.body, "Preview"
+    assert_includes response.body, "Nothing live yet"
     refute_includes response.body, "Sign out"
     refute_includes response.body, "/recording_studio_root_switchable/v1/root_switch"
 
@@ -224,7 +227,9 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     get recording_studio_pages.admin_page_path(page_recording)
 
     assert_response :success
+    assert_includes response.body, "md:grid-cols-2"
     assert_includes response.body, "Preview"
+    refute_includes response.body, "Nothing live yet"
     assert_includes response.body, "Visible notes"
     assert_includes response.body, "Staff can read this."
     assert_includes response.body, "max-w-prose"

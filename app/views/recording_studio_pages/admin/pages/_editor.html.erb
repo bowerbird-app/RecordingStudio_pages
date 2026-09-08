@@ -13,65 +13,75 @@
     variant: :h1
   ) %>
 
-  <div class="flex flex-wrap items-center gap-3">
-    <%= render "recording_studio_pages/admin/pages/add_section_dropdown" %>
-    <%= render "recording_studio_pages/admin/pages/add_template_dropdown" %>
-    <%= render FlatPack::Button::Component.new(
-      text: "Edit page",
-      href: edit_admin_page_path(id: page_recording.id),
-      style: :secondary,
-      size: :md,
-      data: { turbo_frame: "_top" }
-    ) %>
-    <%= render FlatPack::Button::Component.new(
-      text: "Publish",
-      href: "/recordings/#{@page_recording.id}/publishable/edit",
-      style: :secondary,
-      size: :md,
-      data: { turbo_frame: "_top" }
-    ) %>
-  </div>
+  <%= render FlatPack::Grid::Component.new(cols: 2, gap: :lg, align: :start) do %>
+    <div class="flex min-w-0 flex-col gap-6">
+      <div class="flex flex-wrap items-center gap-3">
+        <%= render "recording_studio_pages/admin/pages/add_section_dropdown" %>
+        <%= render "recording_studio_pages/admin/pages/add_template_dropdown" %>
+        <%= render FlatPack::Button::Component.new(
+          text: "Edit page",
+          href: edit_admin_page_path(id: page_recording.id),
+          style: :secondary,
+          size: :md,
+          data: { turbo_frame: "_top" }
+        ) %>
+        <%= render FlatPack::Button::Component.new(
+          text: "Publish",
+          href: "/recordings/#{@page_recording.id}/publishable/edit",
+          style: :secondary,
+          size: :md,
+          data: { turbo_frame: "_top" }
+        ) %>
+      </div>
 
-  <% if @unknown_sections.any? %>
-    <%= render FlatPack::Alert::Component.new(
-      style: :warning,
-      title: "Some sections are waiting on a missing type",
-      description: "Their content is still saved. Register the section type to edit them again."
-    ) %>
-  <% end %>
-
-  <% if section_recordings.any? %>
-    <div data-controller="recording-studio-pages--section-list">
-      <%= render FlatPack::List::Component.new(
-        ordered: true,
-        orderable: true,
-        orderable_url: reorder_admin_page_sections_path(page_id: page_recording.id),
-        orderable_method: :patch,
-        param_uuid_name: "moving_recording_id",
-        param_target_position_name: "target_position",
-        divider: true,
-        class: "list-decimal pl-6"
-      ) do %>
-        <% section_recordings.each_with_index do |recording, index| %>
-          <%= render "recording_studio_pages/admin/pages/section_row", recording: recording, position: index + 1 %>
-        <% end %>
+      <% if @unknown_sections.any? %>
+        <%= render FlatPack::Alert::Component.new(
+          style: :warning,
+          title: "Some sections are waiting on a missing type",
+          description: "Their content is still saved. Register the section type to edit them again."
+        ) %>
       <% end %>
-    </div>
-  <% else %>
-    <%= render FlatPack::Alert::Component.new(
-      style: :info,
-      title: "Nothing here yet",
-      description: "Open Add section and pick a type."
-    ) %>
-  <% end %>
 
-  <% if @rendered_sections.present? %>
-    <%= render FlatPack::SectionTitle::Component.new(
-      title: "Preview",
-      subtitle: "Off sections stay off. This is how the page reads."
-    ) %>
-    <div class="overflow-hidden rounded-[var(--radius-lg)] border border-[var(--surface-border-color)]">
-      <%= render "recording_studio_pages/pages/sections" %>
+      <% if section_recordings.any? %>
+        <div data-controller="recording-studio-pages--section-list">
+          <%= render FlatPack::List::Component.new(
+            ordered: true,
+            orderable: true,
+            orderable_url: reorder_admin_page_sections_path(page_id: page_recording.id),
+            orderable_method: :patch,
+            param_uuid_name: "moving_recording_id",
+            param_target_position_name: "target_position",
+            divider: true,
+            class: "list-decimal pl-6"
+          ) do %>
+            <% section_recordings.each_with_index do |recording, index| %>
+              <%= render "recording_studio_pages/admin/pages/section_row", recording: recording, position: index + 1 %>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <%= render FlatPack::Alert::Component.new(
+          style: :info,
+          title: "Nothing here yet",
+          description: "Open Add section and pick a type."
+        ) %>
+      <% end %>
+    </div><div class="flex min-w-0 flex-col gap-4 md:sticky md:top-6">
+      <%= render FlatPack::SectionTitle::Component.new(
+        title: "Preview",
+        subtitle: "Off sections stay off. This is how the page reads."
+      ) %>
+      <% if @rendered_sections.present? %>
+        <div class="max-h-[80vh] overflow-auto rounded-[var(--radius-lg)] border border-[var(--surface-border-color)]">
+          <%= render "recording_studio_pages/pages/sections" %>
+        </div>
+      <% else %>
+        <%= render FlatPack::Alert::Component.new(
+          style: :info,
+          title: "Nothing live yet",
+          description: "Turn a section on and it shows up here."
+        ) %>
+      <% end %>
     </div>
   <% end %>
 </div>
