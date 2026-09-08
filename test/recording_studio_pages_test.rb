@@ -309,6 +309,7 @@ class RecordingStudioPagesTest < Minitest::Test
     social = File.read(File.expand_path("dummy/app/components/dummy/ctas/social_logins_component.rb", __dir__))
     assert_includes social, "recording_studio_user_omniauth_provider_names"
     assert_includes social, "recording_studio_user_omniauth_authorize_path"
+    assert_includes social, "max-w-sm"
     refute_includes social, "recording_studio_user/omniauth/continue_with_providers"
     refute_includes social, "/users/sign_in"
     engine = File.read(File.expand_path("../lib/recording_studio_pages/engine.rb", __dir__))

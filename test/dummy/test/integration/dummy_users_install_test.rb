@@ -33,6 +33,7 @@ class DummyUsersInstallTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Continue with Google"
     assert_includes response.body, "Continue with Apple"
+    assert_includes response.body, "max-w-sm"
     assert_includes response.body, 'action="/users/auth/google_oauth2"'
     assert_includes response.body, 'action="/users/auth/apple"'
     refute_includes response.body, 'href="/users/sign_in"'
