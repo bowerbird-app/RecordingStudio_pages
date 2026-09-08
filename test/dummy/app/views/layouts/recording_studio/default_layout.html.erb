@@ -1,6 +1,6 @@
-<%# Dummy host override of Recording Studio default_layout. Flatpack's built-in rounded theme belongs on html (https://flatpack.bowerbird.io/), not custom CSS. Core puts data-theme on body only. %>
+<%# Dummy host override of Recording Studio default_layout. The named theme is FlatPack.configuration.default_theme (dummy: rounded), on html (https://flatpack.bowerbird.io/). Core puts data-theme on body only. %>
 <!DOCTYPE html>
-<html data-theme="rounded">
+<html data-theme="<%= RecordingStudioPages.theme %>">
   <head>
     <% rs_config = RecordingStudio.configuration %>
     <% app_name = (rs_config.respond_to?(:app_name) ? rs_config.app_name : nil) || "CHANGE_APP_NAME_IN_DEFAULT_LAYOUT" %>
@@ -43,7 +43,7 @@
     <%= javascript_importmap_tags if respond_to?(:javascript_importmap_tags) %>
   </head>
 
-  <body class="bg-(--surface-page-background-color) text-(--surface-content-color)" data-recording-studio-default-layout="true" data-theme="<%= content_for(:body_theme).presence || 'rounded' %>">
+  <body class="bg-(--surface-page-background-color) text-(--surface-content-color)" data-recording-studio-default-layout="true" data-theme="<%= content_for(:body_theme).presence || RecordingStudioPages.theme %>">
     <main class="mx-auto min-h-screen w-full max-w-6xl p-6">
       <% if flash[:notice].present? %>
         <%= render FlatPack::Alert::Component.new(description: flash[:notice], style: :success, class: "mb-4") %>

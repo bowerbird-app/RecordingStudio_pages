@@ -91,7 +91,8 @@ class RecordingStudioPagesTest < Minitest::Test
   def test_dummy_login_layout_keeps_flatpack_assets_without_tight_main_offset
     application_layout = File.read(File.expand_path("dummy/app/views/layouts/application.html.erb", __dir__))
 
-    assert_includes application_layout, '<html data-theme="rounded">'
+    assert_includes application_layout, "RecordingStudioPages.theme"
+    refute_includes application_layout, 'data-theme="rounded"'
     assert_includes application_layout, 'stylesheet_link_tag "flat_pack/variables"'
     assert_includes application_layout, 'stylesheet_link_tag "flat_pack/application"'
     assert_includes application_layout, "javascript_importmap_tags"
@@ -103,7 +104,8 @@ class RecordingStudioPagesTest < Minitest::Test
   def test_public_layout_loads_flatpack_without_the_sign_in_column
     layout = File.read(File.expand_path("../app/views/layouts/recording_studio_pages/public.html.erb", __dir__))
 
-    assert_includes layout, '<html data-theme="rounded">'
+    assert_includes layout, '<html data-theme="<%= RecordingStudioPages.theme %>">'
+    refute_includes layout, 'data-theme="rounded"'
     refute_includes layout, 'class="h-full"'
     assert_includes layout, 'stylesheet_link_tag "flat_pack/variables"'
     assert_includes layout, 'stylesheet_link_tag "flat_pack/application"'
@@ -133,7 +135,8 @@ class RecordingStudioPagesTest < Minitest::Test
   def test_dummy_default_layout_loads_flatpack_application_on_html_theme
     layout = File.read(File.expand_path("dummy/app/views/layouts/recording_studio/default_layout.html.erb", __dir__))
 
-    assert_includes layout, '<html data-theme="rounded">'
+    assert_includes layout, '<html data-theme="<%= RecordingStudioPages.theme %>">'
+    refute_includes layout, 'data-theme="rounded"'
     assert_includes layout, 'stylesheet_link_tag "flat_pack/variables"'
     assert_includes layout, 'stylesheet_link_tag "flat_pack/application"'
     assert_includes layout, 'stylesheet_link_tag "tailwind"'
@@ -153,6 +156,13 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes initializer_source, "config.include_children"
     refute_includes initializer_source, "config.features."
     refute_includes initializer_source, "v3"
+  end
+
+  def test_dummy_sets_the_host_flatpack_theme
+    initializer = File.read(File.expand_path("dummy/config/initializers/flat_pack.rb", __dir__))
+
+    assert_includes initializer, "FlatPack.configure"
+    assert_includes initializer, "default_theme = :rounded"
   end
 
   def test_dummy_readme_explains_dummy_app_purpose

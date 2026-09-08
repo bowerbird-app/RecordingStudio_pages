@@ -48,7 +48,7 @@ recording_studio_admin_for :admin, at: "/admin", root_section: :pages
 root to: "recording_studio_pages/homepages#show"
 ```
 
-Point `/` at the homepage controller. Public pages use `recording_studio_pages/public`. That layout loads Flatpack tokens (`flat_pack/variables`, `flat_pack/application`) then Tailwind, and puts `data-theme="rounded"` on `html`. Do not reuse the Devise `application` layout for public pages — it is `max-w-md` for sign-in. Heroes render with Flatpack's Hero component at full width; other sections sit in `max-w-6xl`. Publishable `config.layout` is for Publishable's own screens; dummy sets it to `recording_studio/default_layout`.
+Point `/` at the homepage controller. Public pages use `recording_studio_pages/public`. That layout loads Flatpack tokens (`flat_pack/variables`, `flat_pack/application`) then Tailwind, and puts the host’s named Flatpack theme on `html` (`FlatPack.configuration.default_theme`, dummy `rounded`). Do not reuse the Devise `application` layout for public pages — it is `max-w-md` for sign-in. Heroes render with Flatpack's Hero component at full width; other sections sit in `max-w-6xl`. Publishable `config.layout` is for Publishable's own screens; dummy sets it to `recording_studio/default_layout`.
 
 ## How a page is stored
 
@@ -191,7 +191,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 1. Bundle `recording_studio_pages` with Publishable, Orderable, and Duplicatable.
 2. Mount Pages, Duplicatable, and Publishable. Keep Pages off `/`.
 3. `RecordingStudioPages::Section` already opts into Duplicatable when that gem is loaded. Do not add a second copy path.
-4. Public pages must load `flat_pack/application` with `data-theme` on `html`.
+4. Public pages load `flat_pack/application` and use the host Flatpack theme on `html` (`FlatPack.configuration.default_theme`). Dummy sets `rounded`.
 5. Pin Flatpack `v0.1.162` (or later) so List `orderable_url` persists drag. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`.
 6. Define `recording_studio_pages_page_nav` if gem screens should share host chrome. Otherwise they use Recording Studio page nav.
 7. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.

@@ -101,6 +101,27 @@ module RecordingStudioPages
       configuration.homepage_path.presence || "/"
     end
 
+    # Named Flatpack theme on public pages. Hosts set this once:
+    # `FlatPack.configuration.default_theme`. Dummy uses `rounded`.
+    def theme
+      normalize_theme(flatpack_default_theme)
+    end
+
+    def normalize_theme(name)
+      normalized = name.to_s.strip.downcase.tr("_", "-").gsub(/[^a-z0-9-]/, "")
+      normalized.presence || "rounded"
+    end
+
+    def flatpack_default_theme
+      return unless defined?(FlatPack)
+      return unless FlatPack.respond_to?(:configuration)
+
+      config = FlatPack.configuration
+      return unless config.respond_to?(:default_theme)
+
+      config.default_theme
+    end
+
     def page_parent?(recording)
       recording.present? && page_parent_types.include?(recording.recordable_type.to_s)
     end

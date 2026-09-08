@@ -17,6 +17,11 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     Current.actor = nil
   end
 
+  test "dummy host names the rounded Flatpack theme" do
+    assert_equal :rounded, FlatPack.configuration.default_theme
+    assert_equal "rounded", RecordingStudioPages.theme
+  end
+
   test "unpublished homepage is not public" do
     create_page!(parent_recording: @root, title: "Draft Home", homepage: true, actor: @actor)
 
@@ -107,6 +112,28 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "max-w-md"
     refute_includes response.body, "data-recording-studio-default-layout"
     assert_includes response.body, 'data-theme="rounded"'
+  end
+
+  test "public pages use the host Flatpack theme" do
+    original = FlatPack.configuration.default_theme
+    FlatPack.configuration.default_theme = :featured_in
+    page_recording = create_page!(parent_recording: @root, title: "Themed home", homepage: true, actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Host theme" },
+      actor: @actor
+    )
+    publish_page!(page_recording, slug: "themed-home", actor: @actor)
+
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, 'data-theme="featured-in"'
+    refute_includes response.body, 'data-theme="rounded"'
+    assert_includes response.body, "Host theme"
+  ensure
+    FlatPack.configuration.default_theme = original
   end
 
   test "a published page can be only a fullscreen hero" do

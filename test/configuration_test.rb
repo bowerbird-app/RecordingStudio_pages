@@ -30,6 +30,18 @@ class ConfigurationTest < Minitest::Test
     assert_equal original.fetch(:register_built_in_sections), @configuration.register_built_in_sections
   end
 
+  def test_theme_falls_back_to_rounded
+    assert_equal "rounded", RecordingStudioPages.normalize_theme(nil)
+    assert_equal "rounded", RecordingStudioPages.normalize_theme("")
+    assert_equal "rounded", RecordingStudioPages.normalize_theme("???")
+  end
+
+  def test_theme_normalizes_host_flatpack_names
+    assert_equal "rounded", RecordingStudioPages.normalize_theme(:rounded)
+    assert_equal "featured-in", RecordingStudioPages.normalize_theme(:featured_in)
+    assert_equal "ocean", RecordingStudioPages.normalize_theme("Ocean")
+  end
+
   def test_initialize_uses_defaults
     configuration = RecordingStudioPages::Configuration.new
 
