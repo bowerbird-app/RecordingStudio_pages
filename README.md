@@ -170,7 +170,7 @@ List fields skip blank extra slots and items marked `_destroy`.
 
 ## Admin
 
-RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a Flatpack ordered, orderable list. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s More menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page, then Orderable `recording_studio_orderable_append!` puts it at the end.
+RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a padded Flatpack Card around an ordered, orderable list. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s More menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page, then Orderable `recording_studio_orderable_append!` puts it at the end.
 
 The editor is a two-column Flatpack Grid: the section list on the left, the live page on the right. The live column has no heading. Small screens stack those columns. Enabled sections use the same components as the public page. Unpublished pages stay private on public routes. Add a section from **Add section**. Apply **Use a template** to append that template’s sections. Open **Edit page** to rename, set home, or remove the page.
 

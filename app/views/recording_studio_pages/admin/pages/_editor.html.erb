@@ -43,22 +43,24 @@
       <% end %>
 
       <% if section_recordings.any? %>
-        <div data-controller="recording-studio-pages--section-list">
-          <%= render FlatPack::List::Component.new(
-            ordered: true,
-            orderable: true,
-            orderable_url: reorder_admin_page_sections_path(page_id: page_recording.id),
-            orderable_method: :patch,
-            param_uuid_name: "moving_recording_id",
-            param_target_position_name: "target_position",
-            divider: true,
-            class: "list-decimal pl-6"
-          ) do %>
-            <% section_recordings.each_with_index do |recording, index| %>
-              <%= render "recording_studio_pages/admin/pages/section_row", recording: recording, position: index + 1 %>
+        <%= render FlatPack::Card::Component.new(padding: :md) do %>
+          <div data-controller="recording-studio-pages--section-list">
+            <%= render FlatPack::List::Component.new(
+              ordered: true,
+              orderable: true,
+              orderable_url: reorder_admin_page_sections_path(page_id: page_recording.id),
+              orderable_method: :patch,
+              param_uuid_name: "moving_recording_id",
+              param_target_position_name: "target_position",
+              divider: true,
+              class: "list-decimal pl-6"
+            ) do %>
+              <% section_recordings.each_with_index do |recording, index| %>
+                <%= render "recording_studio_pages/admin/pages/section_row", recording: recording, position: index + 1 %>
+              <% end %>
             <% end %>
-          <% end %>
-        </div>
+          </div>
+        <% end %>
       <% else %>
         <%= render FlatPack::Alert::Component.new(
           style: :info,

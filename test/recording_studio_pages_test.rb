@@ -283,6 +283,8 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes editor, "orderable_url:"
     assert_includes editor, "add_template_dropdown"
     assert_includes editor, "FlatPack::Grid::Component.new(cols: 2"
+    assert_includes editor, "FlatPack::Card::Component.new(padding: :md)"
+    refute_includes editor, "padding: :none"
     refute_includes editor, 'title: "Preview"'
     refute_includes editor, "Off sections stay off"
     assert_includes editor, 'title: "Nothing live yet"'

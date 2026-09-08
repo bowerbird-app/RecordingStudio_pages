@@ -90,6 +90,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "md:grid-cols-2"
     refute_includes response.body, "Off sections stay off"
     assert_includes response.body, "Nothing live yet"
+    refute_includes response.body, "--card-padding-md"
     refute_includes response.body, "Sign out"
     refute_includes response.body, "/recording_studio_root_switchable/v1/root_switch"
 
@@ -105,6 +106,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Hero"
     assert_includes response.body, "More"
     assert_includes response.body, "flat-pack--list-orderable"
+    assert_includes response.body, "--card-padding-md"
     sections = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
     assert_equal %w[hero], sections.map { |recording| recording.recordable.section_type }
     assert_equal "Hero", sections.first.recordable.content["title"]
