@@ -8,17 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Dummy installs Recording Studio Users `v0.11.0` so Join can render Users Continue-with social buttons instead of fake links to `/users/sign_in`.
+- Dummy installs Recording Studio Users `v0.11.0` so hero social CTAs can render Users Continue-with buttons instead of fake links to `/users/sign_in`.
+- Dummy **Walk in** template and seeded page: a fullscreen hero image whose call to action is those Continue-with buttons.
 
 ### Changed
 - Dummy pins Accessible `v0.9.1` and Attachable `v0.5.1` (Users requires Accessible `~> 0.8` and Attachable `~> 0.5.0`). Seed and tests grant access with `bootstrap_owner_access!` / `grant_access`.
 - Dummy sign-in is Users email-first chrome. Password is the second screen. Google and Apple Continue-with buttons follow dummy test/development credentials under `omniauth:`.
+- Dummy `social_logins` CTA calls Users OmniAuth helpers and draws Flatpack Continue-with buttons. It does not render the sign-in `continue_with_providers` partial (that partial includes an **Or** divider).
 
 ### Upgrade notes
 - Add `recording_studio_user` (`v0.11.0`) in the host Gemfile when a hero should use Users Continue-with buttons. Run `recording_studio_user:install`, `recording_studio_user:migrations`, then `db:migrate`. Register `RecordingStudioUser::People` and `RecordingStudioUser::Profile`. Skip Devise sessions/registrations/passwords and mount `recording_studio_user_auth_for :users`.
 - Bump Accessible to `>= 0.8` and run its migrations (`depends_on_recording_id`). Bump Attachable to `~> 0.5.0`.
-- Render `recording_studio_user/omniauth/continue_with_providers` for social CTAs. Continue-with buttons appear only for providers in Rails credentials under `omniauth:`. Do not put live OAuth secrets in the app.
-- Dummy test and development credentials use placeholder Google and Apple client ids so Join can render. Replace those with real credentials in a host. Do not copy the dummy values.
+- Call Users OmniAuth helpers from a hero CTA component (`recording_studio_user_omniauth_configured?`, `recording_studio_user_omniauth_provider_names`, `recording_studio_user_omniauth_authorize_path`). Keep `recording_studio_user/omniauth/continue_with_providers` on the sign-in screen. Continue-with buttons appear only for providers in Rails credentials under `omniauth:`. Do not put live OAuth secrets in the app.
+- Dummy test and development credentials use placeholder Google and Apple client ids so Join and Walk in can render. Replace those with real credentials in a host. Do not copy the dummy values.
 
 ## [0.3.0] - 2026-09-07
 

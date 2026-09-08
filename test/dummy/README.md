@@ -36,7 +36,8 @@ Sign-in is email first (**Continue with email**), then password. Google and Appl
 
 - `/` - published homepage
 - `/pages/:uuid/tonight` - seeded **Tonight** page: one fullscreen hero, public URL (not the editor preview)
-- `/pages/:uuid/join` - seeded **Join** page: one hero whose call to action is Users Continue-with buttons
+- `/pages/:uuid/join` - seeded **Join** page: one centered hero whose call to action is Users Continue-with buttons
+- `/pages/:uuid/walk-in` - seeded **Walk in** page: one fullscreen hero image whose call to action is the same Continue-with buttons
 - `/pages/:uuid/start-from-a-url` - seeded **Start from a URL** page: one hero with a paste-a-link field
 - `/start` - dummy catcher for that URL field
 - `/studio` - dummy sandbox

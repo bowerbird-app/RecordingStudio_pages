@@ -63,5 +63,23 @@ RecordingStudioPages.configure do |config|
         }
       ]
     )
+    RecordingStudioPages.register_template(
+      key: :walk_in,
+      name: "Walk in",
+      source: "dummy",
+      sections: [
+        {
+          type: :hero,
+          content: {
+            eyebrow: "Members",
+            title: "The lights are already on",
+            body: "Use the door you already have.",
+            image_url: "/images/hero-tonight.jpg",
+            cta: { type: "social_logins" }
+          },
+          settings: { variant: "fullscreen_image" }
+        }
+      ]
+    )
   end
 end

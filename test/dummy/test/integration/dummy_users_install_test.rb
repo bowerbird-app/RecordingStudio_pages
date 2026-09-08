@@ -9,7 +9,7 @@ class DummyUsersInstallTest < ActionDispatch::IntegrationTest
     assert User.devise_modules.include?(:omniauthable)
   end
 
-  test "sign in and the Join CTA share Users continue-with buttons" do
+  test "sign in and hero social CTAs post to the same Users OmniAuth paths" do
     get new_user_session_path
 
     assert_response :success
@@ -20,15 +20,15 @@ class DummyUsersInstallTest < ActionDispatch::IntegrationTest
     Current.actor = actor
     root = create_workspace_root!("Join CTA #{SecureRandom.hex(4)}")
     grant_admin!(root, actor)
-    page_recording = create_page!(parent_recording: root, title: "Join", actor: actor)
+    page_recording = create_page!(parent_recording: root, title: "Walk in", actor: actor)
     RecordingStudioPages::Services::ApplyTemplate.call(
       page_recording: page_recording,
-      template_key: "join",
+      template_key: "walk_in",
       actor: actor
     ).value!
-    publishable = publish_page!(page_recording, slug: "join-cta", actor: actor)
+    publishable = publish_page!(page_recording, slug: "walk-in-cta", actor: actor)
 
-    get "/pages/#{publishable.id}/join-cta"
+    get "/pages/#{publishable.id}/walk-in-cta"
 
     assert_response :success
     assert_includes response.body, "Continue with Google"
@@ -36,5 +36,6 @@ class DummyUsersInstallTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'action="/users/auth/google_oauth2"'
     assert_includes response.body, 'action="/users/auth/apple"'
     refute_includes response.body, 'href="/users/sign_in"'
+    refute_includes response.body, ">Or<"
   end
 end

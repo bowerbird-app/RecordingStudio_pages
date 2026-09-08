@@ -140,7 +140,7 @@ Hero content looks like `cta: { type: "button", text: "Come in", url: "/users/si
 
 New page still starts from a **template**. The template names the CTA. Editing the hero is where you change Button / Social logins / URL field. Add section does not list CTAs.
 
-Dummy registers `social_logins` and `url_form`, plus **Join** and **Start from a URL** templates, so a one-section landing can be a button, sign-in buttons, or a paste-a-link field. Dummy `social_logins` renders Recording Studio Users `recording_studio_user/omniauth/continue_with_providers` — Continue-with buttons for providers whose secrets are in Rails credentials under `omniauth:`. Dummy test and development credentials enable Google and Apple so Join can show those buttons. Hosts leave `omniauth_providers` empty and put real secrets in credentials; do not copy dummy client ids.
+Dummy registers `social_logins` and `url_form`, plus **Join**, **Walk in**, and **Start from a URL** templates, so a one-section landing can be a button, sign-in buttons, or a paste-a-link field. Dummy `social_logins` calls Recording Studio Users OmniAuth helpers (`recording_studio_user_omniauth_provider_names`, `recording_studio_user_omniauth_authorize_path`, and the provider label/logo helpers) and draws stacked Flatpack Continue-with buttons. It does not render `recording_studio_user/omniauth/continue_with_providers` — that partial is for the sign-in screen and includes an **Or** divider. Dummy test and development credentials enable Google and Apple so Join and Walk in can show those buttons. Hosts leave `omniauth_providers` empty and put real secrets in credentials; do not copy dummy client ids.
 
 ## Register a template
 
@@ -162,7 +162,7 @@ RecordingStudioPages.register_template(
 
 hero, rich_text, image_text, logo_cloud, feature_grid, call_to_action. Registered variants change layout: image left/right, narrow rich text, compact logos, feature column counts, and CTA banner vs card.
 
-- Built-in templates: `marketing_home` (hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero). Dummy also registers `join` (hero with social logins) and `start_from_url` (hero with a URL field). Dummy seeds published **Tonight**, **Join**, and **Start from a URL** pages. Open Tonight at `/pages/:uuid/tonight`, Join at `/pages/:uuid/join`, and the URL landing at `/pages/:uuid/start-from-a-url`. Those public URLs are the page, not the editor preview. A fullscreen hero fills the viewport (`100dvh`); Flatpack’s image hero is otherwise `min-h-[560px]`. Dummy Home is the `marketing_home` sample; seed restores that template if the sections drift (a second hero from **Use a template**, old copy, and so on).
+- Built-in templates: `marketing_home` (hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero). Dummy also registers `join` (centered hero with social logins), `walk_in` (fullscreen hero image with social logins), and `start_from_url` (hero with a URL field). Dummy seeds published **Tonight**, **Join**, **Walk in**, and **Start from a URL** pages. Open Tonight at `/pages/:uuid/tonight`, Join at `/pages/:uuid/join`, Walk in at `/pages/:uuid/walk-in`, and the URL landing at `/pages/:uuid/start-from-a-url`. Those public URLs are the page, not the editor preview. A fullscreen hero fills the viewport (`100dvh`); Flatpack’s image hero is otherwise `min-h-[560px]`. Dummy Home is the `marketing_home` sample; seed restores that template if the sections drift (a second hero from **Use a template**, old copy, and so on).
 
 Rich text is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero images are URL fields until Attachable is wired.
 
@@ -202,6 +202,7 @@ Sign in with `admin@admin.com` / `Password`.
 - `/` published homepage
 - `/pages/:uuid/tonight` one fullscreen hero (seeded **Tonight**)
 - `/pages/:uuid/join` one hero with sign-in buttons (seeded **Join**)
+- `/pages/:uuid/walk-in` one fullscreen hero with sign-in buttons (seeded **Walk in**)
 - `/pages/:uuid/start-from-a-url` one hero with a URL field (seeded **Start from a URL**)
 - `/start` dummy catcher for that URL field
 - `/studio` dummy sandbox
@@ -234,4 +235,4 @@ These are limits in sibling gems. This gem documents them instead of forking the
 6. Define `recording_studio_pages_page_nav` if gem screens should share host chrome. Otherwise they use Recording Studio page nav.
 7. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.
 8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.
-9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and render `recording_studio_user/omniauth/continue_with_providers`. Dummy Join does that. Continue-with buttons follow Rails credentials under `omniauth:`.
+9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and call the Users OmniAuth helpers from a CTA component. Dummy Join and Walk in do that. The `continue_with_providers` partial is for the sign-in screen. Continue-with buttons follow Rails credentials under `omniauth:`.

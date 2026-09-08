@@ -303,8 +303,13 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes dummy_initializer, "register_cta"
     assert_includes dummy_initializer, ":social_logins"
     assert_includes dummy_initializer, ":url_form"
+    assert_includes dummy_initializer, "key: :walk_in"
+    assert_includes dummy_initializer, 'type: "social_logins"'
+    assert_includes dummy_initializer, "fullscreen_image"
     social = File.read(File.expand_path("dummy/app/components/dummy/ctas/social_logins_component.rb", __dir__))
-    assert_includes social, "recording_studio_user/omniauth/continue_with_providers"
+    assert_includes social, "recording_studio_user_omniauth_provider_names"
+    assert_includes social, "recording_studio_user_omniauth_authorize_path"
+    refute_includes social, "recording_studio_user/omniauth/continue_with_providers"
     refute_includes social, "/users/sign_in"
     engine = File.read(File.expand_path("../lib/recording_studio_pages/engine.rb", __dir__))
     assert_includes engine, "restore_registries!"

@@ -213,6 +213,31 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Take a seat"
   end
 
+  test "a fullscreen hero can render social continue-with buttons" do
+    page_recording = create_page!(parent_recording: @root, title: "Walk in", actor: @actor)
+    RecordingStudioPages::Services::ApplyTemplate.call(
+      page_recording: page_recording,
+      template_key: "walk_in",
+      actor: @actor
+    ).value!
+    publishable = publish_page!(page_recording, slug: "walk-in", actor: @actor)
+
+    get "/pages/#{publishable.id}/walk-in"
+
+    assert_response :success
+    assert_includes response.body, "The lights are already on"
+    assert_includes response.body, "hero-tonight.jpg"
+    assert_includes response.body, "background-image:"
+    assert_includes response.body, "h-dvh"
+    assert_includes response.body, "Continue with Google"
+    assert_includes response.body, "Continue with Apple"
+    assert_includes response.body, 'action="/users/auth/google_oauth2"'
+    assert_includes response.body, 'action="/users/auth/apple"'
+    refute_includes response.body, 'href="/users/sign_in"'
+    refute_includes response.body, ">Or<"
+    refute_includes response.body, "Come as you are"
+  end
+
   test "a hero can render a host URL field CTA" do
     page_recording = create_page!(parent_recording: @root, title: "Start", actor: @actor)
     RecordingStudioPages::Services::ApplyTemplate.call(

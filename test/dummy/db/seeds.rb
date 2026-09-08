@@ -52,14 +52,21 @@ restore_template_sections = lambda do |page_recording, template_key, actor|
   expected_hero = (hero_entry&.fetch("content") || {}).to_h.stringify_keys
   expected_hero_title = expected_hero["title"]
   expected_cta_type = expected_hero.dig("cta", "type")
+  expected_image_url = expected_hero["image_url"]
+  expected_variant = (hero_entry&.fetch("settings") || {}).to_h.stringify_keys["variant"]
   sections = RecordingStudioPages::Composition.section_recordings_for(page_recording)
   types = sections.map { |recording| recording.recordable.section_type }
   hero = sections.find { |recording| recording.recordable.section_type == "hero" }&.recordable
   hero_title = hero&.content&.[]("title")
   hero_cta_type = hero&.content&.dig("cta", "type")
+  hero_image_url = hero&.content&.[]("image_url")
+  hero_variant = hero&.settings&.[]("variant")
   legacy_cta = hero&.content&.[]("primary_action").present? && hero_cta_type.blank?
   cta_drift = expected_cta_type.present? && hero_cta_type != expected_cta_type
-  return if types == expected_types && hero_title == expected_hero_title && !legacy_cta && !cta_drift
+  image_drift = expected_image_url.present? && hero_image_url != expected_image_url
+  variant_drift = expected_variant.present? && hero_variant != expected_variant
+  return if types == expected_types && hero_title == expected_hero_title && !legacy_cta && !cta_drift &&
+            !image_drift && !variant_drift
 
   sections.each do |recording|
     RecordingStudioPages::Services::RemoveSection.call(section_recording: recording, actor: actor).value!
@@ -181,6 +188,18 @@ begin
   restore_template_sections.call(join_recording, "join", user)
   publish_page.call(join_recording, "join", user)
 
+  walk_in_recording = find_page_recording.call("Walk in")
+  unless walk_in_recording
+    walk_in_recording = RecordingStudioPages::Services::CreatePage.call(
+      parent_recording: root_recording,
+      title: "Walk in",
+      homepage: false,
+      actor: user
+    ).value!
+  end
+  restore_template_sections.call(walk_in_recording, "walk_in", user)
+  publish_page.call(walk_in_recording, "walk-in", user)
+
   start_recording = find_page_recording.call("Start from a URL")
   unless start_recording
     start_recording = RecordingStudioPages::Services::CreatePage.call(
@@ -193,7 +212,7 @@ begin
   restore_template_sections.call(start_recording, "start_from_url", user)
   publish_page.call(start_recording, "start-from-a-url", user)
 
-  puts "Seeded: admin@admin.com / Password"
+  puts "Seeded Home, About, Tonight, Join, Walk in, and Start from a URL. Sign in as admin@admin.com / Password."
   puts "Seeded: Workspace '#{workspace.name}' with homepage '#{homepage_recording.recordable.title}'"
   puts "Seeded: Admin root '#{admin_root.name}'"
 ensure

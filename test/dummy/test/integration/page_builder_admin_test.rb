@@ -228,6 +228,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "apply-template-#{page_recording.id}-marketing_home"
     assert_includes response.body, "apply-template-#{page_recording.id}-full_bleed_hero"
     assert_includes response.body, "apply-template-#{page_recording.id}-join"
+    assert_includes response.body, "apply-template-#{page_recording.id}-walk_in"
     assert_includes response.body, "apply-template-#{page_recording.id}-start_from_url"
     assert_includes response.body, "orderable-url-value"
     refute_includes response.body, "Staff preview"
