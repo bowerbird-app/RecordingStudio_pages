@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dummy sign-in is Users email-first chrome. Password is the second screen. Google and Apple Continue-with buttons follow dummy test/development credentials under `omniauth:`.
 - Dummy `social_logins` CTA calls Users OmniAuth helpers and draws Flatpack Continue-with buttons. It does not render the sign-in `continue_with_providers` partial (that partial includes an **Or** divider). The stack is `max-w-sm`, same as the Users auth shell, so the buttons do not fill a fullscreen hero.
 - Dummy page-builder screens use Recording Studio page nav only. Root switcher and Sign out stay on dummy `/studio` and `/docs`, not in the gem screen right slot.
-- The page editor uses a two-column Flatpack Grid: section list on the left, live preview on the right. Small screens stack the columns.
+- The page editor uses a two-column Flatpack Grid: section list on the left, live page on the right. The live column has no heading. Small screens stack the columns.
 
 ### Upgrade notes
 - Add `recording_studio_user` (`v0.11.0`) in the host Gemfile when a hero should use Users Continue-with buttons. Run `recording_studio_user:install`, `recording_studio_user:migrations`, then `db:migrate`. Register `RecordingStudioUser::People` and `RecordingStudioUser::Profile`. Skip Devise sessions/registrations/passwords and mount `recording_studio_user_auth_for :users`.

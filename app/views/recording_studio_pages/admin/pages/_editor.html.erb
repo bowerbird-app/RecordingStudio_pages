@@ -66,11 +66,7 @@
           description: "Open Add section and pick a type."
         ) %>
       <% end %>
-    </div><div class="flex min-w-0 flex-col gap-4 md:sticky md:top-6">
-      <%= render FlatPack::SectionTitle::Component.new(
-        title: "Preview",
-        subtitle: "Off sections stay off. This is how the page reads."
-      ) %>
+    </div><div class="min-w-0 md:sticky md:top-6">
       <% if @rendered_sections.present? %>
         <div class="max-h-[80vh] overflow-auto rounded-[var(--radius-lg)] border border-[var(--surface-border-color)]">
           <%= render "recording_studio_pages/pages/sections" %>
