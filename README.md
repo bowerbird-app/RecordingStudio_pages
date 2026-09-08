@@ -174,7 +174,7 @@ RS Admin gets a Pages section. The nested section canvas lives at `/recording_st
 
 The editor is also the staff preview. Enabled sections render there with the same components as the public page. Unpublished pages stay private on public routes. Add a section from **Add section**. Apply **Use a template** to append that template’s sections. Open **Edit page** to rename, set home, or remove the page.
 
-Gem screens call `recording_studio_pages_nav`. Hosts that need extra chrome (root switcher, sign out) define `recording_studio_pages_page_nav`. Dummy does that and wraps `dummy_page_nav`. Otherwise the helper falls back to Recording Studio `recording_studio_page_nav`.
+Gem screens call `recording_studio_pages_nav`, which uses Recording Studio page nav (back and close). That default layout stays host-agnostic. Dummy `/studio` and `/docs` add a root switcher and Sign out through `dummy_page_nav`. Do not wrap that host chrome onto gem screens.
 
 Writes need Accessible `:edit` on the configured admin root. Reads need `:view`.
 
@@ -232,7 +232,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 3. `RecordingStudioPages::Section` already opts into Duplicatable when that gem is loaded. Do not add a second copy path.
 4. Public pages load `flat_pack/application` and use the host Flatpack theme on `html` (`FlatPack.configuration.default_theme`). Dummy sets `rounded`.
 5. Pin Flatpack `v0.1.162` (or later) so List `orderable_url` persists drag. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`.
-6. Define `recording_studio_pages_page_nav` if gem screens should share host chrome. Otherwise they use Recording Studio page nav.
+6. Gem screens use Recording Studio page nav. Dummy `/studio` and `/docs` keep host chrome (root switcher, Sign out). Do not put that on gem screens.
 7. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.
 8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.
 9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and call the Users OmniAuth helpers from a CTA component. Dummy Join and Walk in do that. The `continue_with_providers` partial is for the sign-in screen. Continue-with buttons follow Rails credentials under `omniauth:`.

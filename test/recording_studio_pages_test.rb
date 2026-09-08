@@ -89,6 +89,17 @@ class RecordingStudioPagesTest < Minitest::Test
     refute File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
   end
 
+  def test_dummy_does_not_put_host_chrome_on_gem_screens
+    dummy_helper = File.read(File.expand_path("dummy/app/helpers/application_helper.rb", __dir__))
+    gem_helper = File.read(File.expand_path("../app/helpers/recording_studio_pages/application_helper.rb", __dir__))
+
+    refute_includes dummy_helper, "recording_studio_pages_page_nav"
+    assert_includes dummy_helper, "dummy_page_nav"
+    assert_includes dummy_helper, "recording_studio_root_switch_dropdown"
+    assert_includes dummy_helper, "Sign out"
+    assert_includes gem_helper, "recording_studio_page_nav"
+  end
+
   def test_dummy_login_layout_keeps_flatpack_assets_without_tight_main_offset
     application_layout = File.read(File.expand_path("dummy/app/views/layouts/application.html.erb", __dir__))
 

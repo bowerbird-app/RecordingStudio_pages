@@ -15,12 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dummy pins Accessible `v0.9.1` and Attachable `v0.5.1` (Users requires Accessible `~> 0.8` and Attachable `~> 0.5.0`). Seed and tests grant access with `bootstrap_owner_access!` / `grant_access`.
 - Dummy sign-in is Users email-first chrome. Password is the second screen. Google and Apple Continue-with buttons follow dummy test/development credentials under `omniauth:`.
 - Dummy `social_logins` CTA calls Users OmniAuth helpers and draws Flatpack Continue-with buttons. It does not render the sign-in `continue_with_providers` partial (that partial includes an **Or** divider). The stack is `max-w-sm`, same as the Users auth shell, so the buttons do not fill a fullscreen hero.
+- Dummy page-builder screens use Recording Studio page nav only. Root switcher and Sign out stay on dummy `/studio` and `/docs`, not in the gem screen right slot.
 
 ### Upgrade notes
 - Add `recording_studio_user` (`v0.11.0`) in the host Gemfile when a hero should use Users Continue-with buttons. Run `recording_studio_user:install`, `recording_studio_user:migrations`, then `db:migrate`. Register `RecordingStudioUser::People` and `RecordingStudioUser::Profile`. Skip Devise sessions/registrations/passwords and mount `recording_studio_user_auth_for :users`.
 - Bump Accessible to `>= 0.8` and run its migrations (`depends_on_recording_id`). Bump Attachable to `~> 0.5.0`.
 - Call Users OmniAuth helpers from a hero CTA component (`recording_studio_user_omniauth_configured?`, `recording_studio_user_omniauth_provider_names`, `recording_studio_user_omniauth_authorize_path`). Cap the button stack at `max-w-sm` (Users auth does the same) so `w-full` buttons stay equal without filling a wide hero. Keep `recording_studio_user/omniauth/continue_with_providers` on the sign-in screen. Continue-with buttons appear only for providers in Rails credentials under `omniauth:`. Do not put live OAuth secrets in the app.
 - Dummy test and development credentials use placeholder Google and Apple client ids so Join and Walk in can render. Replace those with real credentials in a host. Do not copy the dummy values.
+- Do not define `recording_studio_pages_page_nav` to inject a root switcher or Sign out onto Pages screens. Those screens use Recording Studio page nav. Host chrome belongs on host screens.
 
 ## [0.3.0] - 2026-09-07
 

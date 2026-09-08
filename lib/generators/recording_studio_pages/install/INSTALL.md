@@ -13,6 +13,6 @@ Next:
 5. Bundle and mount RecordingStudioDuplicatable so Copy on a section uses `duplicate_in_place!`.
 6. Register extra sections in the `:register_sections` hook and extra hero fillings in `:register_ctas`. The engine resets registries on reload.
 7. Load Flatpack CSS (`flat_pack/application`) with the host theme on `html` (`FlatPack.configuration.default_theme`). Do not reuse a sign-in layout.
-8. Define `recording_studio_pages_page_nav` if gem screens should share host chrome. Install Trashable if remove should use `trash!`.
+8. Gem screens use Recording Studio page nav (back and close). Install Trashable if remove should use `trash!`.
 
 ===============================================================================

@@ -87,6 +87,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Call to action"
     assert_includes response.body, "add-section-#{page_recording.id}-hero"
     assert_includes response.body, 'id="page_editor"'
+    refute_includes response.body, "Sign out"
+    refute_includes response.body, "recording_studio_root_switchable/root_switch_dropdown"
 
     post recording_studio_pages.admin_page_sections_path(page_recording),
          params: { section: { section_type: "hero" } },
@@ -122,6 +124,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Button"
     assert_includes response.body, "Social logins"
     assert_includes response.body, "URL field"
+    refute_includes response.body, "Sign out"
+    refute_includes response.body, "recording_studio_root_switchable/root_switch_dropdown"
   end
 
   test "staff can change a hero call to action" do

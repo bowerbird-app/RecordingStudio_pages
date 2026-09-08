@@ -11,7 +11,7 @@ This Rails app exists to validate the Recording Studio Page Builder in a real ho
 - Public homepage at `/` from a published page recording. Dummy seed restores the sample Home template if sections drift.
 - Staff page composition at `/recording_studio_pages/admin/pages`. Add a section from the editor dropdown. Use a template. Preview enabled sections on the same screen. Drag sections to reorder. Copy a section from More (Recording Studio Duplicatable). Remove a page from Edit page.
 - RS Admin Pages section at `/admin`. Switch to the Admin root first. The hub also lists **Users**.
-- Recording Studio default layout, FlatPack assets (including `flat_pack/application`), and Tailwind source scanning via `tmp/tailwind` mirrors. Public pages use a full-width layout and the host Flatpack theme (`rounded` here). Users auth uses the gem's centered layout, not the dummy `max-w-md` application layout.
+- Recording Studio default layout, FlatPack assets (including `flat_pack/application`), and Tailwind source scanning via `tmp/tailwind` mirrors. Public pages use a full-width layout and the host Flatpack theme (`rounded` here). Users auth uses the gem's centered layout, not the dummy `max-w-md` application layout. Page builder screens use Recording Studio page nav (back and close). Dummy `/studio` and `/docs` add a root switcher and Sign out.
 - Dummy-only `/docs/*` and `/studio` pages for host-app sandboxing
 
 ## Quick Start
