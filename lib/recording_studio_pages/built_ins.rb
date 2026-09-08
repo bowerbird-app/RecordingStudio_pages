@@ -32,32 +32,32 @@ module RecordingStudioPages
           {
             type: :hero,
             content: {
-              eyebrow: "Recording Studio",
-              title: "Build pages from recordings",
-              body: "Compose a public page from approved sections. No freeform HTML, no parallel CMS tables.",
-              primary_action: { text: "Get started", url: "/users/sign_in" }
+              eyebrow: "Open tonight",
+              title: "The page is the front door",
+              body: "Stack a few pieces. Move them around. Put it live when it feels like a site.",
+              primary_action: { text: "Come in", url: "/users/sign_in" }
             },
             settings: { variant: "centered", alignment: "left" }
           },
           {
             type: :logo_cloud,
             content: {
-              title: "Trusted by teams that already live in the tree",
+              title: "Names on the door",
               items: [
-                { name: "Recording Studio" },
-                { name: "Publishable" },
-                { name: "Admin" }
+                { name: "House lights" },
+                { name: "Late show" },
+                { name: "Stage door" }
               ]
             }
           },
           {
             type: :feature_grid,
             content: {
-              title: "What this gem owns",
+              title: "What you get",
               items: [
-                { title: "Pages", body: "A page is a recording with a title and an ordered list of sections." },
-                { title: "Sections", body: "Every section uses the same generic recording. section_type picks the implementation." },
-                { title: "Registry", body: "Other gems register new sections without a migration." }
+                { title: "Pages", body: "A page is a stack you can reorder." },
+                { title: "Pieces", body: "Each piece has a job. Change the layout without starting over." },
+                { title: "Reuse", body: "Add a type once, then drop it on any page." }
               ]
             },
             settings: { variant: "three_column" }
@@ -65,9 +65,9 @@ module RecordingStudioPages
           {
             type: :call_to_action,
             content: {
-              title: "Publish when it is ready",
-              body: "Drafts stay private. RS Publishable owns live state and SEO.",
-              primary_action: { text: "Open pages", url: "/admin" }
+              title: "Ready when you are",
+              body: "Keep it private until it looks right. Then put it on the street.",
+              primary_action: { text: "Have a look", url: "/users/sign_in" }
             }
           }
         ]

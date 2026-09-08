@@ -104,6 +104,21 @@ class SectionRegistryTest < Minitest::Test
     assert_equal 1, hero_only.sections.length
     assert_equal "hero", hero_only.sections.first.fetch("type")
     assert_equal "fullscreen_image", hero_only.sections.first.fetch("settings").to_h.stringify_keys.fetch("variant")
+
+    home = RecordingStudioPages.template(:marketing_home)
+    types = home.sections.map { |entry| entry.fetch("type") }
+    hero_copy = home.sections.first.fetch("content").to_h.stringify_keys
+    feature_copy = home.sections[2].fetch("content").to_h.stringify_keys
+    cta_copy = home.sections[3].fetch("content").to_h.stringify_keys
+    blob = [hero_copy, feature_copy, cta_copy].to_json
+
+    assert_equal %w[hero logo_cloud feature_grid call_to_action], types
+    assert_equal "The page is the front door", hero_copy.fetch("title")
+    refute_includes blob, "recording"
+    refute_includes blob, "recordable"
+    refute_includes blob, "section_type"
+    refute_includes blob, "gem owns"
+    refute_includes blob, "RS Publishable"
   end
 
   def test_catalog_exposes_sections_and_templates_for_agents

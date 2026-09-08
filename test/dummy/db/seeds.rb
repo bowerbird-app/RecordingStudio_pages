@@ -40,6 +40,27 @@ publish_page = lambda do |page_recording, slug, actor|
   ).value!
 end
 
+restore_template_sections = lambda do |page_recording, template_key, actor|
+  template = RecordingStudioPages.template(template_key)
+  expected_types = template.sections.map { |entry| entry.fetch("type").to_s }
+  hero_entry = template.sections.find { |entry| entry.fetch("type").to_s == "hero" }
+  expected_hero_title = (hero_entry&.fetch("content") || {}).to_h.stringify_keys["title"]
+  sections = RecordingStudioPages::Composition.section_recordings_for(page_recording)
+  types = sections.map { |recording| recording.recordable.section_type }
+  hero_title = sections.find { |recording| recording.recordable.section_type == "hero" }
+                       &.recordable&.content&.[]("title")
+  return if types == expected_types && hero_title == expected_hero_title
+
+  sections.each do |recording|
+    RecordingStudioPages::Services::RemoveSection.call(section_recording: recording, actor: actor).value!
+  end
+  RecordingStudioPages::Services::ApplyTemplate.call(
+    page_recording: page_recording,
+    template_key: template_key,
+    actor: actor
+  ).value!
+end
+
 user = User.find_or_create_by!(email: "admin@admin.com") do |record|
   record.password = "Password"
   record.password_confirmation = "Password"
@@ -75,31 +96,10 @@ begin
       homepage: true,
       actor: user
     ).value!
-    RecordingStudioPages::Services::ApplyTemplate.call(
-      page_recording: homepage_recording,
-      template_key: "marketing_home",
-      actor: user
-    ).value!
   end
 
+  restore_template_sections.call(homepage_recording, "marketing_home", user)
   publish_page.call(homepage_recording, "home", user)
-
-  logo_recording = RecordingStudioPages::Composition.section_recordings_for(homepage_recording).find do |recording|
-    recording.recordable.section_type == "logo_cloud"
-  end
-  if logo_recording && Array(logo_recording.recordable.content["items"]).empty?
-    RecordingStudioPages::Services::ReviseSection.call(
-      section_recording: logo_recording,
-      content: logo_recording.recordable.content.merge(
-        "items" => [
-          { "name" => "Recording Studio" },
-          { "name" => "Publishable" },
-          { "name" => "Admin" }
-        ]
-      ),
-      actor: user
-    ).value!
-  end
 
   about_recording = find_page_recording.call("About")
 
@@ -113,7 +113,7 @@ begin
     RecordingStudioPages::Services::AddSection.call(
       page_recording: about_recording,
       section_type: "rich_text",
-      content: { title: "About this studio", body: "A page is a recording. Sections hang under it." },
+      content: { title: "About this studio", body: "This page sits with the rest of the site. Pieces stack underneath." },
       actor: user
     ).value!
   end

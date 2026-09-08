@@ -67,6 +67,13 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal root_recording, homepage_recording.parent_recording
     assert_equal root_recording, homepage_recording.root_recording
     assert homepage.homepage?
+    homepage_types = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
+                                                      .map { |recording| recording.recordable.section_type }
+    homepage_hero = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
+                                                     .find { |recording| recording.recordable.section_type == "hero" }
+                                                     &.recordable
+    assert_equal %w[hero logo_cloud feature_grid call_to_action], homepage_types
+    assert_equal "The page is the front door", homepage_hero.content["title"]
     assert_equal 1, tonight_sections.size
     assert_equal "hero", tonight_hero.section_type
     assert_equal "fullscreen_image", tonight_hero.settings["variant"]

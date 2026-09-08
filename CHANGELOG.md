@@ -31,6 +31,7 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 - The page editor adds sections from an **Add section** dropdown. Turbo updates the editor. The old add-section library page redirects there.
 - The editor lists sections in a Flatpack ordered list. Drag a row to reorder. Row actions live in a More menu.
 - Public pages use the host Flatpack theme (`FlatPack.configuration.default_theme`) instead of hardcoding `rounded`. Dummy sets `rounded`.
+- Built-in `marketing_home` copy is public-page language. Dummy seed restores Home to that template if the sections drift.
 
 ### Fixed
 - Empty-state Flatpack Alerts use `style` and `description`.
@@ -54,6 +55,7 @@ Recording Studio Page Builder. Pages and sections are recordings. `section_type`
 - Install Recording Studio Trashable if page and section remove should use `trash!`.
 - Public pages use `min-h-dvh`. A fullscreen hero is a `100dvh` wrap around Flatpack Hero (`h-full` on the section). If you copied `recording_studio_pages/public`, take those classes; do not keep `h-full` on `html`/`body` mixed with `min-h-screen`.
 - Set `FlatPack.configuration.default_theme` to your named theme. Public pages read that for `data-theme` on `html`. Dummy uses `rounded`. Do not hardcode `data-theme="rounded"` in a copied public layout.
+- Built-in `marketing_home` copy changed. Pages that already used the template keep their saved words until you apply it again. Dummy `db:seed` restores Home to the current template.
 
 ### Notes
 - Publishable cannot own `/` because slugs cannot be empty and public paths require `:uuid`. Page Builder owns homepage routing. See the README upstream gaps.
