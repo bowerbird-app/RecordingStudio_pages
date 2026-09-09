@@ -73,8 +73,14 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
 
     rendered = RecordingStudioPages::Renderer.call(page_recording.reload)
 
+    rendered = RecordingStudioPages::Renderer.call(page_recording.reload)
+
     assert_equal ["Visible"], rendered.map { |item| item.content["title"] }
     refute hidden.recordable.enabled?
+
+    preview = RecordingStudioPages::Renderer.section(hidden)
+    assert_equal "Hidden", preview.content["title"]
+    assert_equal hidden.id, preview.recording.id
   end
 
   test "data procs that raise are skipped and logged" do

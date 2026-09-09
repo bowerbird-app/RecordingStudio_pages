@@ -23,6 +23,10 @@ module RecordingStudioPages
       new(page_recording, context: context).call
     end
 
+    def self.section(recording, context: nil)
+      new(recording.parent_recording, context: context).render_section(recording)
+    end
+
     def initialize(page_recording, context: nil)
       @page_recording = page_recording
       @context = context
@@ -33,8 +37,6 @@ module RecordingStudioPages
         render_section(recording)
       end
     end
-
-    private
 
     def render_section(recording)
       definition = RecordingStudioPages.find_section(recording.recordable.section_type)
@@ -51,6 +53,8 @@ module RecordingStudioPages
         data: data
       )
     end
+
+    private
 
     def resolve_data(definition, recording, content, settings)
       return unless definition.data.respond_to?(:call)

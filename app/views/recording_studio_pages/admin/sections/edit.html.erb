@@ -6,17 +6,33 @@
     variant: :h1
   ) %>
 
-  <% if @definition %>
-    <%= render "recording_studio_pages/admin/sections/form",
-               url: admin_page_section_path(page_id: page_recording.id, id: @section_recording.id),
-               method: :patch,
-               definition: @definition,
-               recordable: @section_recording.recordable %>
-  <% else %>
-    <%= render FlatPack::Alert::Component.new(
-      style: :warning,
-      title: "This section type is not registered",
-      description: "The saved content is still here. Register #{@section_recording.recordable.section_type} to edit it."
-    ) %>
+  <%= render FlatPack::Grid::Component.new(cols: 2, gap: :lg, align: :start) do %>
+    <div class="min-w-0">
+      <% if @definition %>
+        <%= render "recording_studio_pages/admin/sections/form",
+                   url: admin_page_section_path(page_id: page_recording.id, id: @section_recording.id),
+                   method: :patch,
+                   definition: @definition,
+                   recordable: @section_recording.recordable %>
+      <% else %>
+        <%= render FlatPack::Alert::Component.new(
+          style: :warning,
+          title: "This section type is not registered",
+          description: "The saved content is still here. Register #{@section_recording.recordable.section_type} to edit it."
+        ) %>
+      <% end %>
+    </div><div class="min-w-0 md:sticky md:top-6">
+      <% if @rendered_section&.component_class %>
+        <div class="max-h-[80vh] overflow-auto rounded-[var(--radius-lg)] border border-[var(--surface-border-color)]">
+          <%= render "recording_studio_pages/pages/section", rendered: @rendered_section %>
+        </div>
+      <% else %>
+        <%= render FlatPack::Alert::Component.new(
+          style: :info,
+          title: "Nothing to preview",
+          description: "Register this type and it shows up here."
+        ) %>
+      <% end %>
+    </div>
   <% end %>
 </div>

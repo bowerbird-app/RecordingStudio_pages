@@ -130,8 +130,35 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Button"
     assert_includes response.body, "Social logins"
     assert_includes response.body, "URL field"
+    assert_includes response.body, "md:grid-cols-2"
+    assert_includes response.body, "max-h-[80vh]"
+    assert_includes response.body, "md:sticky"
+    refute_includes response.body, "Nothing to preview"
+    assert_includes response.body, "Hero"
     refute_includes response.body, "Sign out"
     refute_includes response.body, "/recording_studio_root_switchable/v1/root_switch"
+  end
+
+  test "the section editor previews a turned-off section" do
+    page_recording = create_page!(parent_recording: @root, title: "Off preview", actor: @actor)
+    section = add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: { title: "Quiet notes", body: "Still worth a look." },
+      settings: { variant: "narrow" },
+      enabled: false,
+      actor: @actor
+    )
+
+    get recording_studio_pages.edit_admin_page_section_path(page_id: page_recording.id, id: section.id)
+
+    assert_response :success
+    assert_includes response.body, "md:grid-cols-2"
+    assert_includes response.body, "Quiet notes"
+    assert_includes response.body, "Still worth a look."
+    assert_includes response.body, "max-w-prose"
+    assert_includes response.body, "Save section"
+    refute_includes response.body, "Nothing to preview"
   end
 
   test "staff can change a hero call to action" do

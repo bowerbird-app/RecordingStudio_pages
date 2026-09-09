@@ -31,6 +31,7 @@ module RecordingStudioPages
       def edit
         @section_recording = section_recording
         @definition = RecordingStudioPages.find_section(@section_recording.recordable.section_type)
+        @rendered_section = Renderer.section(@section_recording, context: self)
       end
 
       def update
