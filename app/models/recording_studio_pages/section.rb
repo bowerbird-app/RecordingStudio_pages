@@ -4,6 +4,10 @@ begin
   require "recording_studio_duplicatable"
 rescue LoadError
 end
+begin
+  require "recording_studio_attachable"
+rescue LoadError
+end
 
 module RecordingStudioPages
   class Section < ApplicationRecord
@@ -20,6 +24,13 @@ module RecordingStudioPages
       include RecordingStudio::Capabilities::Duplicatable.to(
         prefix: nil,
         suffix: nil
+      )
+    end
+
+    if defined?(RecordingStudio::Capabilities::Attachable)
+      include RecordingStudio::Capabilities::Attachable.to(
+        allowed_content_types: ["image/*"],
+        enabled_attachment_kinds: %i[image]
       )
     end
 

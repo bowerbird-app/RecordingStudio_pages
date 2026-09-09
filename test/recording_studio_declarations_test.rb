@@ -104,6 +104,10 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
     refute RecordingStudio.capability_enabled?(:accessible, for: "RecordingStudioUser::People")
     assert RecordingStudio.capability_enabled?(:duplicatable, for: "RecordingStudioPages::Section")
     refute RecordingStudio.capability_enabled?(:duplicatable, for: "RecordingStudioPages::Page")
+    assert RecordingStudio.capability_enabled?(:attachable, for: "RecordingStudioPages::Section")
+    refute RecordingStudio.capability_enabled?(:attachable, for: "RecordingStudioPages::Page")
+    assert_includes RecordingStudio.allowed_parent_types_for("RecordingStudioAttachable::Attachment"),
+                    "RecordingStudioPages::Section"
   end
 
   private

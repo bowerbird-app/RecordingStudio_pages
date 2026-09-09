@@ -43,6 +43,7 @@ module RecordingStudioPages
       return if definition.nil?
 
       content = definition.read_content(recording.recordable.content)
+      content = definition.fields.resolve_attachments(content, recording: recording, context: @context)
       settings = definition.read_settings(recording.recordable.settings)
       data = resolve_data(definition, recording, content, settings)
       RenderedSection.new(

@@ -52,18 +52,18 @@ restore_template_sections = lambda do |page_recording, template_key, actor|
   expected_hero = (hero_entry&.fetch("content") || {}).to_h.stringify_keys
   expected_hero_title = expected_hero["title"]
   expected_cta_type = expected_hero.dig("cta", "type")
-  expected_image_url = expected_hero["image_url"]
+  expected_image_url = expected_hero["image"] || expected_hero["image_url"]
   expected_variant = (hero_entry&.fetch("settings") || {}).to_h.stringify_keys["variant"]
   sections = RecordingStudioPages::Composition.section_recordings_for(page_recording)
   types = sections.map { |recording| recording.recordable.section_type }
   hero = sections.find { |recording| recording.recordable.section_type == "hero" }&.recordable
   hero_title = hero&.content&.[]("title")
   hero_cta_type = hero&.content&.dig("cta", "type")
-  hero_image_url = hero&.content&.[]("image_url")
+  hero_image = hero&.content&.[]("image").presence || hero&.content&.[]("image_url")
   hero_variant = hero&.settings&.[]("variant")
   legacy_cta = hero&.content&.[]("primary_action").present? && hero_cta_type.blank?
   cta_drift = expected_cta_type.present? && hero_cta_type != expected_cta_type
-  image_drift = expected_image_url.present? && hero_image_url != expected_image_url
+  image_drift = expected_image_url.present? && hero_image != expected_image_url
   variant_drift = expected_variant.present? && hero_variant != expected_variant
   return if types == expected_types && hero_title == expected_hero_title && !legacy_cta && !cta_drift &&
             !image_drift && !variant_drift
@@ -165,10 +165,11 @@ begin
   hero_recording = RecordingStudioPages::Composition.section_recordings_for(tonight_recording).find do |recording|
     recording.recordable.section_type == "hero"
   end
-  if hero_recording && hero_recording.recordable.content["image_url"].blank?
+  if hero_recording && hero_recording.recordable.content["image"].blank? &&
+     hero_recording.recordable.content["image_url"].blank?
     RecordingStudioPages::Services::ReviseSection.call(
       section_recording: hero_recording,
-      content: hero_recording.recordable.content.merge("image_url" => "/images/hero-tonight.jpg"),
+      content: hero_recording.recordable.content.merge("image" => "/images/hero-tonight.jpg"),
       settings: hero_recording.recordable.settings.merge("variant" => "fullscreen_image"),
       actor: user
     ).value!

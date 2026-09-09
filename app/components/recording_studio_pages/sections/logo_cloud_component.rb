@@ -38,9 +38,9 @@ module RecordingStudioPages
       end
 
       def logo_item(item)
-        if item["image_url"].present?
+        if item["image"].present?
           helpers.image_tag(
-            item["image_url"],
+            item["image"],
             alt: item_label(item),
             class: compact? ? "h-8" : "h-10"
           )

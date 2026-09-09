@@ -155,6 +155,23 @@ class SectionRegistryTest < Minitest::Test
     refute content.key?("primary_action")
   end
 
+  def test_hero_upgrades_legacy_image_url_on_read
+    RecordingStudioPages::BuiltIns.register!
+    definition = RecordingStudioPages.section(:hero)
+
+    content = definition.read_content(
+      title: "Old door",
+      image_url: "/images/hero-tonight.jpg"
+    )
+
+    assert_equal "/images/hero-tonight.jpg", content["image"]
+    refute content.key?("image_url")
+    catalog = definition.fields.catalog
+    assert_equal "attachment", catalog[:image][:type]
+    assert_equal "image", catalog[:image][:kind]
+    assert_equal "Image", catalog[:image][:label]
+  end
+
   def test_duplicate_template_raises
     RecordingStudioPages.register_template(key: :probe, name: "Probe", sections: [], source: "pages")
 

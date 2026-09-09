@@ -123,7 +123,7 @@ module RecordingStudioPages
           eyebrow: :string,
           title: { type: :string, required: true },
           body: :rich_text,
-          image_url: :url,
+          image: { type: :attachment, kind: :image, label: "Image" },
           cta: :cta
         },
         settings: {
@@ -163,7 +163,7 @@ module RecordingStudioPages
         fields: {
           title: { type: :string, required: true },
           body: :rich_text,
-          image_url: :url,
+          image: { type: :attachment, kind: :image, label: "Image" },
           primary_action: :link
         },
         settings: {
@@ -184,7 +184,11 @@ module RecordingStudioPages
           title: :string,
           items: {
             type: :list,
-            item: { name: :string, url: :url, image_url: :url }
+            item: {
+              name: :string,
+              url: :url,
+              image: { type: :attachment, kind: :image, label: "Image" }
+            }
           }
         },
         settings: {

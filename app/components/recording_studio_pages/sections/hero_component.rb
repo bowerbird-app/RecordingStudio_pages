@@ -73,7 +73,7 @@ module RecordingStudioPages
       end
 
       def image_url
-        content["image_url"].to_s.presence
+        content["image"].to_s.presence
       end
 
       def rendered_cta
