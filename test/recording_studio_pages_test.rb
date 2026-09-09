@@ -294,7 +294,7 @@ class RecordingStudioPagesTest < Minitest::Test
       File.expand_path("../app/views/recording_studio_pages/admin/sections/edit.html.erb", __dir__)
     )
     assert_includes section_edit, "FlatPack::Grid::Component.new(cols: 2"
-    assert_includes section_edit, 'recording_studio_pages/pages/section'
+    assert_includes section_edit, "recording_studio_pages/pages/section"
     refute_includes section_edit, 'title: "Preview"'
     assert_includes section_edit, 'title: "Nothing to preview"'
 
