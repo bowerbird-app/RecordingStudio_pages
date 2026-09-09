@@ -24,7 +24,8 @@
                      key: field_key,
                      spec: field_spec,
                      value: cta[field_key.to_s],
-                     disabled: !active %>
+                     disabled: !active,
+                     section_recording: local_assigns[:section_recording] %>
         <% end %>
       <% else %>
         <p class="text-sm text-[var(--surface-muted-content-color)]">This one draws itself. Nothing to fill in.</p>

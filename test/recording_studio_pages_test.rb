@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.0", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.1", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -61,12 +61,15 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes gemfile, 'tag: "0.3.1"'
   end
 
-  def test_section_opts_into_duplicatable
+  def test_section_opts_into_duplicatable_and_attachable
     section_source = File.read(File.expand_path("../app/models/recording_studio_pages/section.rb", __dir__))
     service_source = File.read(File.expand_path("../lib/recording_studio_pages/services/duplicate_section.rb", __dir__))
 
     assert_includes section_source, "Capabilities::Duplicatable.to"
+    assert_includes section_source, "Capabilities::Attachable.to"
+    assert_includes section_source, "image/*"
     assert_includes service_source, "duplicate_in_place!"
+    assert_includes service_source, "record_attachment_upload"
     refute_includes service_source, "AddSection.call"
   end
 
@@ -331,7 +334,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes hero, "h-dvh"
     assert_includes hero, '"h-full"'
     assert_includes hero, "CtaRenderer"
+    assert_includes hero, 'content["image"]'
     refute_includes hero, "h-screen"
+    refute_includes hero, 'content["image_url"]'
 
     cta_js = File.read(File.expand_path("../app/javascript/recording_studio_pages/controllers/cta_fields_controller.js", __dir__))
     assert_includes cta_js, "panelTargets"
@@ -349,7 +354,22 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes social, "max-w-sm"
     refute_includes social, "recording_studio_user/omniauth/continue_with_providers"
     refute_includes social, "/users/sign_in"
+    field = File.read(File.expand_path("../app/views/recording_studio_pages/admin/sections/_field.html.erb", __dir__))
+    attachment_field = File.read(
+      File.expand_path("../app/views/recording_studio_pages/admin/sections/_attachment_field.html.erb", __dir__)
+    )
+    built_ins = File.read(File.expand_path("../lib/recording_studio_pages/built_ins.rb", __dir__))
+    assert_includes field, ':attachment'
+    assert_includes attachment_field, "Choose image"
+    assert_includes attachment_field, "recording-studio-attachable--attachment-image-picker"
+    refute_includes attachment_field, "Image url"
+    assert_includes built_ins, "type: :attachment"
+    refute_includes built_ins, "image_url:"
     engine = File.read(File.expand_path("../lib/recording_studio_pages/engine.rb", __dir__))
     assert_includes engine, "restore_registries!"
+    attachment_js = File.read(
+      File.expand_path("../app/javascript/recording_studio_pages/controllers/attachment_field_controller.js", __dir__)
+    )
+    assert_includes attachment_js, "attachment.id"
   end
 end

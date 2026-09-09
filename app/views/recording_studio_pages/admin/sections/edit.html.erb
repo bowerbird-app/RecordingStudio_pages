@@ -13,7 +13,8 @@
                    url: admin_page_section_path(page_id: page_recording.id, id: @section_recording.id),
                    method: :patch,
                    definition: @definition,
-                   recordable: @section_recording.recordable %>
+                   recordable: @section_recording.recordable,
+                   section_recording: @section_recording %>
       <% else %>
         <%= render FlatPack::Alert::Component.new(
           style: :warning,

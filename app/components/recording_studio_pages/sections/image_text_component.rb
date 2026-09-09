@@ -33,7 +33,7 @@ module RecordingStudioPages
       end
 
       def image_column
-        url = @rendered.content["image_url"].to_s.strip
+        url = @rendered.content["image"].to_s.strip
         return if url.blank?
 
         helpers.image_tag(url, alt: @rendered.content["title"].to_s, class: "max-w-full")

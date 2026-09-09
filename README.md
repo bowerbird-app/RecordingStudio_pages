@@ -14,6 +14,7 @@ gem "recording_studio_pages", github: "bowerbird-app/RecordingStudio_pages"
 gem "recording_studio_publishable", github: "bowerbird-app/RecordingStudio_publishable"
 gem "recording_studio_orderable", github: "bowerbird-app/RecordingStudio_orderable"
 gem "recording_studio_duplicatable", github: "bowerbird-app/RecordingStudio_duplicatable"
+gem "recording_studio_attachable", github: "bowerbird-app/RecordingStudio_attachable"
 gem "recording_studio_admin", github: "bowerbird-app/RecordingStudio_admin"
 ```
 
@@ -32,7 +33,8 @@ RecordingStudio.configure do |config|
     "Workspace",
     "Folder",
     "RecordingStudioPages::Page",
-    "RecordingStudioPages::Section"
+    "RecordingStudioPages::Section",
+    "RecordingStudioAttachable::Attachment"
   ]
   config.require_recordable_declarations = true
 end
@@ -43,6 +45,7 @@ Mount the engines. Keep the page builder off `/` so it does not collide with RS 
 ```ruby
 mount RecordingStudioPages::Engine, at: "/recording_studio_pages"
 mount RecordingStudioDuplicatable::Engine, at: "/recording_studio_duplicatable"
+mount RecordingStudioAttachable::Engine, at: "/recording_studio_attachable"
 mount RecordingStudioPublishable::Engine, at: "/"
 recording_studio_admin_for :admin, at: "/admin", root_section: :pages
 root to: "recording_studio_pages/homepages#show"
@@ -56,15 +59,16 @@ Point `/` at the homepage controller. Public pages use `recording_studio_pages/p
 Workspace (root recording)
   └── Page recording (title, homepage, template_key)
         ├── Section recording (section_type: hero, content, settings)
+        │     └── Attachment children (photos for that section)
         ├── Section recording (section_type: feature_grid, ...)
         └── Publishable child (slug, status, SEO)
 ```
 
-There is no `HeroSection` table. `section_type: "hero"` is a key on the generic section recording. A new section type is a registry entry, not a migration.
+There is no `HeroSection` table. `section_type: "hero"` is a key on the generic section recording. A new section type is a registry entry, not a migration. There is no Pages-owned Image type. Photos are Recording Studio Attachable children of the section.
 
 `Recording#record` parents a new child under the workspace root unless you pass `parent_recording:`. Page Builder services always pass it.
 
-Order lives on `recording_studio_recordings.recording_studio_orderable_position` through RS Orderable. Publication, slug, and SEO live on the RS Publishable child. Do not add those columns to `recording_studio_pages_pages`.
+Order lives on `recording_studio_recordings.recording_studio_orderable_position` through RS Orderable. Publication, slug, and SEO live on the RS Publishable child. Do not add those columns to `recording_studio_pages_pages`. Section JSON stores the attachment recording id, not a blob URL. Public render turns that id into an Active Storage path. Saved `image_url` values still render until the next save writes `image`.
 
 ## Register a section
 
@@ -85,7 +89,8 @@ RecordingStudioPages.configure do |config|
       fields: {
         title: { type: :string, required: true },
         people: { type: :list, item: { name: :string, role: :string } },
-        members: :recording_ids
+        members: :recording_ids,
+        photo: { type: :attachment, kind: :image, label: "Image" }
       },
       settings: { variant: :string },
       variants: %w[photos names_only],
@@ -99,7 +104,9 @@ end
 
 `page_parent_types` is the allow list for new pages. `CreatePage` rejects anything else, including a blank parent. `homepage_path` is the public home URL shown in the editor when the page is marked as home.
 
-`fields.title` may be `:string` or `{ type: :string, required: true }`. `recording_ids` stores Recording ids. Resolve the actual records at render time, or with `data:`. Do not copy domain records into section JSON.
+`fields.title` may be `:string` or `{ type: :string, required: true }`. `recording_ids` stores Recording ids. Resolve the actual records at render time, or with `data:`. Do not copy domain records into section JSON. `:attachment` stores an Attachable child id on the section. Built-in hero, image-and-text, and logo-cloud items use `image`. Old `image_url` values upgrade on read.
+
+`RecordingStudioPages::Section` opts into Attachable when that gem is loaded (`image/*` only). Other gems that `register_section` do not need to include Attachable themselves. Hosts mount Attachable, add `RecordingStudioAttachable::Attachment` to `recordable_types`, pin Active Storage, and eager-load `controllers/recording_studio_attachable`. The section editor **Choose image** button opens Attachable's picker against that section. Public visitors get an Active Storage blob path, not an Attachable preview route.
 
 Duplicate keys raise `RecordingStudioPages::DuplicateRegistration`. Unknown types do not crash render or delete data. They stay on the page until you register the type again.
 
@@ -219,22 +226,23 @@ These are limits in sibling gems. This gem documents them instead of forking the
 2. **Publishable slug uniqueness is not a hard unique constraint** across pages.
 3. **RS Admin is a hub of screens and widgets**, not a nested canvas for ordered sections.
 4. **Action Text assumes mutable records.** Section copy is JSON plus `sanitize`.
-5. **Attachable is required by Publishable 0.2.1** even when you only want slug and status. Hero `image_url` is still a URL field, not an attachment recording.
+5. **Attachable is required by Publishable 0.2.1** even when you only want slug and status. Section photos also use Attachable. They are children of the section, not of the page.
 6. **Core has no `trash!`.** Page Builder calls `trash!` when Trashable is present; otherwise it logs `trashed` and sets `trashed_at`. Install Trashable for a real trash path.
 7. **Flatpack ordered list items are `display:flex`**, so native `<ol>` markers stay hidden. Page Builder sets `leading:` to the position number.
 
 ## Version
 
-0.3.0. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
+0.3.1. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
 
 ## Upgrade
 
 1. Bundle `recording_studio_pages` with Publishable, Orderable, and Duplicatable.
 2. Mount Pages, Duplicatable, and Publishable. Keep Pages off `/`.
-3. `RecordingStudioPages::Section` already opts into Duplicatable when that gem is loaded. Do not add a second copy path.
+3. `RecordingStudioPages::Section` already opts into Duplicatable and Attachable when those gems are loaded. Do not add a second copy path or a Pages-owned Image type. Do not enable Attachable on Page for section photos.
 4. Public pages load `flat_pack/application` and use the host Flatpack theme on `html` (`FlatPack.configuration.default_theme`). Dummy sets `rounded`.
-5. Pin Flatpack `v0.1.162` (or later) so List `orderable_url` persists drag. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`.
+5. Pin Flatpack `v0.1.162` (or later) so List `orderable_url` persists drag. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`. Pin Attachable `v0.5.1` (or later) for the image picker.
 6. Gem screens use Recording Studio page nav. Dummy `/studio` and `/docs` keep host chrome (root switcher, Sign out). Do not put that on gem screens.
 7. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.
 8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.
 9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and call the Users OmniAuth helpers from a CTA component. Dummy Join and Walk in do that. The `continue_with_providers` partial is for the sign-in screen. Continue-with buttons follow Rails credentials under `omniauth:`.
+10. Built-in `image` fields are `{ type: :attachment, kind: :image }`. Old `image_url` rows still render. The next save writes `image` when someone picks a file. Mount Attachable, register `RecordingStudioAttachable::Attachment`, start Active Storage, and eager-load its Stimulus controllers. Public pages resolve ids to `rails_blob_path`. Copying a section copies that section's photos and rewrites the ids.

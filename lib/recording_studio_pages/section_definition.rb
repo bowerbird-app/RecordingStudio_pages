@@ -23,7 +23,7 @@ module RecordingStudioPages
     end
 
     def read_content(raw)
-      fields.read(upgrade_legacy_cta(raw))
+      fields.read(fields.upgrade_legacy_attachments(upgrade_legacy_cta(raw)))
     end
 
     def read_settings(raw)

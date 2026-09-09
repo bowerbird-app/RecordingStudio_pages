@@ -135,6 +135,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "md:sticky"
     refute_includes response.body, "Nothing to preview"
     assert_includes response.body, "Hero"
+    assert_includes response.body, "Choose image"
+    refute_includes response.body, "Image url"
     refute_includes response.body, "Sign out"
     refute_includes response.body, "/recording_studio_root_switchable/v1/root_switch"
   end

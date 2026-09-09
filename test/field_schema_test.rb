@@ -121,4 +121,54 @@ class FieldSchemaTest < Minitest::Test
     assert_equal "cta", schema.catalog[:cta][:type]
     assert_equal "Headline", schema.catalog[:title][:label]
   end
+
+  def test_attachment_coerces_ids_and_catalogs_kind
+    schema = RecordingStudioPages::FieldSchema.new(
+      image: { type: :attachment, kind: :image, label: "Image", required: true }
+    )
+
+    assert_equal "abc-123", schema.read(image: "abc-123")["image"]
+    assert_nil schema.read(image: "")["image"]
+    assert_equal "attachment", schema.catalog[:image][:type]
+    assert_equal "image", schema.catalog[:image][:kind]
+    assert_equal "Image", schema.catalog[:image][:label]
+    assert_equal true, schema.catalog[:image][:required]
+    assert_includes schema.validate({}), "image is required"
+    assert_empty schema.validate(image: "/images/hero.jpg")
+    assert_empty schema.validate(image: "https://example.com/hero.jpg")
+    assert_empty schema.validate(image: "11111111-2222-3333-4444-555555555555")
+    assert(schema.validate(image: "javascript:alert(1)").any? { |error| error.include?("image") })
+  end
+
+  def test_attachment_upgrade_remap_and_resolve_urls
+    schema = RecordingStudioPages::FieldSchema.new(
+      image: { type: :attachment, kind: :image },
+      items: {
+        type: :list,
+        item: { name: :string, image: { type: :attachment, kind: :image } }
+      }
+    )
+
+    upgraded = schema.upgrade_legacy_attachments(
+      image_url: "/images/hero.jpg",
+      items: [{ name: "One", image_url: "https://example.com/logo.png" }]
+    )
+    read = schema.read(upgraded)
+
+    assert_equal "/images/hero.jpg", read["image"]
+    assert_equal "https://example.com/logo.png", read.dig("items", 0, "image")
+    refute read.key?("image_url")
+
+    mapping = { "old-id" => "new-id" }
+    remapped = schema.remap_attachments({ "image" => "old-id", "items" => [{ "name" => "One", "image" => "old-id" }] }, mapping)
+    assert_equal "new-id", remapped["image"]
+    assert_equal "new-id", remapped.dig("items", 0, "image")
+
+    resolved = schema.resolve_attachments(
+      { "image" => "/images/hero.jpg", "items" => [{ "name" => "One", "image" => "https://example.com/logo.png" }] },
+      recording: nil
+    )
+    assert_equal "/images/hero.jpg", resolved["image"]
+    assert_equal "https://example.com/logo.png", resolved.dig("items", 0, "image")
+  end
 end

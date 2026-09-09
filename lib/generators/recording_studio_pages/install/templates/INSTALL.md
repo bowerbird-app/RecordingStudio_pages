@@ -4,11 +4,11 @@ Next steps:
 
 1. Review config/initializers/recording_studio_pages.rb.
 2. Add `RecordingStudioPages::Page` and `RecordingStudioPages::Section` to `RecordingStudio.configuration.recordable_types`.
-3. Install Orderable's position column, Publishable's table, and Attachable if Publishable 0.2.1 is in the host. Publishable includes Attachable even when you only want slug and status.
+3. Install Orderable's position column, Publishable's table, and Attachable. Publishable includes Attachable even when you only want slug and status. Section photos also use Attachable: add `RecordingStudioAttachable::Attachment` to `recordable_types`, mount the engine, and eager-load its Stimulus controllers. `RecordingStudioPages::Section` already opts in.
 4. Install the engine migrations with `bin/rails generate recording_studio_pages:migrations`.
 5. Apply the migrations with `bin/rails db:migrate`.
 6. Mount Publishable at `/` and set `root to: "recording_studio_pages/homepages#show"`. Do not mount this engine at `/` if RS Admin already owns `/admin`.
-7. Bundle and mount RecordingStudioDuplicatable. Copy on a section uses `duplicate_in_place!`.
+7. Bundle and mount RecordingStudioDuplicatable. Copy on a section uses `duplicate_in_place!` and copies that section's photos.
 8. Adjust auth, layout, and current actor integration to match your host app. Public pages must use a full-width layout that loads `flat_pack/variables` then `flat_pack/application` then Tailwind, with the host Flatpack theme on `html` (`FlatPack.configuration.default_theme`). Do not reuse a sign-in layout (`max-w-md`).
 9. Gem screens use Recording Studio page nav (back and close). Install Trashable if remove should use `trash!`.
 10. Register custom sections in the `:register_sections` hook and custom hero fillings in `:register_ctas`. The engine resets registries on reload.

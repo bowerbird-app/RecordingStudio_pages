@@ -9,5 +9,13 @@ module RecordingStudioPages
         recording_studio_page_nav(title: title, page_nav_back_url: back_url)
       end
     end
+
+    def pages_attachable_routes
+      return unless defined?(RecordingStudioAttachable)
+      return recording_studio_attachable if respond_to?(:recording_studio_attachable)
+      return unless respond_to?(:main_app)
+
+      main_app.recording_studio_attachable if main_app.respond_to?(:recording_studio_attachable)
+    end
   end
 end

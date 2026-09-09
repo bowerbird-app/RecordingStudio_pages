@@ -67,6 +67,21 @@ module PageBuilderTestHelper
     ).value!
   end
 
+  MINI_PNG = ["89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c63000100000500010d0a2db40000000049454e44ae426082"].pack("H*")
+
+  def attach_image!(parent_recording:, actor:, filename: "hero.png")
+    blob = ActiveStorage::Blob.create_and_upload!(
+      io: StringIO.new(MINI_PNG),
+      filename: filename,
+      content_type: "image/png"
+    )
+    parent_recording.record_attachment_upload(
+      signed_blob_id: blob.signed_id,
+      name: filename,
+      actor: actor
+    )
+  end
+
   def publish_page!(page_recording, slug:, actor:)
     RecordingStudioPublishable::Services::Publishables::Update.call(
       parent_recording: page_recording,

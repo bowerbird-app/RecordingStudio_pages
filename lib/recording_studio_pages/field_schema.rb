@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
+require "uri"
+
 module RecordingStudioPages
   class FieldSchema
     SIMPLE_TYPES = %i[string text rich_text url boolean integer attachment].freeze
     COMPOSITE_TYPES = %i[link list recording_ids cta].freeze
+    RECORDING_ID = /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
 
     def initialize(fields)
       @fields = normalize(fields)
@@ -35,6 +38,27 @@ module RecordingStudioPages
 
     def catalog
       fields.transform_values { |spec| catalog_spec(spec) }
+    end
+
+    def upgrade_legacy_attachments(raw)
+      upgrade_attachment_hash(stringify_keys(raw), fields)
+    end
+
+    def remap_attachments(raw, mapping)
+      transform(raw) do |spec, value|
+        next value unless spec[:type].to_sym == :attachment
+
+        mapped = mapping[value.to_s]
+        mapped.presence || value
+      end
+    end
+
+    def resolve_attachments(raw, recording:, context: nil)
+      transform(raw) do |spec, value|
+        next value unless spec[:type].to_sym == :attachment
+
+        AttachmentUrl.call(value, recording: recording, context: context)
+      end
     end
 
     private
@@ -130,6 +154,7 @@ module RecordingStudioPages
       return validate_cta(key, value) if type == :cta
       return validate_list(key, spec, value) if type == :list
       return validate_recording_ids(key, value) if type == :recording_ids
+      return validate_attachment(key, value) if type == :attachment
 
       []
     end
@@ -240,7 +265,56 @@ module RecordingStudioPages
       catalog[:default] = spec[:default] if spec.key?(:default)
       catalog[:required] = true if spec[:required]
       catalog[:label] = spec[:label] if spec[:label]
+      catalog[:kind] = spec[:kind].to_s if spec[:kind]
       catalog
+    end
+
+    def validate_attachment(key, value)
+      return [] if value.blank?
+
+      text = value.to_s.strip
+      return [] if safe_url?(text)
+      return [] if text.match?(RECORDING_ID)
+
+      ["#{key} must be an image or a URL"]
+    end
+
+    def upgrade_attachment_hash(source, specs)
+      result = source.dup
+      specs.each do |key, spec|
+        key_s = key.to_s
+        type = spec[:type].to_sym
+        if type == :attachment
+          result[key_s] = result[key_s].presence || result["#{key_s}_url"]
+        elsif type == :list
+          nested = self.class.new(spec[:item] || {}).fields
+          result[key_s] = Array(result[key_s]).map do |item|
+            upgrade_attachment_hash(stringify_keys(item), nested)
+          end
+        end
+      end
+      result
+    end
+
+    def transform(raw)
+      transform_hash(stringify_keys(raw), fields) { |spec, value| yield spec, value }
+    end
+
+    def transform_hash(hash, specs)
+      result = hash.dup
+      specs.each do |key, spec|
+        key_s = key.to_s
+        type = spec[:type].to_sym
+        result[key_s] = if type == :list
+                          nested = self.class.new(spec[:item] || {}).fields
+                          Array(result[key_s]).map do |item|
+                            transform_hash(stringify_keys(item), nested) { |nested_spec, value| yield nested_spec, value }
+                          end
+                        else
+                          yield(spec, result[key_s])
+                        end
+      end
+      result
     end
   end
 end

@@ -107,13 +107,13 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal "social_logins", join_hero.content.dig("cta", "type")
     assert_equal "social_logins", walk_in_hero.content.dig("cta", "type")
     assert_equal "fullscreen_image", walk_in_hero.settings["variant"]
-    assert_equal "/images/hero-tonight.jpg", walk_in_hero.content["image_url"]
+    assert_equal "/images/hero-tonight.jpg", walk_in_hero.content["image"] || walk_in_hero.content["image_url"]
     assert_equal "The lights are already on", walk_in_hero.content["title"]
     assert_equal "url_form", start_hero.content.dig("cta", "type")
     assert_equal 1, tonight_sections.size
     assert_equal "hero", tonight_hero.section_type
     assert_equal "fullscreen_image", tonight_hero.settings["variant"]
-    assert_equal "/images/hero-tonight.jpg", tonight_hero.content["image_url"]
+    assert_equal "/images/hero-tonight.jpg", tonight_hero.content["image"] || tonight_hero.content["image_url"]
     assert_equal "The floor is already warm", tonight_hero.content["title"]
     assert_equal 3, Workspace.count
     assert_not_nil RecordingStudioUser.profile_for(User.find_by!(email: "admin@admin.com"))

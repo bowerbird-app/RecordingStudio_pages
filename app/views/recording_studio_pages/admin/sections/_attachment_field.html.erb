@@ -1,0 +1,62 @@
+<% attachable = pages_attachable_routes %>
+<% picker_recording = local_assigns[:section_recording] %>
+<% preview_url = RecordingStudioPages::AttachmentUrl.call(value, recording: picker_recording, context: self) %>
+<% modal_id = "section-image-picker-#{picker_recording.id}-#{name.parameterize}" %>
+<% chosen = preview_url.present? %>
+
+<div
+  class="flex flex-col gap-3"
+  data-controller="recording-studio-pages--attachment-field recording-studio-attachable--attachment-image-picker"
+  data-action="recording-studio-attachable--attachment-image-picker:selected->recording-studio-pages--attachment-field#selected"
+  data-recording-studio-attachable--attachment-image-picker-picker-url-value="<%= attachable.recording_attachment_picker_path(picker_recording) %>"
+  data-recording-studio-attachable--attachment-image-picker-upload-url-value="<%= attachable.recording_attachments_path(picker_recording) %>"
+  data-recording-studio-attachable--attachment-image-picker-direct-upload-url-value="<%= main_app.rails_direct_uploads_path %>"
+  data-recording-studio-attachable--attachment-image-picker-max-file-size-value="<%= RecordingStudioAttachable.configuration.max_file_size %>"
+  data-recording-studio-attachable--attachment-image-picker-image-processing-enabled-value="<%= RecordingStudioAttachable.configuration.image_processing_enabled %>"
+  data-recording-studio-attachable--attachment-image-picker-image-processing-max-width-value="<%= RecordingStudioAttachable.configuration.image_processing_max_width %>"
+  data-recording-studio-attachable--attachment-image-picker-image-processing-max-height-value="<%= RecordingStudioAttachable.configuration.image_processing_max_height %>"
+  data-recording-studio-attachable--attachment-image-picker-image-processing-quality-value="<%= RecordingStudioAttachable.configuration.image_processing_quality %>"
+  data-recording-studio-attachable--attachment-image-picker-multiple-selection-value="false"
+  data-recording-studio-attachable--attachment-image-picker-modal-id-value="<%= modal_id %>">
+  <p class="text-sm font-medium text-[var(--surface-content-color)]"><%= label %></p>
+  <%= hidden_field_tag name, value, data: { recording_studio_pages__attachment_field_target: "input" } %>
+
+  <%= tag.img(
+        alt: label,
+        src: preview_url,
+        class: "max-h-40 max-w-full rounded-[var(--radius-md)] border border-[var(--surface-border-color)] #{chosen ? "" : "hidden"}",
+        data: { recording_studio_pages__attachment_field_target: "preview" }
+      ) %>
+
+  <p
+    class="<%= chosen ? "hidden " : "" %>text-sm text-[var(--surface-muted-content-color)]"
+    data-recording-studio-pages--attachment-field-target="empty">
+    No picture yet.
+  </p>
+
+  <div class="flex flex-wrap gap-3">
+    <%= render FlatPack::Button::Component.new(
+      text: "Choose image",
+      style: :secondary,
+      size: :md,
+      type: "button",
+      data: { action: "recording-studio-attachable--attachment-image-picker#openSinglePicker" }
+    ) %>
+    <span data-recording-studio-pages--attachment-field-target="remove" <% unless chosen %>hidden<% end %>>
+      <%= render FlatPack::Button::Component.new(
+        text: "Remove",
+        style: :secondary,
+        size: :md,
+        type: "button",
+        data: { action: "recording-studio-pages--attachment-field#clear" }
+      ) %>
+    </span>
+  </div>
+
+  <%= render "recording_studio_attachable/attachment_image_pickers/modal",
+             modal_id: modal_id,
+             modal_title: "Choose an image",
+             recording: picker_recording,
+             search_aria_label: "Search images",
+             empty_state_text: "No pictures here yet. Upload one." %>
+</div>
