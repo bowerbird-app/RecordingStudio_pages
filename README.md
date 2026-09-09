@@ -171,7 +171,7 @@ hero, rich_text, image_text, logo_cloud, feature_grid, call_to_action. Registere
 
 - Built-in templates: `marketing_home` (hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero). Dummy also registers `join` (centered hero with social logins), `walk_in` (fullscreen hero image with social logins), and `start_from_url` (hero with a URL field). Dummy seeds published **Tonight**, **Join**, **Walk in**, and **Start from a URL** pages. Open Tonight at `/pages/:uuid/tonight`, Join at `/pages/:uuid/join`, Walk in at `/pages/:uuid/walk-in`, and the URL landing at `/pages/:uuid/start-from-a-url`. Those public URLs are the page, not the editor preview. A fullscreen hero fills the viewport (`100dvh`); Flatpack’s image hero is otherwise `min-h-[560px]`. Dummy Home is the `marketing_home` sample; seed restores that template if the sections drift (a second hero from **Use a template**, old copy, and so on).
 
-Rich text is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero images are URL fields until Attachable is wired.
+Rich text is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero, image-and-text, and logo-cloud photos are Attachable children of the section. The JSON stores the attachment id; public render turns it into an Active Storage path.
 
 List fields skip blank extra slots and items marked `_destroy`.
 
