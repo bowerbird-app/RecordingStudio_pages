@@ -304,9 +304,13 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes section_edit, 'text: "Cancel"'
     assert_includes section_edit, "style: :default"
     assert_includes section_edit, "flex-wrap items-center gap-3"
+    assert_includes section_edit, "form: section_form_id"
+    assert_includes section_edit, "turbo: false"
     form = File.read(File.expand_path("../app/views/recording_studio_pages/admin/sections/_form.html.erb", __dir__))
     refute_includes form, "Save section"
     refute_includes form, 'text: "Update"'
+    assert_includes form, "form_with"
+    assert_includes form, "novalidate: true"
     controller = File.read(
       File.expand_path("../app/controllers/recording_studio_pages/admin/sections_controller.rb", __dir__)
     )

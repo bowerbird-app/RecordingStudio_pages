@@ -164,6 +164,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">Update<"
     assert_includes response.body, ">Cancel<"
     assert_includes response.body, 'form="section-editor"'
+    assert_includes response.body, 'data-turbo="false"'
     refute_includes response.body, "Save section"
     refute_includes response.body, "Nothing to preview"
   end

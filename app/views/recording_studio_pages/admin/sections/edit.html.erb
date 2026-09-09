@@ -14,7 +14,8 @@
         style: :primary,
         size: :md,
         type: :submit,
-        form: section_form_id
+        form: section_form_id,
+        data: { turbo: false }
       ) %>
     <% end %>
     <%= render FlatPack::Button::Component.new(
