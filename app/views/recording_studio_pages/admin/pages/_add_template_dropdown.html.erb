@@ -1,0 +1,25 @@
+<% if RecordingStudioPages.templates.any? %>
+  <% RecordingStudioPages.templates.each do |template| %>
+    <%= form_with url: apply_template_admin_page_path(id: page_recording.id),
+                  method: :post,
+                  html: { id: "apply-template-#{page_recording.id}-#{template.key}", class: "hidden" },
+                  data: { turbo_frame: "page_editor" } do %>
+      <%= hidden_field_tag :template_key, template.key %>
+    <% end %>
+  <% end %>
+
+  <%= render FlatPack::Button::Dropdown::Component.new(
+    text: "Use a template",
+    style: :secondary,
+    size: :md,
+    placement: :bottom_left
+  ) do |dropdown| %>
+    <% RecordingStudioPages.templates.each do |template| %>
+      <% dropdown.menu_item(
+        text: template.name,
+        form: "apply-template-#{page_recording.id}-#{template.key}",
+        type: "submit"
+      ) %>
+    <% end %>
+  <% end %>
+<% end %>

@@ -1,0 +1,11 @@
+<% component_class = rendered.component_class %>
+<% if component_class %>
+  <% full_bleed = rendered.definition.key == "hero" %>
+  <% if full_bleed %>
+    <%= render component_class.new(rendered: rendered) %>
+  <% else %>
+    <div class="mx-auto w-full max-w-6xl px-6 py-8">
+      <%= render component_class.new(rendered: rendered) %>
+    </div>
+  <% end %>
+<% end %>

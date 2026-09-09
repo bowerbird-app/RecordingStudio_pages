@@ -1,0 +1,17 @@
+<% dummy_nav = local_assigns[:admin] %>
+<% if dummy_nav %>
+  <% recording_studio_pages_nav(title: @page.title, back_url: RecordingStudioPages.homepage_path) %>
+<% end %>
+
+<div class="flex min-h-dvh w-full flex-col">
+  <% if dummy_nav %>
+    <div class="mx-auto w-full max-w-6xl px-6 pt-6">
+      <%= render FlatPack::PageTitle::Component.new(
+        title: @page.title,
+        variant: :h1
+      ) %>
+    </div>
+  <% end %>
+
+  <%= render "recording_studio_pages/pages/sections" %>
+</div>

@@ -8,10 +8,13 @@ class ApplicationController < ActionController::Base
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
+  # Users auth screens use layouts/recording_studio_user/auth. Any other Devise
+  # screen keeps layouts/application. Everything else uses core default layout.
   layout :application_layout
 
   before_action :authenticate_user!
   before_action :set_current_actor
+  skip_recording_studio_root_resolution if: :devise_controller?
 
   private
 

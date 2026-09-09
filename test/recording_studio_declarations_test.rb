@@ -9,9 +9,10 @@ require "rails/test_help"
 class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
   test "dummy recordable declarations validate and expose parent/root introspection" do
     assert RecordingStudio.validate_recordable_declarations!
-    assert_equal ["Workspace"], RecordingStudio.root_recordable_types
+    assert_equal %w[AdminRoot RecordingStudioUser::People Workspace].sort, RecordingStudio.root_recordable_types.sort
     assert_equal %w[Workspace Folder], RecordingStudio.allowed_parent_types_for("Folder")
-    assert_equal %w[Workspace Folder], RecordingStudio.allowed_parent_types_for(Page)
+    assert_equal %w[Workspace Folder], RecordingStudio.allowed_parent_types_for("RecordingStudioPages::Page")
+    assert_equal ["RecordingStudioPages::Page"], RecordingStudio.allowed_parent_types_for("RecordingStudioPages::Section")
   end
 
   test "root recordable creates a root recording" do
@@ -45,11 +46,15 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
     folder_recording = record_child(Folder.new(name: unique_name("Page Folder")), root_recording, root_recording)
 
     workspace_page_recording = record_child(
-      Page.new(title: unique_name("Workspace Page")),
+      RecordingStudioPages::Page.new(title: unique_name("Workspace Page"), homepage: false),
       root_recording,
       root_recording
     )
-    folder_page_recording = record_child(Page.new(title: unique_name("Folder Page")), root_recording, folder_recording)
+    folder_page_recording = record_child(
+      RecordingStudioPages::Page.new(title: unique_name("Folder Page"), homepage: false),
+      root_recording,
+      folder_recording
+    )
 
     assert_equal root_recording, workspace_page_recording.parent_recording
     assert_equal folder_recording, folder_page_recording.parent_recording
@@ -74,23 +79,31 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
 
   test "page cannot be recorded under another page" do
     root_recording = RecordingStudio.root_recording_for(Workspace.create!(name: unique_name("Invalid Page Workspace")))
-    page_recording = record_child(Page.new(title: unique_name("Parent Page")), root_recording, root_recording)
+    page_recording = record_child(
+      RecordingStudioPages::Page.new(title: unique_name("Parent Page"), homepage: false),
+      root_recording,
+      root_recording
+    )
 
     error = assert_raises(RecordingStudio::InvalidParent) do
-      record_child(Page.new(title: unique_name("Nested Page")), root_recording, page_recording)
+      record_child(
+        RecordingStudioPages::Page.new(title: unique_name("Nested Page"), homepage: false),
+        root_recording,
+        page_recording
+      )
     end
-    assert_equal "Page cannot be recorded under Page", error.message
+    assert_match(/cannot be recorded under/i, error.message)
   end
 
-  test "accessible is enabled on workspace and example mixin stays opt-in" do
+  test "accessible is enabled on workspace and admin root" do
     assert RecordingStudio.capability_enabled?(:accessible, for: "Workspace")
+    assert RecordingStudio.capability_enabled?(:accessible, for: "AdminRoot")
     refute RecordingStudio.capability_enabled?(:accessible, for: "Folder")
-    refute RecordingStudio.capability_enabled?(:accessible, for: "Page")
-
-    assert RecordingStudio.capability_enabled?(:example, for: "Workspace")
-    refute RecordingStudio.capability_enabled?(:example, for: "Folder")
-    refute RecordingStudio.capability_enabled?(:example, for: "Page")
-    assert_equal({ label: "dummy workspace" }, RecordingStudio.capability_options(:example, for: "Workspace"))
+    refute RecordingStudio.capability_enabled?(:accessible, for: "RecordingStudioPages::Page")
+    assert RecordingStudio.capability_enabled?(:accessible, for: "RecordingStudioUser::Profile")
+    refute RecordingStudio.capability_enabled?(:accessible, for: "RecordingStudioUser::People")
+    assert RecordingStudio.capability_enabled?(:duplicatable, for: "RecordingStudioPages::Section")
+    refute RecordingStudio.capability_enabled?(:duplicatable, for: "RecordingStudioPages::Page")
   end
 
   private

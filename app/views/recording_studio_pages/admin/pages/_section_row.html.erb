@@ -1,0 +1,12 @@
+<% recordable = recording.recordable %>
+<% definition = RecordingStudioPages.find_section(recordable.section_type) %>
+
+<%= render FlatPack::List::Item.new(id: recording.id, class: "!items-center") do %>
+  <div class="flex w-full items-center justify-between gap-3">
+    <p class="font-medium"><%= definition&.name || recordable.section_type %></p>
+    <%= render "recording_studio_pages/admin/pages/section_actions",
+               recording: recording,
+               definition: definition,
+               recordable: recordable %>
+  </div>
+<% end %>

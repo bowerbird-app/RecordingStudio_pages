@@ -1,0 +1,51 @@
+<div data-section-row-menu>
+  <%= form_with url: duplicate_admin_page_section_path(page_id: page_recording.id, id: recording.id),
+                method: :post,
+                html: { id: section_action_form_id(recording, "copy"), class: "hidden" } do %>
+  <% end %>
+  <%= form_with url: toggle_admin_page_section_path(page_id: page_recording.id, id: recording.id),
+                method: :post,
+                html: { id: section_action_form_id(recording, "toggle"), class: "hidden" } do %>
+  <% end %>
+  <%= form_with url: admin_page_section_path(page_id: page_recording.id, id: recording.id),
+                method: :delete,
+                html: { id: section_action_form_id(recording, "remove"), class: "hidden" } do %>
+  <% end %>
+
+  <%= render FlatPack::Button::Dropdown::Component.new(
+    text: "",
+    icon: "ellipsis-horizontal",
+    style: :ghost,
+    size: :sm,
+    show_chevron: false,
+    placement: :bottom_right,
+    trigger_attributes: {
+      title: "Actions",
+      aria: { label: "Actions" }
+    }
+  ) do |dropdown| %>
+    <% if definition %>
+      <% dropdown.menu_item(
+        text: "Edit",
+        href: edit_admin_page_section_path(page_id: page_recording.id, id: recording.id),
+        data: { turbo_frame: "_top" }
+      ) %>
+    <% end %>
+    <% dropdown.menu_item(
+      text: "Copy",
+      form: section_action_form_id(recording, "copy"),
+      type: "submit"
+    ) %>
+    <% dropdown.menu_item(
+      text: recordable.enabled? ? "Turn off" : "Turn on",
+      form: section_action_form_id(recording, "toggle"),
+      type: "submit"
+    ) %>
+    <% dropdown.menu_item(
+      text: "Remove",
+      form: section_action_form_id(recording, "remove"),
+      type: "submit",
+      destructive: true
+    ) %>
+  <% end %>
+</div>
