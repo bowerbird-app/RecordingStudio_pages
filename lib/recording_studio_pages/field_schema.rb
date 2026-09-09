@@ -296,11 +296,11 @@ module RecordingStudioPages
       result
     end
 
-    def transform(raw)
-      transform_hash(stringify_keys(raw), fields) { |spec, value| yield spec, value }
+    def transform(raw, &)
+      transform_hash(stringify_keys(raw), fields, &)
     end
 
-    def transform_hash(hash, specs)
+    def transform_hash(hash, specs, &)
       result = hash.dup
       specs.each do |key, spec|
         key_s = key.to_s
@@ -308,7 +308,7 @@ module RecordingStudioPages
         result[key_s] = if type == :list
                           nested = self.class.new(spec[:item] || {}).fields
                           Array(result[key_s]).map do |item|
-                            transform_hash(stringify_keys(item), nested) { |nested_spec, value| yield nested_spec, value }
+                            transform_hash(stringify_keys(item), nested, &)
                           end
                         else
                           yield(spec, result[key_s])

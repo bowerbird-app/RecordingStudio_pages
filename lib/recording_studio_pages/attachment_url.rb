@@ -69,9 +69,7 @@ module RecordingStudioPages
       if helpers.respond_to?(:main_app) && helpers.main_app.respond_to?(:rails_blob_path)
         return helpers.main_app.rails_blob_path(blob, only_path: true)
       end
-      if helpers.respond_to?(:rails_blob_path)
-        return helpers.rails_blob_path(blob, only_path: true)
-      end
+      return helpers.rails_blob_path(blob, only_path: true) if helpers.respond_to?(:rails_blob_path)
 
       Rails.application.routes.url_helpers.rails_blob_path(blob, only_path: true)
     end

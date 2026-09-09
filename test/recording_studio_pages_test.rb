@@ -359,7 +359,7 @@ class RecordingStudioPagesTest < Minitest::Test
       File.expand_path("../app/views/recording_studio_pages/admin/sections/_attachment_field.html.erb", __dir__)
     )
     built_ins = File.read(File.expand_path("../lib/recording_studio_pages/built_ins.rb", __dir__))
-    assert_includes field, ':attachment'
+    assert_includes field, ":attachment"
     assert_includes attachment_field, "Choose image"
     assert_includes attachment_field, "recording-studio-attachable--attachment-image-picker"
     refute_includes attachment_field, "Image url"
