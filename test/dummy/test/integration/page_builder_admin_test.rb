@@ -135,6 +135,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "md:sticky"
     refute_includes response.body, "Nothing to preview"
     assert_includes response.body, "Hero"
+    assert_includes response.body, ">Update<"
+    assert_includes response.body, ">Cancel<"
     assert_includes response.body, "Choose image"
     refute_includes response.body, "Image url"
     refute_includes response.body, "Sign out"
@@ -159,7 +161,10 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Quiet notes"
     assert_includes response.body, "Still worth a look."
     assert_includes response.body, "max-w-prose"
-    assert_includes response.body, "Save section"
+    assert_includes response.body, ">Update<"
+    assert_includes response.body, ">Cancel<"
+    assert_includes response.body, 'form="section-editor"'
+    refute_includes response.body, "Save section"
     refute_includes response.body, "Nothing to preview"
   end
 
@@ -179,18 +184,25 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
           params: {
             section: {
               content: {
-                title: "Come as you are",
+                title: "Doors open",
                 cta: { type: "social_logins" }
               }
             }
           }
 
-    assert_redirected_to recording_studio_pages.admin_page_path(id: page_recording.id)
+    assert_redirected_to recording_studio_pages.edit_admin_page_section_path(
+      page_id: page_recording.id,
+      id: section.id
+    )
     saved = section.reload.recordable.content
     assert_equal "social_logins", saved.dig("cta", "type")
+    assert_equal "Doors open", saved["title"]
     follow_redirect!
-    assert_includes response.body, "Come as you are"
+    assert_includes response.body, "Updated."
+    assert_includes response.body, "Doors open"
+    refute_includes response.body, "Come as you are"
     assert_includes response.body, "Continue with Google"
+    assert_includes response.body, ">Update<"
   end
 
   test "the add section library redirects to the page editor" do

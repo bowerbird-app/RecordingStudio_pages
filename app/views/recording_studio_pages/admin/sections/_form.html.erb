@@ -1,4 +1,4 @@
-<%= form_with url: url, method: method, local: true do %>
+<%= form_with url: url, method: method, local: true, id: local_assigns[:form_id] do %>
   <% content_values = definition.read_content(recordable&.content) %>
   <%= hidden_field_tag "section[section_type]", definition.key %>
   <div class="flex flex-col gap-4">
@@ -28,7 +28,6 @@
                  value: recordable&.settings&.dig(key.to_s),
                  section_recording: local_assigns[:section_recording] %>
     <% end %>
-
-    <%= render FlatPack::Button::Component.new(text: "Save section", style: :primary, size: :md, type: :submit) %>
   </div>
 <% end %>
+

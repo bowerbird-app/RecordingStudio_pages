@@ -1,4 +1,5 @@
 <% recording_studio_pages_nav(title: "Edit section", back_url: page_builder_page_path) %>
+<% section_form_id = "section-editor" %>
 
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
@@ -6,12 +7,31 @@
     variant: :h1
   ) %>
 
+  <div class="flex flex-wrap items-center gap-3">
+    <% if @definition %>
+      <%= render FlatPack::Button::Component.new(
+        text: "Update",
+        style: :primary,
+        size: :md,
+        type: :submit,
+        form: section_form_id
+      ) %>
+    <% end %>
+    <%= render FlatPack::Button::Component.new(
+      text: "Cancel",
+      style: :default,
+      size: :md,
+      href: page_builder_page_path
+    ) %>
+  </div>
+
   <%= render FlatPack::Grid::Component.new(cols: 2, gap: :lg, align: :start) do %>
     <div class="min-w-0">
       <% if @definition %>
         <%= render "recording_studio_pages/admin/sections/form",
                    url: admin_page_section_path(page_id: page_recording.id, id: @section_recording.id),
                    method: :patch,
+                   form_id: section_form_id,
                    definition: @definition,
                    recordable: @section_recording.recordable,
                    section_recording: @section_recording %>
@@ -22,7 +42,8 @@
           description: "The saved content is still here. Register #{@section_recording.recordable.section_type} to edit it."
         ) %>
       <% end %>
-    </div><div class="min-w-0 md:sticky md:top-6">
+    </div>
+    <div class="min-w-0 md:sticky md:top-6">
       <% if @rendered_section&.component_class %>
         <div class="max-h-[80vh] overflow-auto rounded-[var(--radius-lg)] border border-[var(--surface-border-color)]">
           <%= render "recording_studio_pages/pages/section", rendered: @rendered_section %>

@@ -40,12 +40,14 @@ Section photos live on the section as Attachable children. The JSON stores the a
 
 ### Changed
 - `:attachment` field specs catalog `kind`, coerce blank to nil, and accept a recording id or a safe URL.
+- Edit section puts **Update** and **Cancel** under the title, above the two-column grid. The buttons stay compact (not full width). Update reloads that section so the preview refreshes.
 
 ### Upgrade notes
 - Bundle and mount `recording_studio_attachable` (`v0.5.1` or later). Add `RecordingStudioAttachable::Attachment` to `recordable_types`. Start Active Storage and eager-load `controllers/recording_studio_attachable`.
 - Do not enable Attachable on Page for section photos. Do not add a Pages-owned Image type.
 - Old `image_url` values still render. The next save writes `image` when someone picks a file. Templates may keep a static path such as `/images/hero-tonight.jpg` until they upload through the picker.
 - If you overrode `recording_studio_pages/admin/sections/_field`, take the `:attachment` picker (or keep a URL field on purpose).
+- If you overrode `recording_studio_pages/admin/sections/edit` or `_form`, take the **Update** / **Cancel** row above the grid and the stay-on-page Update redirect, or keep your layout on purpose.
 
 ## [0.3.0] - 2026-09-07
 

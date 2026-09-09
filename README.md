@@ -181,7 +181,7 @@ RS Admin gets a Pages section. The nested section canvas lives at `/recording_st
 
 The editor is a two-column Flatpack Grid: the section list on the left, the live page on the right. The live column has no heading. Small screens stack those columns. Enabled sections use the same components as the public page. Unpublished pages stay private on public routes. Add a section from **Add section**. Apply **Use a template** to append that template’s sections. Open **Edit page** to rename, set home, or remove the page.
 
-Edit section uses the same Grid: the form on the left, that one section on the right. The preview column has no heading. It uses the same components as the public page, including a section that is turned off. Small screens stack those columns.
+Edit section puts **Update** and **Cancel** under the title, then the same Grid: the form on the left, that one section on the right. The buttons are compact, not full width. Update stays on the section and refreshes the preview. Cancel goes back to the page. The preview column has no heading. It uses the same components as the public page, including a section that is turned off. Small screens stack those columns.
 
 Gem screens call `recording_studio_pages_nav`, which uses Recording Studio page nav (back and close). That default layout stays host-agnostic. Dummy `/studio` and `/docs` add a root switcher and Sign out through `dummy_page_nav`. Do not wrap that host chrome onto gem screens.
 

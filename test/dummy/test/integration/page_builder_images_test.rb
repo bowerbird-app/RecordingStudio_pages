@@ -60,7 +60,10 @@ class PageBuilderImagesTest < ActionDispatch::IntegrationTest
             }
           }
 
-    assert_redirected_to recording_studio_pages.admin_page_path(id: page_recording.id)
+    assert_redirected_to recording_studio_pages.edit_admin_page_section_path(
+      page_id: page_recording.id,
+      id: section.id
+    )
     saved = section.reload.recordable.content
     assert_equal attachment.id, saved["image"]
     refute saved.key?("image_url")

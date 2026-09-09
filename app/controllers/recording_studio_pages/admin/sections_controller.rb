@@ -49,7 +49,8 @@ module RecordingStudioPages
           )
         end
 
-        redirect_to admin_page_path(id: page_recording.id), notice: "Section saved."
+        redirect_to edit_admin_page_section_path(page_id: page_recording.id, id: section_recording.id),
+                    notice: "Updated."
       end
 
       def destroy

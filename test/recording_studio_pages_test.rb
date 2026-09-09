@@ -300,6 +300,19 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes section_edit, "recording_studio_pages/pages/section"
     refute_includes section_edit, 'title: "Preview"'
     assert_includes section_edit, 'title: "Nothing to preview"'
+    assert_includes section_edit, 'text: "Update"'
+    assert_includes section_edit, 'text: "Cancel"'
+    assert_includes section_edit, "style: :default"
+    assert_includes section_edit, "flex-wrap items-center gap-3"
+    form = File.read(File.expand_path("../app/views/recording_studio_pages/admin/sections/_form.html.erb", __dir__))
+    refute_includes form, "Save section"
+    refute_includes form, 'text: "Update"'
+    controller = File.read(
+      File.expand_path("../app/controllers/recording_studio_pages/admin/sections_controller.rb", __dir__)
+    )
+    assert_includes controller, "edit_admin_page_section_path"
+    assert_includes controller, 'notice: "Updated."'
+    refute_includes controller, "Section saved."
 
     section_row = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/pages/_section_row.html.erb", __dir__)
