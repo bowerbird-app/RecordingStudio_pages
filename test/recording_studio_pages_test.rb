@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.1", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.2", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -341,6 +341,9 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes append, "recording_studio_orderable_move!"
     assert_includes index, "description:"
     refute_includes index, "message:"
+    assert_includes index, 'text: "New"'
+    assert_includes index, "flex-wrap items-center gap-3"
+    refute_includes index, 'text: "New page"'
     assert_includes edit, "Remove page"
 
     page_model = File.read(File.expand_path("../app/models/recording_studio_pages/page.rb", __dir__))

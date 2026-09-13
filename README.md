@@ -177,7 +177,12 @@ List fields skip blank extra slots and items marked `_destroy`.
 
 ## Admin
 
-RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a padded Flatpack Card around an ordered, orderable list. Each row is the section type name. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s three-dot menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page, then Orderable `recording_studio_orderable_append!` puts it at the end.
+Two surfaces, not one:
+
+- **RS Admin** at `/admin` is a Pages hub: live/draft counts, **View pages**, and **New page**. Those links jump into the page builder. Admin is widgets and links, not the nested editor.
+- **Custom gem screens** at `/recording_studio_pages/admin/pages` are the page list, new-page form, editor, and section editor. The list **New** button is compact (not full width). The create screen title stays **New page**.
+
+The nested section canvas lives on those custom screens because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a padded Flatpack Card around an ordered, orderable list. Each row is the section type name. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s three-dot menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page, then Orderable `recording_studio_orderable_append!` puts it at the end.
 
 The editor is a two-column Flatpack Grid: the section list on the left, the live page on the right. The live column has no heading. Small screens stack those columns. Enabled sections use the same components as the public page. Unpublished pages stay private on public routes. Add a section from **Add section**. Apply **Use a template** to append that template’s sections. Open **Edit page** to rename, set home, or remove the page.
 
@@ -232,7 +237,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.1. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
+0.3.2. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
 
 ## Upgrade
 

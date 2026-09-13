@@ -7,12 +7,14 @@
     variant: :h1
   ) %>
 
-  <%= render FlatPack::Button::Component.new(
-    text: "New page",
-    href: new_admin_page_path,
-    style: :primary,
-    size: :md
-  ) %>
+  <div class="flex flex-wrap items-center gap-3">
+    <%= render FlatPack::Button::Component.new(
+      text: "New",
+      href: new_admin_page_path,
+      style: :primary,
+      size: :md
+    ) %>
+  </div>
 
   <% if @page_recordings.empty? %>
     <%= render FlatPack::Alert::Component.new(

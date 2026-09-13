@@ -343,6 +343,9 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Nothing here yet"
     assert_includes response.body, "Add a page to get going."
+    assert_includes response.body, ">New<"
+    assert_includes response.body, "flex-wrap items-center gap-3"
+    refute_includes response.body, "New page"
   end
 
   test "visitors cannot mutate pages" do

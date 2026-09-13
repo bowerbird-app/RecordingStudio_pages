@@ -28,6 +28,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - If you overrode `recording_studio_pages/admin/pages/_editor`, take the two-column Grid (edit left, live page right, no Preview heading) and the padded Card around the section list, or keep your layout on purpose.
 - If you overrode `recording_studio_pages/admin/sections/edit`, take the two-column Grid (form left, that section on the right, no Preview heading), or keep your layout on purpose.
 
+## [0.3.2] - 2026-09-13
+
+The pages list **New** button stays compact. It no longer stretches across the column.
+
+### Changed
+- Pages list (`/recording_studio_pages/admin/pages`) uses a compact **New** button instead of a full-width **New page**.
+
+### Upgrade notes
+- If you overrode `recording_studio_pages/admin/pages/index`, take the compact **New** button (or keep a full-width label on purpose).
+- The RS Admin hub still says **New page**. That hub links into the custom page builder; it is not the list screen.
+
 ## [0.3.1] - 2026-09-09
 
 Section photos live on the section as Attachable children. The JSON stores the attachment recording id.
