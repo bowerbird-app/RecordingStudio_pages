@@ -30,14 +30,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.2] - 2026-09-13
 
-The pages list **New** button stays compact. It no longer stretches across the column.
+Staff compose pages through the RS Admin Pages section. Public pages stay on Publishable.
 
 ### Changed
-- Pages list (`/recording_studio_pages/admin/pages`) uses a compact **New** button instead of a full-width **New page**.
+- The Pages admin slice is the Pages **section**. The list is the child Admin screen at `/admin/screens/pages`. **New** and Open are jobs under that section. Access uses the Pages resource (Accessible on the Admin access recording, and the Pages section must be enabled).
+- `/recording_studio_pages/admin/pages` redirects to the Admin list. The nested editor stays a gem screen because Admin is not a nested canvas. Back from the editor and New returns to the Admin list.
+- Dummy Publishable close returns to the Admin Pages screen.
 
 ### Upgrade notes
-- If you overrode `recording_studio_pages/admin/pages/index`, take the compact **New** button (or keep a full-width label on purpose).
-- The RS Admin hub still says **New page**. That hub links into the custom page builder; it is not the list screen.
+- Enable `section :pages` on the admin root recordable. Switch to that Admin root before composing pages.
+- Take `/admin/screens/pages` as the list. Old `/recording_studio_pages/admin/pages` redirects there.
+- If you overrode `recording_studio_pages/admin/pages/index`, drop it. The list is the Admin screen.
+- If you overrode editor/New nav, back to the Admin Pages screen (or keep a host path on purpose).
 
 ## [0.3.1] - 2026-09-09
 

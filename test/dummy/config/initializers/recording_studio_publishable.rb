@@ -9,6 +9,6 @@ RecordingStudioPublishable.configure do |config|
       RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: :edit)
   end
   config.management_close_url_resolver = lambda do |controller:, **|
-    "/recording_studio_pages/admin/pages"
+    RecordingStudioPages::Admin.screen_path
   end
 end

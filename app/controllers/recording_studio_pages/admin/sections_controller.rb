@@ -3,7 +3,8 @@
 module RecordingStudioPages
   module Admin
     class SectionsController < BaseController
-      before_action :require_admin_write_access!, only: %i[create update destroy reorder toggle duplicate]
+      before_action :authorize_pages_view!, only: %i[new edit]
+      before_action :authorize_pages_write!, only: %i[create update destroy reorder toggle duplicate]
       before_action :page_recording
 
       def new

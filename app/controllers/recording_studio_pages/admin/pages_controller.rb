@@ -3,10 +3,11 @@
 module RecordingStudioPages
   module Admin
     class PagesController < BaseController
-      before_action :require_admin_write_access!, only: %i[create update destroy apply_template]
+      before_action :authorize_pages_view!, only: %i[index show new edit]
+      before_action :authorize_pages_write!, only: %i[create update destroy apply_template]
 
       def index
-        @page_recordings = page_scope
+        redirect_to pages_admin_screen_path
       end
 
       def new
@@ -56,9 +57,9 @@ module RecordingStudioPages
 
       def destroy
         result = Services::RemovePage.call(page_recording: page_recording, actor: current_admin_actor)
-        return redirect_to(admin_pages_path, alert: result.error) if result.failure?
+        return redirect_to(pages_admin_screen_path, alert: result.error) if result.failure?
 
-        redirect_to admin_pages_path, notice: "Page removed."
+        redirect_to pages_admin_screen_path, notice: "Page removed."
       end
 
       def apply_template
@@ -77,12 +78,6 @@ module RecordingStudioPages
       end
 
       private
-
-      def page_scope
-        RecordingStudio::Recording.where(recordable_type: "RecordingStudioPages::Page", trashed_at: nil)
-                                  .includes(:recordable)
-                                  .order(updated_at: :desc)
-      end
 
       def page_params
         params.fetch(:page, {}).permit(:title, :homepage, :template_key)

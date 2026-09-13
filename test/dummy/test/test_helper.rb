@@ -90,6 +90,17 @@ module PageBuilderTestHelper
     ).value!
   end
 
+  def switch_to_root!(recording)
+    patch "/recording_studio_root_switchable/v1/root_switch", params: {
+      scope: "all_workspaces",
+      root_switch: {
+        root_recording_id: recording.id,
+        return_to: "/studio"
+      }
+    }
+    follow_redirect!
+  end
+
   def isolate_public_homepage!
     RecordingStudioPages::Page.where(homepage: true).update_all(homepage: false)
   end

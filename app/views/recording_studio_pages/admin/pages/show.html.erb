@@ -1,4 +1,4 @@
-<% recording_studio_pages_nav(title: @page_recording.recordable.title, back_url: admin_pages_path) %>
+<% recording_studio_pages_nav(title: @page_recording.recordable.title, back_url: pages_admin_screen_path) %>
 
 <%= turbo_frame_tag "page_editor" do %>
   <%= render "recording_studio_pages/admin/pages/editor" %>

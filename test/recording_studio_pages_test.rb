@@ -277,7 +277,10 @@ class RecordingStudioPagesTest < Minitest::Test
     end
 
     editor = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/_editor.html.erb", __dir__))
-    index = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/index.html.erb", __dir__))
+    admin = File.read(File.expand_path("../lib/recording_studio_pages/admin.rb", __dir__))
+    pages_controller = File.read(
+      File.expand_path("../app/controllers/recording_studio_pages/admin/pages_controller.rb", __dir__)
+    )
     edit = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/edit.html.erb", __dir__))
     template_dropdown = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/pages/_add_template_dropdown.html.erb", __dir__)
@@ -339,11 +342,12 @@ class RecordingStudioPagesTest < Minitest::Test
     append = File.read(File.expand_path("../lib/recording_studio_pages/services/append_section_order.rb", __dir__))
     assert_includes append, "recording_studio_orderable_append!"
     refute_includes append, "recording_studio_orderable_move!"
-    assert_includes index, "description:"
-    refute_includes index, "message:"
-    assert_includes index, 'text: "New"'
-    assert_includes index, "flex-wrap items-center gap-3"
-    refute_includes index, 'text: "New page"'
+    assert_includes admin, "context.admin_screen_path(SCREEN_KEY)"
+    assert_includes admin, 'admin_action "pages.open"'
+    assert_includes admin, 'text: "New"'
+    refute_includes admin, "/recording_studio_pages/admin/pages\""
+    assert_includes pages_controller, "pages_admin_screen_path"
+    assert_includes pages_controller, "redirect_to pages_admin_screen_path"
     assert_includes edit, "Remove page"
 
     page_model = File.read(File.expand_path("../app/models/recording_studio_pages/page.rb", __dir__))

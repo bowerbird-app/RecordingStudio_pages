@@ -6,16 +6,19 @@ module RecordingStudioPages
       include RecordingStudio::UsesDefaultLayout if defined?(RecordingStudio::UsesDefaultLayout)
 
       before_action :authenticate_user!, raise: false
-      before_action :require_admin_access!
 
       helper_method :page_recording, :section_recordings, :page_builder_page_path, :section_definitions,
-                    :add_section_form_id, :section_action_form_id
+                    :add_section_form_id, :section_action_form_id, :pages_admin_screen_path
 
       private
 
       def page_builder_page_path(recording = nil)
         recording ||= page_recording
         admin_page_path(id: recording.id)
+      end
+
+      def pages_admin_screen_path
+        RecordingStudioPages::Admin.screen_path
       end
 
       def section_definitions
@@ -50,34 +53,46 @@ module RecordingStudioPages
         parts.join(" ").presence
       end
 
-      def require_admin_access!
-        return if admin_authorized?(:view)
+      def authorize_pages_view!
+        authorize_pages_resource!(:open)
+      end
 
+      def authorize_pages_write!
+        authorize_pages_resource!(:edit)
+      end
+
+      def authorize_pages_resource!(action)
+        unless defined?(RecordingStudioAdmin)
+          head :forbidden
+          return
+        end
+
+        RecordingStudioAdmin.authorize_resource!(
+          key: RESOURCE_KEY,
+          action: action,
+          context: pages_admin_context,
+          record: pages_admin_record
+        )
+      rescue RecordingStudioAdmin::AuthorizationFailed, RecordingStudioAdmin::DefinitionNotFound
         head :forbidden
       end
 
-      def require_admin_write_access!
-        return if admin_authorized?(:edit)
-
-        head :forbidden
-      end
-
-      def admin_authorized?(role)
-        return true unless defined?(RecordingStudioAccessible)
-        return true unless defined?(RecordingStudioAdmin)
-
-        access_recording = RecordingStudioAdmin.configuration.access_recording_resolver&.call(admin_context)
-        return false unless access_recording
-
-        RecordingStudioAccessible.authorized?(
-          actor: current_admin_actor,
-          recording: access_recording,
-          role: role
+      def pages_admin_context
+        RecordingStudioAdmin::Context.new(
+          params: params.to_unsafe_h,
+          current_actor: current_admin_actor,
+          controller: self,
+          routes: (main_app if respond_to?(:main_app)),
+          view_context: (view_context if respond_to?(:view_context, true))
         )
       end
 
-      def admin_context
-        RecordingStudioAdmin::Context.new(controller: self) if defined?(RecordingStudioAdmin::Context)
+      def pages_admin_record
+        return if params[:id].blank? && params[:page_id].blank?
+
+        page_recording
+      rescue ActiveRecord::RecordNotFound
+        nil
       end
 
       def current_admin_actor

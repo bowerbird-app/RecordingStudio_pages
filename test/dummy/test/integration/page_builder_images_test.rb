@@ -13,6 +13,7 @@ class PageBuilderImagesTest < ActionDispatch::IntegrationTest
     grant_admin!(@root, @actor)
     Current.actor = @actor
     sign_in @actor
+    switch_to_root!(@admin_root)
   end
 
   teardown do
