@@ -35,11 +35,13 @@ Staff compose pages through the RS Admin Pages section. Public pages stay on Pub
 ### Changed
 - The Pages admin slice is the Pages **section**. The list is the child Admin screen at `/admin/screens/pages`. **New** and Open are jobs under that section. Access uses the Pages resource (Accessible on the Admin access recording, and the Pages section must be enabled).
 - `/recording_studio_pages/admin/pages` redirects to the Admin list. The nested editor stays a gem screen because Admin is not a nested canvas. Back from the editor and New returns to the Admin list.
+- Orderable and Copy in the editor use that same Admin Pages gate, so staff do not need a second workspace grant.
 - Dummy Publishable close returns to the Admin Pages screen.
 
 ### Upgrade notes
-- Enable `section :pages` on the admin root recordable. Switch to that Admin root before composing pages.
+- Enable `section :pages` on the admin root recordable. Switch to that Admin root before composing pages. Staff access is that section, not a workspace grant.
 - Take `/admin/screens/pages` as the list. Old `/recording_studio_pages/admin/pages` redirects there.
+- Public `/` and `/pages/:uuid/:slug` stay on Publishable. They do not go through Admin.
 - If you overrode `recording_studio_pages/admin/pages/index`, drop it. The list is the Admin screen.
 - If you overrode editor/New nav, back to the Admin Pages screen (or keep a host path on purpose).
 

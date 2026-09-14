@@ -180,8 +180,9 @@ List fields skip blank extra slots and items marked `_destroy`.
 Staff work goes through the **Pages** Admin section. Public pages do not.
 
 - **RS Admin Pages section** is the hub (`/admin` when `root_section: :pages`, otherwise `/admin/sections/pages`). Live/draft counts, **Pages**, and **New** live there. Dummy `AdminRoot` enables `section :pages`.
-- **Pages screen** at `/admin/screens/pages` is the list. **New** opens the create form. **Open** opens the editor. Access is `RecordingStudioAdmin.authorize_resource!` on the Pages resource, which checks Accessible on the Admin access recording and that the Pages section is enabled. Switch to the Admin root first. A workspace root cannot open the editor.
-- **Editor and section editor** stay gem screens at `/recording_studio_pages/admin/pages/:id`. Admin is a hub of screens and widgets, not a nested canvas. Those jobs are still under the section: you reach them from the Admin list, and they authorize the same Pages resource. Back returns to the Admin list.
+- **Pages screen** at `/admin/screens/pages` is the list. **New** opens the create form. **Open** opens the editor. Access is the Pages resource: Accessible on the Admin access recording, and the Pages section must be enabled. Switch to the Admin root first. A workspace root cannot open the editor or the hub.
+- **Editor and section editor** stay gem screens at `/recording_studio_pages/admin/pages/:id`. Admin is a hub of screens and widgets, not a nested canvas. Those jobs are still under the section: you reach them from the Admin list, and they authorize the same Pages resource. Orderable and Copy use that same Admin gate, so staff do not need a second workspace grant. Back returns to the Admin list.
+- New pages still live in a workspace (content), not under the Admin root. The create form parents them under a workspace the actor can edit when there is one.
 
 The editor lists sections in a padded Flatpack Card around an ordered, orderable list. Each row is the section type name. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s three-dot menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page, then Orderable `recording_studio_orderable_append!` puts it at the end.
 
@@ -191,11 +192,11 @@ Edit section puts **Update** and **Cancel** under the title, then the same Grid:
 
 Gem screens call `recording_studio_pages_nav`, which uses Recording Studio page nav (back and close). That default layout stays host-agnostic. Dummy `/studio` and `/docs` add a root switcher and Sign out through `dummy_page_nav`. Do not wrap that host chrome onto gem screens.
 
-Writes need Accessible `:edit` on the Admin access recording, through the Pages resource. Reads need `:view`. The Pages section must be enabled on that admin root.
+Writes need Accessible `:edit` on the Admin access recording, through the Pages resource. Reads need `:view`. The Pages section must be enabled on that admin root. That is the staff gate. Workspace Accessible is not a second check on the editor.
 
 `/admin` is the RS Admin hub. Switch the current root to **Admin** first. RS Admin forbids the hub while the current root is a workspace. The page builder uses that same Admin gate.
 
-Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`. Public inner pages at `/pages/:uuid/:slug` use the same `recording_studio_pages/public` layout as `/`, so a fullscreen hero can actually go edge to edge.
+Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`. Visitors read `/` and `/pages/:uuid/:slug` without Admin. Those public routes skip sign-in and root switching. They use the `recording_studio_pages/public` layout so a fullscreen hero can actually go edge to edge.
 
 Drag-reorder persists through Flatpack List `orderable_url`. The Pages Stimulus controller only blocks row-menu drags and reloads if that save fails.
 

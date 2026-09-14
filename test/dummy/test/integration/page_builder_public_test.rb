@@ -114,6 +114,26 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'data-theme="rounded"'
   end
 
+  test "visitors can read a published page without Admin" do
+    page_recording = create_page!(parent_recording: @root, title: "Public about", actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: { title: "Come in", body: "No staff badge required." },
+      actor: @actor
+    )
+    publishable = publish_page!(page_recording, slug: "public-about", actor: @actor)
+    sign_out @actor if respond_to?(:sign_out)
+    Current.actor = nil
+
+    get "/pages/#{publishable.id}/public-about"
+
+    assert_response :success
+    assert_includes response.body, "Come in"
+    refute_includes response.body, "/admin/screens/pages"
+    refute_includes response.body, "data-recording-studio-default-layout"
+  end
+
   test "public pages use the host Flatpack theme" do
     original = FlatPack.configuration.default_theme
     FlatPack.configuration.default_theme = :featured_in

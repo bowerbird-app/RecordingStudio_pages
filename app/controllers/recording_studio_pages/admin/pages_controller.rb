@@ -88,7 +88,7 @@ module RecordingStudioPages
       end
 
       def create_parent_recording
-        switched_content_root || first_workspace_root
+        switched_content_root || writable_workspace_root || first_workspace_root
       end
 
       def switched_content_root
@@ -103,12 +103,29 @@ module RecordingStudioPages
         nil
       end
 
+      def writable_workspace_root
+        return unless current_admin_actor
+        return unless defined?(RecordingStudioAccessible)
+
+        workspace_roots.find do |recording|
+          RecordingStudioAccessible.authorized?(
+            actor: current_admin_actor,
+            recording: recording,
+            role: :edit
+          )
+        end
+      end
+
       def first_workspace_root
-        RecordingStudio::Recording.find_by(
+        workspace_roots.first
+      end
+
+      def workspace_roots
+        RecordingStudio::Recording.where(
           parent_recording_id: nil,
           trashed_at: nil,
           recordable_type: "Workspace"
-        )
+        ).order(:created_at, :id)
       end
 
       def render_failure(result, view)

@@ -14,7 +14,88 @@ module RecordingStudioPages
       RecordingStudioAdmin.register_screen(PagesScreen)
       RecordingStudioAdmin.register_resource(PagesResource)
       RecordingStudioAdmin.register_section(PagesSection)
+      install_capability_gates!
     end
+
+    def self.allows?(actor:, action:)
+      return false unless defined?(RecordingStudioAdmin)
+      return false if actor.blank?
+
+      RecordingStudioAdmin.authorize_resource!(
+        key: RESOURCE_KEY,
+        action: action,
+        context: RecordingStudioAdmin::Context.new(params: {}, current_actor: actor)
+      )
+      true
+    rescue RecordingStudioAdmin::AuthorizationFailed, RecordingStudioAdmin::DefinitionNotFound
+      false
+    end
+
+    def self.pages_tree_recording?(recording)
+      recording.respond_to?(:recordable_type) &&
+        %w[RecordingStudioPages::Page RecordingStudioPages::Section].include?(recording.recordable_type.to_s)
+    end
+
+    def self.install_capability_gates!
+      install_orderable_gate!
+      install_duplicatable_gate!
+    end
+
+    def self.install_orderable_gate!
+      return unless defined?(RecordingStudioOrderable)
+      return if @orderable_gate_installed
+
+      previous = RecordingStudioOrderable.configuration.authorization_resolver
+      RecordingStudioOrderable.configuration.authorization_resolver = lambda do |**kwargs|
+        orderable_gate_allows?(previous, **kwargs)
+      end
+      @orderable_gate_installed = true
+    end
+
+    def self.install_duplicatable_gate!
+      return unless defined?(RecordingStudioDuplicatable)
+      return if @duplicatable_gate_installed
+
+      previous = RecordingStudioDuplicatable.configuration.authorization_resolver
+      RecordingStudioDuplicatable.configuration.authorization_resolver = lambda do |**kwargs|
+        duplicatable_gate_allows?(previous, **kwargs)
+      end
+      @duplicatable_gate_installed = true
+    end
+
+    def self.orderable_gate_allows?(previous, action:, actor:, recording:, controller: nil)
+      return true if previous_orderable_allows?(previous, action: action, actor: actor, recording: recording,
+                                                          controller: controller)
+
+      pages_tree_recording?(recording) && allows?(actor: actor, action: :edit)
+    end
+
+    def self.previous_orderable_allows?(previous, action:, actor:, recording:, controller:)
+      if previous.respond_to?(:call)
+        return previous.call(action: action, actor: actor, recording: recording, controller: controller)
+      end
+      return true unless RecordingStudioOrderable::Authorization.use_accessible?
+
+      RecordingStudioOrderable::Authorization.accessible_authorized?(actor: actor, recording: recording)
+    end
+
+    def self.duplicatable_gate_allows?(previous, actor:, recording:, role:)
+      return true if previous_duplicatable_allows?(previous, actor: actor, recording: recording, role: role)
+
+      pages_tree_recording?(recording) && allows?(actor: actor, action: :edit)
+    end
+
+    def self.previous_duplicatable_allows?(previous, actor:, recording:, role:)
+      return previous.call(actor: actor, recording: recording, role: role) if previous.respond_to?(:call)
+      return false unless defined?(RecordingStudioAccessible)
+
+      RecordingStudioAccessible.authorized?(actor: actor, recording: recording, role: role)
+    rescue StandardError
+      false
+    end
+    private_class_method :install_capability_gates!, :install_orderable_gate!, :install_duplicatable_gate!,
+                         :orderable_gate_allows?, :previous_orderable_allows?, :duplicatable_gate_allows?,
+                         :previous_duplicatable_allows?
 
     def self.screen_path
       "#{admin_mount_path}/screens/#{SCREEN_KEY}"

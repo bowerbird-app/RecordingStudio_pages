@@ -345,8 +345,11 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes admin, "context.admin_screen_path(SCREEN_KEY)"
     assert_includes admin, 'admin_action "pages.open"'
     assert_includes admin, 'text: "New"'
+    assert_includes admin, "def self.allows?"
+    assert_includes admin, "install_orderable_gate!"
     refute_includes admin, "/recording_studio_pages/admin/pages\""
     assert_includes pages_controller, "pages_admin_screen_path"
+    assert_includes pages_controller, "writable_workspace_root"
     assert_includes pages_controller, "redirect_to pages_admin_screen_path"
     assert_includes edit, "Remove page"
 
