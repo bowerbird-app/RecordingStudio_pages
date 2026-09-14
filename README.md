@@ -190,13 +190,13 @@ The editor is a two-column Flatpack Grid: the section list on the left, the live
 
 Edit section puts **Update** and **Cancel** under the title, then the same Grid: the form on the left, that one section on the right. The buttons are compact, not full width. Update stays on the section and refreshes the preview. Cancel goes back to the page. The preview column has no heading. It uses the same components as the public page, including a section that is turned off. Small screens stack those columns.
 
-Gem screens call `recording_studio_pages_nav`, which uses Recording Studio page nav (back and close). That default layout stays host-agnostic. Dummy `/studio` and `/docs` add a root switcher and Sign out through `dummy_page_nav`. Do not wrap that host chrome onto gem screens.
+Gem screens call `recording_studio_pages_nav`, which uses Recording Studio page nav (back and close). That default layout stays host-agnostic. Dummy signed-in home uses a Flatpack sidebar of example pages. Dummy `/docs` adds a root switcher and Sign out through `dummy_page_nav`. Do not wrap that host chrome onto gem screens.
 
 Writes need Accessible `:edit` on the Admin access recording, through the Pages resource. Reads need `:view`. The Pages section must be enabled on that admin root. That is the staff gate. Workspace Accessible is not a second check on the editor.
 
 `/admin` is the RS Admin hub. Switch the current root to **Admin** first. RS Admin forbids the hub while the current root is a workspace. The page builder uses that same Admin gate.
 
-Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`. Visitors read `/` and `/pages/:uuid/:slug` without Admin. Those public routes skip sign-in and root switching. They use the `recording_studio_pages/public` layout so a fullscreen hero can actually go edge to edge.
+Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`. Visitors read `/` and `/pages/:uuid/:slug` without Admin. Those public routes skip sign-in and root switching. They use the `recording_studio_pages/public` layout so a fullscreen hero can actually go edge to edge. Signed-in dummy `/` is the host sidebar, not that public homepage.
 
 Drag-reorder persists through Flatpack List `orderable_url`. The Pages Stimulus controller only blocks row-menu drags and reloads if that save fails.
 
@@ -215,13 +215,13 @@ bin/dev
 
 Sign in with `admin@admin.com` / `Password`.
 
-- `/` published homepage
+- `/` published homepage for visitors. Signed-in `/` is a sidebar of example pages. On the Admin root that home is a **Pages** button to `/admin`.
 - `/pages/:uuid/tonight` one fullscreen hero (seeded **Tonight**)
 - `/pages/:uuid/join` one hero with sign-in buttons (seeded **Join**)
 - `/pages/:uuid/walk-in` one fullscreen hero with sign-in buttons (seeded **Walk in**)
 - `/pages/:uuid/start-from-a-url` one hero with a URL field (seeded **Start from a URL**)
 - `/start` dummy catcher for that URL field
-- `/studio` dummy sandbox
+- `/studio` same signed-in home as `/`
 - `/recording_studio_pages/admin/pages` redirects to the Admin Pages list
 - `/admin` RS Admin Pages hub (switch to the Admin root first)
 - `/admin/screens/pages` page list
@@ -249,7 +249,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 3. `RecordingStudioPages::Section` already opts into Duplicatable and Attachable when those gems are loaded. Do not add a second copy path or a Pages-owned Image type. Do not enable Attachable on Page for section photos.
 4. Public pages load `flat_pack/application` and use the host Flatpack theme on `html` (`FlatPack.configuration.default_theme`). Dummy sets `rounded`.
 5. Pin Flatpack `v0.1.162` (or later) so List `orderable_url` persists drag. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`. Pin Attachable `v0.5.1` (or later) for the image picker.
-6. Gem screens use Recording Studio page nav. Dummy `/studio` and `/docs` keep host chrome (root switcher, Sign out). Do not put that on gem screens.
+6. Gem screens use Recording Studio page nav. Dummy signed-in home uses a sidebar of example pages. Dummy `/docs` keeps host chrome (root switcher, Sign out). Do not put that on gem screens.
 7. Enable `section :pages` on the admin root. Staff compose from `/admin` → Pages screen. Switch to the Admin root first.
 8. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.
 9. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.

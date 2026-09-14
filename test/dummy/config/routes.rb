@@ -7,7 +7,7 @@ Rails.application.routes.draw do
              }
   recording_studio_user_auth_for :users
 
-  get "/recording_studio", to: redirect("/studio"), as: nil
+  get "/recording_studio", to: redirect("/"), as: nil
   mount RecordingStudio::Engine, at: "/recording_studio"
   mount RecordingStudioRootSwitchable::Engine, at: "/recording_studio_root_switchable"
   mount RecordingStudioAccessible::Engine, at: "/admin/access"
@@ -30,5 +30,8 @@ Rails.application.routes.draw do
   get "/studio", to: "home#index", as: :studio
   get "/start", to: "starts#show", as: :start
 
+  authenticated :user do
+    root to: "home#index", as: :authenticated_root
+  end
   root to: "recording_studio_pages/homepages#show"
 end

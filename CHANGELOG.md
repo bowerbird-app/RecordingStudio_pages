@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dummy pins Accessible `v0.9.1` and Attachable `v0.5.1` (Users requires Accessible `~> 0.8` and Attachable `~> 0.5.0`). Seed and tests grant access with `bootstrap_owner_access!` / `grant_access`.
 - Dummy sign-in is Users email-first chrome. Password is the second screen. Google and Apple Continue-with buttons follow dummy test/development credentials under `omniauth:`.
 - Dummy `social_logins` CTA calls Users OmniAuth helpers and draws Flatpack Continue-with buttons. It does not render the sign-in `continue_with_providers` partial (that partial includes an **Or** divider). The stack is `max-w-sm`, same as the Users auth shell, so the buttons do not fill a fullscreen hero.
-- Dummy page-builder screens use Recording Studio page nav only. Root switcher and Sign out stay on dummy `/studio` and `/docs`, not in the gem screen right slot.
+- Dummy signed-in `/` uses a Flatpack sidebar of example pages. Visitors still get the published homepage. On the Admin root, that home is a **Pages** button to `/admin`.
+- Dummy page-builder screens use Recording Studio page nav only. Root switcher and Sign out stay on dummy signed-in home and `/docs`, not in the gem screen right slot.
 - The page editor uses a two-column Flatpack Grid: section list on the left, live page on the right. The live column has no heading. The section list sits in a Card with padding (`padding: :md`, not `:none`). Each row is the section type name with a three-dot actions menu. Small screens stack the columns.
 - Edit section uses the same Grid: form on the left, that one section on the right. The preview has no heading. Turned-off sections still preview. Small screens stack the columns.
 
@@ -37,6 +38,7 @@ Staff compose pages through the RS Admin Pages section. Public pages stay on Pub
 - `/recording_studio_pages/admin/pages` redirects to the Admin list. The nested editor stays a gem screen because Admin is not a nested canvas. Back from the editor and New returns to the Admin list.
 - Orderable and Copy in the editor use that same Admin Pages gate, so staff do not need a second workspace grant.
 - Dummy Publishable close returns to the Admin Pages screen.
+- Dummy signed-in `/` uses a Flatpack sidebar of example pages. Visitors still get the published homepage. On the Admin root, that home is a **Pages** button to `/admin`.
 
 ### Upgrade notes
 - Enable `section :pages` on the admin root recordable. Switch to that Admin root before composing pages. Staff access is that section, not a workspace grant.

@@ -55,7 +55,7 @@ A template for building **Rails mountable engine gems** with PostgreSQL UUID pri
 
 ## Dummy App Guidance
 
-The dummy app includes a starter authenticated sidebar in `test/dummy/app/views/layouts/flat_pack/_sidebar.html.erb` with linked pages for install, config, recordable types, recordings tree, gem views, and methods. Those pages are intentionally scaffolded examples with a consistent FlatPack style; update their labels, routes, and content so they fit the gem you are building.
+The dummy app includes a starter authenticated sidebar in `test/dummy/app/views/layouts/flat_pack/_sidebar.html.erb` with links to example published pages. The Admin root home is a **Pages** button to `/admin`. Keep those jobs separate from gem screens.
 
 The home page in `test/dummy/app/views/home/index.html.erb` is the corresponding starting point for a very minimal demo of the gem's primary behavior. Keep it narrowly focused and use the sidebar pages for the broader explanation of concepts, setup, and API surface.
 

@@ -1,0 +1,33 @@
+<%= render FlatPack::Sidebar::Component.new(side: sidebar_side) do |sidebar| %>
+  <% sidebar.header do %>
+    <%= render FlatPack::Sidebar::Header::Component.new(
+      brand_abbr: "P",
+      title: "Pages"
+    ) %>
+  <% end %>
+
+  <% sidebar.items do %>
+    <nav class="py-4 space-y-1" aria-label="Pages">
+      <% dummy_example_pages.each do |page| %>
+        <%= render FlatPack::Sidebar::Item::Component.new(
+          text: page[:title],
+          href: page[:href],
+          icon: page[:icon],
+          active: current_page?(page[:href])
+        ) %>
+      <% end %>
+    </nav>
+  <% end %>
+
+  <% sidebar.footer do %>
+    <%= render FlatPack::Sidebar::Footer::Component.new do %>
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        text: "Sign out",
+        href: main_app.destroy_user_session_path,
+        icon: :lock,
+        class: "mx-0",
+        data: { turbo_method: :delete }
+      ) %>
+    <% end %>
+  <% end %>
+<% end %>

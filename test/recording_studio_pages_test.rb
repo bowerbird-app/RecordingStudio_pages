@@ -83,13 +83,15 @@ class RecordingStudioPagesTest < Minitest::Test
   def test_dummy_app_uses_recording_studio_default_layout
     application_controller_path = File.expand_path("dummy/app/controllers/application_controller.rb", __dir__)
     controller_source = File.read(application_controller_path)
+    home_controller = File.read(File.expand_path("dummy/app/controllers/home_controller.rb", __dir__))
 
     assert_includes controller_source, "include RecordingStudio::UsesDefaultLayout"
     assert_includes controller_source, '"recording_studio/default_layout"'
     assert_includes controller_source, "devise_controller? ? \"application\""
     refute_includes controller_source, "flat_pack_sidebar"
-    refute File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack_sidebar.html.erb", __dir__))
-    refute File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
+    assert_includes home_controller, 'layout "flat_pack_sidebar"'
+    assert File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack_sidebar.html.erb", __dir__))
+    assert File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
   end
 
   def test_dummy_does_not_put_host_chrome_on_gem_screens
@@ -191,7 +193,7 @@ class RecordingStudioPagesTest < Minitest::Test
 
     assert_includes readme_source, "Page Builder"
     assert_includes readme_source, "/recording_studio"
-    refute_includes readme_source, "flat_pack_sidebar"
+    assert_includes readme_source, "sidebar"
   end
 
   def test_product_readme_is_the_page_builder_guide
@@ -209,11 +211,17 @@ class RecordingStudioPagesTest < Minitest::Test
   def test_dummy_studio_page_uses_sandbox_title
     view_path = File.expand_path("dummy/app/views/home/index.html.erb", __dir__)
     view_source = File.read(view_path)
+    sidebar = File.read(File.expand_path("dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
 
-    assert_includes view_source, 'title: "Page Builder studio"'
-    assert_includes view_source, "FlatPack::Card::Component"
-    assert_includes view_source, "dummy_page_nav"
+    assert_includes view_source, 'title: "Example pages"'
+    assert_includes view_source, 'text: "Pages"'
+    assert_includes view_source, 'href: "/admin"'
+    refute_includes view_source, "FlatPack::Card::Component"
+    refute_includes view_source, "dummy_page_nav"
+    refute_includes view_source, 'title: "Page Builder studio"'
     refute_includes view_source, 'title: "Template Demo"'
+    assert_includes sidebar, "dummy_example_pages"
+    refute_includes sidebar, "docs_install"
   end
 
   def test_dummy_docs_pages_use_minimal_flatpack_documentation_components

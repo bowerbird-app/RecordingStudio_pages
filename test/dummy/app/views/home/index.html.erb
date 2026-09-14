@@ -1,50 +1,14 @@
-<% dummy_page_nav(title: "Studio", back_url: studio_path) %>
-
-<div class="flex w-full flex-col gap-6">
+<% if @admin_root_home %>
+  <%= render FlatPack::Button::Component.new(
+    text: "Pages",
+    style: :primary,
+    size: :md,
+    href: "/admin"
+  ) %>
+<% else %>
   <%= render FlatPack::PageTitle::Component.new(
-    title: "Page Builder studio",
-    subtitle: "This dummy app is the host-app sandbox for Recording Studio Pages.",
+    title: "Example pages",
+    subtitle: "Open one from the side.",
     variant: :h1
   ) %>
-
-  <div class="grid gap-6 lg:grid-cols-2">
-    <%= render FlatPack::Card::Component.new(style: :default) do |card| %>
-      <% card.header do %>
-        <%= render FlatPack::PageTitle::Component.new(
-          title: "What's working",
-          subtitle: "The dummy host already wires the page builder.",
-          variant: :h3,
-          class: "mb-0 pb-0"
-        ) %>
-      <% end %>
-
-      <% card.body do %>
-        <ul class="space-y-3 text-sm leading-6">
-          <li>Public home is a published page recording at <code>/</code>.</li>
-          <li>Staff compose pages through Admin Pages at <code>/admin</code>. Switch to the Admin root first. The list is <code>/admin/screens/pages</code>.</li>
-          <li>Public pages stay on Recording Studio Publishable.</li>
-          <li>RS Publishable owns live state, slug, and SEO.</li>
-        </ul>
-      <% end %>
-    <% end %>
-
-    <%= render FlatPack::Card::Component.new(style: :outlined) do |card| %>
-      <% card.header do %>
-        <%= render FlatPack::PageTitle::Component.new(
-          title: "Next steps",
-          subtitle: "Use this host as the proof surface for the gem.",
-          variant: :h3,
-          class: "mb-0 pb-0"
-        ) %>
-      <% end %>
-
-      <% card.body do %>
-        <ol class="space-y-3 text-sm leading-6 list-decimal pl-5">
-          <li>Sign in and open Pages in admin.</li>
-          <li>Open a page, add a section, copy it from the three-dot menu, drag to order, then publish.</li>
-          <li>Publish the page, then open it as a visitor.</li>
-        </ol>
-      <% end %>
-    <% end %>
-  </div>
-</div>
+<% end %>
