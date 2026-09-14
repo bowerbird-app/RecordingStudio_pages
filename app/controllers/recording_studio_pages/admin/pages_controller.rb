@@ -3,10 +3,11 @@
 module RecordingStudioPages
   module Admin
     class PagesController < BaseController
-      before_action :require_admin_write_access!, only: %i[create update destroy apply_template]
+      before_action :authorize_pages_view!, only: %i[index show new edit]
+      before_action :authorize_pages_write!, only: %i[create update destroy apply_template]
 
       def index
-        @page_recordings = page_scope
+        redirect_to pages_admin_screen_path
       end
 
       def new
@@ -56,9 +57,9 @@ module RecordingStudioPages
 
       def destroy
         result = Services::RemovePage.call(page_recording: page_recording, actor: current_admin_actor)
-        return redirect_to(admin_pages_path, alert: result.error) if result.failure?
+        return redirect_to(pages_admin_screen_path, alert: result.error) if result.failure?
 
-        redirect_to admin_pages_path, notice: "Page removed."
+        redirect_to pages_admin_screen_path, notice: "Page removed."
       end
 
       def apply_template
@@ -78,12 +79,6 @@ module RecordingStudioPages
 
       private
 
-      def page_scope
-        RecordingStudio::Recording.where(recordable_type: "RecordingStudioPages::Page", trashed_at: nil)
-                                  .includes(:recordable)
-                                  .order(updated_at: :desc)
-      end
-
       def page_params
         params.fetch(:page, {}).permit(:title, :homepage, :template_key)
       end
@@ -93,7 +88,7 @@ module RecordingStudioPages
       end
 
       def create_parent_recording
-        switched_content_root || first_workspace_root
+        switched_content_root || writable_workspace_root || first_workspace_root
       end
 
       def switched_content_root
@@ -108,12 +103,29 @@ module RecordingStudioPages
         nil
       end
 
+      def writable_workspace_root
+        return unless current_admin_actor
+        return unless defined?(RecordingStudioAccessible)
+
+        workspace_roots.find do |recording|
+          RecordingStudioAccessible.authorized?(
+            actor: current_admin_actor,
+            recording: recording,
+            role: :edit
+          )
+        end
+      end
+
       def first_workspace_root
-        RecordingStudio::Recording.find_by(
+        workspace_roots.first
+      end
+
+      def workspace_roots
+        RecordingStudio::Recording.where(
           parent_recording_id: nil,
           trashed_at: nil,
           recordable_type: "Workspace"
-        )
+        ).order(:created_at, :id)
       end
 
       def render_failure(result, view)

@@ -177,19 +177,26 @@ List fields skip blank extra slots and items marked `_destroy`.
 
 ## Admin
 
-RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a padded Flatpack Card around an ordered, orderable list. Each row is the section type name. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s three-dot menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page, then Orderable `recording_studio_orderable_append!` puts it at the end.
+Staff work goes through the **Pages** Admin section. Public pages do not.
+
+- **RS Admin Pages section** is the hub (`/admin` when `root_section: :pages`, otherwise `/admin/sections/pages`). Live/draft counts, **Pages**, and **New** live there. Dummy `AdminRoot` enables `section :pages`.
+- **Pages screen** at `/admin/screens/pages` is the list. **New** opens the create form. **Open** opens the editor. Access is the Pages resource: Accessible on the Admin access recording, and the Pages section must be enabled. Switch to the Admin root first. A workspace root cannot open the editor or the hub.
+- **Editor and section editor** stay gem screens at `/recording_studio_pages/admin/pages/:id`. Admin is a hub of screens and widgets, not a nested canvas. Those jobs are still under the section: you reach them from the Admin list, and they authorize the same Pages resource. Orderable and Copy use that same Admin gate, so staff do not need a second workspace grant. Back returns to the Admin list.
+- New pages still live in a workspace (content), not under the Admin root. The create form parents them under a workspace the actor can edit when there is one.
+
+The editor lists sections in a padded Flatpack Card around an ordered, orderable list. Each row is the section type name. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s three-dot menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page, then Orderable `recording_studio_orderable_append!` puts it at the end.
 
 The editor is a two-column Flatpack Grid: the section list on the left, the live page on the right. The live column has no heading. Small screens stack those columns. Enabled sections use the same components as the public page. Unpublished pages stay private on public routes. Add a section from **Add section**. Apply **Use a template** to append that template’s sections. Open **Edit page** to rename, set home, or remove the page.
 
 Edit section puts **Update** and **Cancel** under the title, then the same Grid: the form on the left, that one section on the right. The buttons are compact, not full width. Update stays on the section and refreshes the preview. Cancel goes back to the page. The preview column has no heading. It uses the same components as the public page, including a section that is turned off. Small screens stack those columns.
 
-Gem screens call `recording_studio_pages_nav`, which uses Recording Studio page nav (back and close). That default layout stays host-agnostic. Dummy `/studio` and `/docs` add a root switcher and Sign out through `dummy_page_nav`. Do not wrap that host chrome onto gem screens.
+Gem screens call `recording_studio_pages_nav`, which uses Recording Studio page nav (back and close). That default layout stays host-agnostic. Dummy signed-in home uses a Flatpack sidebar of example pages. Dummy `/docs` adds a root switcher and Sign out through `dummy_page_nav`. Do not wrap that host chrome onto gem screens.
 
-Writes need Accessible `:edit` on the configured admin root. Reads need `:view`.
+Writes need Accessible `:edit` on the Admin access recording, through the Pages resource. Reads need `:view`. The Pages section must be enabled on that admin root. That is the staff gate. Workspace Accessible is not a second check on the editor.
 
-`/admin` is the RS Admin hub. Switch the current root to **Admin** first. RS Admin forbids the hub while the current root is a workspace. The page builder editor does not require that switch.
+`/admin` is the RS Admin hub. Switch the current root to **Admin** first. RS Admin forbids the hub while the current root is a workspace. The page builder uses that same Admin gate.
 
-Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`. Public inner pages at `/pages/:uuid/:slug` use the same `recording_studio_pages/public` layout as `/`, so a fullscreen hero can actually go edge to edge.
+Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`. Visitors read `/` and `/pages/:uuid/:slug` without Admin. Those public routes skip sign-in and root switching. They use the `recording_studio_pages/public` layout so a fullscreen hero can actually go edge to edge. Signed-in dummy `/` is the host sidebar, not that public homepage.
 
 Drag-reorder persists through Flatpack List `orderable_url`. The Pages Stimulus controller only blocks row-menu drags and reloads if that save fails.
 
@@ -208,15 +215,16 @@ bin/dev
 
 Sign in with `admin@admin.com` / `Password`.
 
-- `/` published homepage
+- `/` published homepage for visitors. Signed-in `/` is a sidebar of example pages. On the Admin root that home is a **Pages** button to `/admin`.
 - `/pages/:uuid/tonight` one fullscreen hero (seeded **Tonight**)
 - `/pages/:uuid/join` one hero with sign-in buttons (seeded **Join**)
 - `/pages/:uuid/walk-in` one fullscreen hero with sign-in buttons (seeded **Walk in**)
 - `/pages/:uuid/start-from-a-url` one hero with a URL field (seeded **Start from a URL**)
 - `/start` dummy catcher for that URL field
-- `/studio` dummy sandbox
-- `/recording_studio_pages/admin/pages` page builder
-- `/admin` RS Admin hub
+- `/studio` same signed-in home as `/`
+- `/recording_studio_pages/admin/pages` redirects to the Admin Pages list
+- `/admin` RS Admin Pages hub (switch to the Admin root first)
+- `/admin/screens/pages` page list
 
 ## Upstream gaps
 
@@ -232,7 +240,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.1. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
+0.3.2. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
 
 ## Upgrade
 
@@ -241,8 +249,9 @@ These are limits in sibling gems. This gem documents them instead of forking the
 3. `RecordingStudioPages::Section` already opts into Duplicatable and Attachable when those gems are loaded. Do not add a second copy path or a Pages-owned Image type. Do not enable Attachable on Page for section photos.
 4. Public pages load `flat_pack/application` and use the host Flatpack theme on `html` (`FlatPack.configuration.default_theme`). Dummy sets `rounded`.
 5. Pin Flatpack `v0.1.162` (or later) so List `orderable_url` persists drag. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`. Pin Attachable `v0.5.1` (or later) for the image picker.
-6. Gem screens use Recording Studio page nav. Dummy `/studio` and `/docs` keep host chrome (root switcher, Sign out). Do not put that on gem screens.
-7. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.
-8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.
-9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and call the Users OmniAuth helpers from a CTA component. Dummy Join and Walk in do that. The `continue_with_providers` partial is for the sign-in screen. Continue-with buttons follow Rails credentials under `omniauth:`.
-10. Built-in `image` fields are `{ type: :attachment, kind: :image }`. Old `image_url` rows still render. The next save writes `image` when someone picks a file. Mount Attachable, register `RecordingStudioAttachable::Attachment`, start Active Storage, and eager-load its Stimulus controllers. Public pages resolve ids to `rails_blob_path`. Copying a section copies that section's photos and rewrites the ids.
+6. Gem screens use Recording Studio page nav. Dummy signed-in home uses a sidebar of example pages. Dummy `/docs` keeps host chrome (root switcher, Sign out). Do not put that on gem screens.
+7. Enable `section :pages` on the admin root. Staff compose from `/admin` → Pages screen. Switch to the Admin root first.
+8. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.
+9. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.
+10. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and call the Users OmniAuth helpers from a CTA component. Dummy Join and Walk in do that. The `continue_with_providers` partial is for the sign-in screen. Continue-with buttons follow Rails credentials under `omniauth:`.
+11. Built-in `image` fields are `{ type: :attachment, kind: :image }`. Old `image_url` rows still render. The next save writes `image` when someone picks a file. Mount Attachable, register `RecordingStudioAttachable::Attachment`, start Active Storage, and eager-load its Stimulus controllers. Public pages resolve ids to `rails_blob_path`. Copying a section copies that section's photos and rewrites the ids.

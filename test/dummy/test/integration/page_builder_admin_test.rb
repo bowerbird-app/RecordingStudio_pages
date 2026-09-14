@@ -13,6 +13,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     grant_admin!(@root, @actor)
     Current.actor = @actor
     sign_in @actor
+    switch_to_root!(@admin_root)
   end
 
   teardown do
@@ -28,6 +29,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     ).last
     assert_not_nil page_recording
     assert_redirected_to recording_studio_pages.admin_page_path(page_recording)
+    assert_equal @root.id, page_recording.parent_recording_id
 
     post recording_studio_pages.admin_page_sections_path(page_recording), params: {
       section: { section_type: "hero", content: { title: "First" } }
@@ -328,21 +330,40 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Remove page"
 
     delete recording_studio_pages.admin_page_path(page_recording)
-    assert_redirected_to recording_studio_pages.admin_pages_path
+    assert_redirected_to RecordingStudioPages::Admin.screen_path
     follow_redirect!
     assert_includes response.body, "Page removed."
     assert_nil RecordingStudio::Recording.find_by(id: page_recording.id, trashed_at: nil)
   end
 
-  test "empty pages index uses a Flatpack alert description" do
+  test "the pages list lives on the Admin Pages screen" do
+    get recording_studio_pages.admin_pages_path
+
+    assert_redirected_to RecordingStudioPages::Admin.screen_path
+    follow_redirect!
+    assert_response :success
+    assert_includes response.body, ">New<"
+    refute_includes response.body, "New page"
+  end
+
+  test "empty Admin Pages screen still offers New" do
     RecordingStudioPages::Page.update_all(title: "Not empty #{SecureRandom.hex(4)}")
     RecordingStudio::Recording.where(recordable_type: "RecordingStudioPages::Page").update_all(trashed_at: Time.current)
 
-    get recording_studio_pages.admin_pages_path
+    get RecordingStudioPages::Admin.screen_path
 
     assert_response :success
-    assert_includes response.body, "Nothing here yet"
-    assert_includes response.body, "Add a page to get going."
+    assert_includes response.body, ">New<"
+    refute_includes response.body, "Nothing here yet"
+  end
+
+  test "the editor is forbidden while the current root is a workspace" do
+    page_recording = create_page!(parent_recording: @root, title: "Stay put", actor: @actor)
+    switch_to_root!(@root)
+
+    get recording_studio_pages.admin_page_path(page_recording)
+
+    assert_response :forbidden
   end
 
   test "visitors cannot mutate pages" do
@@ -374,6 +395,35 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
+  test "staff with only Admin access can compose a page in a workspace they cannot open" do
+    admin_only = create_actor!("admin-only-pages@example.com")
+    grant_admin!(@admin_root, admin_only)
+    sign_in admin_only
+    Current.actor = admin_only
+    switch_to_root!(@admin_root)
+
+    post recording_studio_pages.admin_pages_path, params: { page: { title: "Admin only", homepage: "0" } }
+    assert_response :redirect
+
+    page_recording = RecordingStudio::Recording.order(:created_at).where(
+      recordable_type: "RecordingStudioPages::Page"
+    ).last
+    assert_not_nil page_recording
+    refute RecordingStudioAccessible.authorized?(actor: admin_only, recording: page_recording, role: :edit)
+
+    post recording_studio_pages.admin_page_sections_path(page_recording), params: {
+      section: { section_type: "hero", content: { title: "From admin" } }
+    }
+    assert_response :redirect
+    sections = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
+    assert_equal %w[hero], sections.map { |recording| recording.recordable.section_type }
+
+    post recording_studio_pages.duplicate_admin_page_section_path(page_recording, sections.first)
+    assert_response :redirect
+    copied = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
+    assert_equal %w[hero hero], copied.map { |recording| recording.recordable.section_type }
+  end
+
   test "the RS Admin hub opens after switching to the Admin root" do
     patch "/recording_studio_root_switchable/v1/root_switch", params: {
       scope: "all_workspaces",
@@ -388,6 +438,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Pages"
+    assert_includes response.body, RecordingStudioPages::Admin.screen_path
+    assert_includes response.body, RecordingStudioPages::Admin.new_page_path
   end
 
   test "the RS Admin hub is forbidden while the current root is a workspace" do
