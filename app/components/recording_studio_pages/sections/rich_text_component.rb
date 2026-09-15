@@ -13,6 +13,8 @@ module RecordingStudioPages
         "mt-8 space-y-5 text-[length:var(--text-2xl)] leading-relaxed",
         "text-[var(--surface-muted-content-color)]"
       ].join(" ").freeze
+      COPY_CLASS = "relative z-10 px-16 py-24".freeze
+      COPY_WITH_IMAGE_CLASS = "relative z-10 px-16 pt-24 pb-56".freeze
       IMAGE_CLASS = [
         "pointer-events-none absolute -bottom-8 -right-8",
         "h-48 w-48 sm:h-[75%] sm:w-[42%] sm:max-w-md",
@@ -38,11 +40,15 @@ module RecordingStudioPages
       private
 
       def copy
-        helpers.content_tag(:div, class: "relative z-10 px-16 py-24") do
+        helpers.content_tag(:div, class: copy_class) do
           helpers.content_tag(:div, class: "max-w-xl") do
             helpers.safe_join([heading, body].compact)
           end
         end
+      end
+
+      def copy_class
+        image_url ? COPY_WITH_IMAGE_CLASS : COPY_CLASS
       end
 
       def heading

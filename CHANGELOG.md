@@ -28,6 +28,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - If you overrode `recording_studio_pages/admin/pages/_editor`, take the two-column Grid (edit left, live page right, no Preview heading) and the padded Card around the section list, or keep your layout on purpose.
 - If you overrode `recording_studio_pages/admin/sections/edit`, take the two-column Grid (form left, that section on the right, no Preview heading), or keep your layout on purpose.
 
+## [0.3.3] - 2026-09-15
+
+Rich text keeps the corner image off the words.
+
+### Changed
+- When a rich text card has a corner image, the copy gets extra bottom inset (`pb-56`) so the mark sits in the empty corner instead of on the last lines.
+
+### Upgrade notes
+- If you overrode the rich text component, take the extra bottom inset when an image is present, or keep your layout on purpose.
+
 ## [0.3.2] - 2026-09-15
 
 Rich text is a full-width card with larger type and a named background.
