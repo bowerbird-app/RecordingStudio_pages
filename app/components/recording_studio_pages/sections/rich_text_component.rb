@@ -4,6 +4,15 @@ module RecordingStudioPages
   module Sections
     class RichTextComponent < ViewComponent::Base
       BACKGROUNDS = %w[default muted inverted].freeze
+      HEADING_CLASS = [
+        "text-[length:var(--text-4xl)] sm:text-[length:var(--text-5xl)]",
+        "font-semibold tracking-tight leading-[1.15] fp-text-balance",
+        "text-[var(--surface-content-color)]"
+      ].join(" ").freeze
+      BODY_CLASS = [
+        "mt-8 space-y-5 text-[length:var(--text-2xl)] leading-relaxed",
+        "text-[var(--surface-muted-content-color)]"
+      ].join(" ").freeze
 
       def initialize(rendered:)
         @rendered = rendered
@@ -29,7 +38,7 @@ module RecordingStudioPages
         helpers.content_tag(
           :h1,
           @rendered.content["title"].presence || "Notes",
-          class: "text-[length:var(--text-4xl)] sm:text-[length:var(--text-5xl)] font-semibold tracking-tight leading-[1.15] fp-text-balance text-[var(--surface-content-color)]"
+          class: HEADING_CLASS
         )
       end
 
@@ -37,11 +46,7 @@ module RecordingStudioPages
         html = helpers.sanitize(@rendered.content["body"].to_s)
         return if html.blank?
 
-        helpers.content_tag(
-          :div,
-          html,
-          class: "mt-8 space-y-5 text-[length:var(--text-2xl)] leading-relaxed text-[var(--surface-muted-content-color)]"
-        )
+        helpers.content_tag(:div, html, class: BODY_CLASS)
       end
 
       def wrapper_class
