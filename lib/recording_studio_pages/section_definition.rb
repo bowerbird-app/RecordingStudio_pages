@@ -14,13 +14,7 @@ module RecordingStudioPages
       @name = name.to_s
       @category = category.to_s
       @component = component
-      @fields = FieldSchema.new(fields)
-      @settings = FieldSchema.new(settings)
-      @variants = Array(variants).map(&:to_s)
-      @validations = Array(validations)
-      @data = data
-      @source = source
-      @full_bleed = full_bleed
+      assign_payload(fields, settings, variants, validations, data, source, full_bleed)
     end
 
     def full_bleed?
@@ -76,6 +70,16 @@ module RecordingStudioPages
     end
 
     private
+
+    def assign_payload(fields, settings, variants, validations, data, source, full_bleed)
+      @fields = FieldSchema.new(fields)
+      @settings = FieldSchema.new(settings)
+      @variants = Array(variants).map(&:to_s)
+      @validations = Array(validations)
+      @data = data
+      @source = source
+      @full_bleed = full_bleed
+    end
 
     def normalize_variant(value)
       text = value.to_s
