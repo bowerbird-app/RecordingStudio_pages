@@ -24,7 +24,7 @@
   <%= tag.img(
         alt: label,
         src: preview_url,
-        class: "max-h-40 max-w-full rounded-[var(--radius-md)] border border-[var(--surface-border-color)] #{chosen ? "" : "hidden"}",
+        class: "self-start h-auto w-auto max-h-40 max-w-full object-contain rounded-[var(--radius-md)] border border-[var(--surface-border-color)] #{chosen ? "" : "hidden"}",
         data: { recording_studio_pages__attachment_field_target: "preview" }
       ) %>
 
