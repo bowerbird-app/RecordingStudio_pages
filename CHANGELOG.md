@@ -41,12 +41,14 @@ A Menu section puts a sticky top bar on a public page.
 ### Changed
 - Public layout asks for `viewport-fit=cover` so the bar can sit in the safe area.
 - Dummy loads Flatpack Stimulus (`controllers/flat_pack`) so **More** works.
+- Dummy imports Turbo and pins RS Admin Stimulus so the Pages hub Live pages and Drafts cards leave the shimmer and show counts.
 
 ### Upgrade notes
 - Add a Menu from **Add section**, or apply **Marketing home**. Pages that already exist keep their sections until you add one.
 - If you overrode `_section.html.erb`, take `full_bleed?` instead of hardcoding Hero.
 - Public pages should load Flatpack JS. Dummy does that with `lazyLoadControllersFrom("controllers/flat_pack", application)`.
 - Dummy only: signed-in `/` is the host home (sidebar, root switcher, example page buttons). Visitors still get the published homepage at `/`. Keep `root to: "recording_studio_pages/homepages#show"` in a host that wants the marketing page for everyone. Dummy uses `/site` for the live page while signed in.
+- Dummy (and hosts) need `import "@hotwired/turbo-rails"` on the JS that serves `/admin`, plus the Admin Stimulus pin from `recording_studio_admin:install`. Without them, hub widgets stay on the skeleton.
 
 ## [0.3.3] - 2026-09-15
 

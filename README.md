@@ -193,6 +193,8 @@ Writes need Accessible `:edit` on the configured admin root. Reads need `:view`.
 
 `/admin` is the RS Admin hub. Switch the current root to **Admin** first. RS Admin forbids the hub while the current root is a workspace. The page builder editor does not require that switch.
 
+The hub’s Live pages and Drafts cards load through Turbo frames. Dummy imports `@hotwired/turbo-rails` and pins RS Admin Stimulus (`controllers/recording_studio_admin`, the same pin `recording_studio_admin:install` adds). Without those, the cards stay on the shimmer. Hosts that already ran the Admin install already have the Stimulus pin; they still need Turbo on the layout that serves `/admin`.
+
 Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`. Public inner pages at `/pages/:uuid/:slug` use the same `recording_studio_pages/public` layout as `/`, so a fullscreen hero can actually go edge to edge.
 
 Drag-reorder persists through Flatpack List `orderable_url`. The Pages Stimulus controller only blocks row-menu drags and reloads if that save fails.
@@ -221,7 +223,7 @@ Sign in with `admin@admin.com` / `Password`.
 - `/start` dummy catcher for that URL field
 - `/studio` same signed-in home as `/`
 - `/recording_studio_pages/admin/pages` page builder
-- `/admin` RS Admin hub. Switch to the Admin root from the top-bar switcher first.
+- `/admin` RS Admin hub. Switch to the Admin root from the top-bar switcher first. Dummy loads Turbo and RS Admin Stimulus so Live pages and Drafts show counts instead of staying on the shimmer.
 
 ## Upstream gaps
 
@@ -253,3 +255,4 @@ These are limits in sibling gems. This gem documents them instead of forking the
 10. Built-in `image` fields are `{ type: :attachment, kind: :image }`. Old `image_url` rows still render. The next save writes `image` when someone picks a file. Mount Attachable, register `RecordingStudioAttachable::Attachment`, start Active Storage, and eager-load its Stimulus controllers. Public pages resolve ids to `rails_blob_path`. Copying a section copies that section's photos and rewrites the ids.
 11. If you overrode the rich text component, take the extra bottom inset when a corner image is present (`pb-56`), or keep your layout on purpose.
 12. Built-in **Menu** (`top_nav`) is a full-bleed Flatpack TopNav section. Add it from **Add section**, or apply **Marketing home**. Old pages stay as they are until you add one. If you overrode `_section.html.erb`, take `full_bleed?` (Hero and Menu set `full_bleed: true`). Public layout should use `viewport-fit=cover`. Load Flatpack Stimulus (`controllers/flat_pack`) so **More** on a phone opens.
+13. RS Admin hub widgets need Turbo on the admin layout. Dummy imports `@hotwired/turbo-rails` and pins `controllers/recording_studio_admin`. Run `recording_studio_admin:install` in a host for that Stimulus pin. Without Turbo, Live pages and Drafts stay on the shimmer.

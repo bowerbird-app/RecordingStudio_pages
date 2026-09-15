@@ -380,6 +380,8 @@ class RecordingStudioPagesTest < Minitest::Test
       File.expand_path("../app/views/recording_studio_pages/pages/_section.html.erb", __dir__)
     )
     dummy_js = File.read(File.expand_path("dummy/app/javascript/controllers/index.js", __dir__))
+    dummy_application_js = File.read(File.expand_path("dummy/app/javascript/application.js", __dir__))
+    dummy_importmap = File.read(File.expand_path("dummy/config/importmap.rb", __dir__))
     assert_includes top_nav, "FlatPack::TopNav"
     assert_includes top_nav, "CtaRenderer"
     assert_includes top_nav, "homepage_path"
@@ -387,6 +389,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes section_partial, "full_bleed?"
     refute_includes section_partial, 'key == "hero"'
     assert_includes dummy_js, 'lazyLoadControllersFrom("controllers/flat_pack"'
+    assert_includes dummy_application_js, 'import "@hotwired/turbo-rails"'
+    assert_includes dummy_importmap, 'pin "@hotwired/turbo-rails"'
+    assert_includes dummy_importmap, "controllers/recording_studio_admin"
 
     rich_text = File.read(
       File.expand_path("../app/components/recording_studio_pages/sections/rich_text_component.rb", __dir__)

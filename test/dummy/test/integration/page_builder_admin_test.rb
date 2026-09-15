@@ -19,6 +19,17 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     Current.actor = nil
   end
 
+  def switch_to_admin_root!
+    patch "/recording_studio_root_switchable/v1/root_switch", params: {
+      scope: "all_workspaces",
+      root_switch: {
+        root_recording_id: @admin_root.id,
+        return_to: "/admin"
+      }
+    }
+    follow_redirect!
+  end
+
   test "staff can create a page, add a section, reorder, disable, and delete" do
     post recording_studio_pages.admin_pages_path, params: { page: { title: "Campaign", homepage: "0" } }
     assert_response :redirect
@@ -403,19 +414,51 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
   end
 
   test "the RS Admin hub opens after switching to the Admin root" do
-    patch "/recording_studio_root_switchable/v1/root_switch", params: {
-      scope: "all_workspaces",
-      root_switch: {
-        root_recording_id: @admin_root.id,
-        return_to: "/studio"
-      }
-    }
-    follow_redirect!
+    switch_to_admin_root!
 
     get "/admin"
 
     assert_response :success
     assert_includes response.body, "Pages"
+  end
+
+  test "pages hub widgets resolve live and draft counts instead of staying on the shimmer" do
+    live = create_page!(parent_recording: @root, title: "Live Hub #{SecureRandom.hex(4)}", actor: @actor)
+    create_page!(parent_recording: @root, title: "Draft Hub #{SecureRandom.hex(4)}", actor: @actor)
+    publish_page!(live, slug: "live-hub-#{SecureRandom.hex(4)}", actor: @actor)
+
+    switch_to_admin_root!
+
+    get "/admin"
+
+    assert_response :success
+    assert_includes response.body, "@hotwired/turbo-rails"
+    assert_includes response.body, "controllers/recording_studio_admin/async_widgets_controller"
+    assert_includes response.body, 'data-controller="recording-studio-admin--async-widgets"'
+    assert_includes response.body, "aria-busy"
+    assert_includes response.body, "/admin/sections/pages/widgets/widgets.pages.published_pages"
+    assert_includes response.body, "/admin/sections/pages/widgets/widgets.pages.draft_pages"
+
+    published_count = RecordingStudioPages::Composition.published_pages_count
+    draft_count = RecordingStudioPages::Composition.draft_pages_count
+
+    get "/admin/sections/pages/widgets/widgets.pages.published_pages",
+        params: { widget_view_variant: :compact },
+        headers: { "Turbo-Frame" => "recording-studio-admin-widget" }
+
+    assert_response :success
+    refute_includes response.body, "aria-busy"
+    assert_includes response.body, "Live pages"
+    assert_includes response.body, ">#{published_count}<"
+
+    get "/admin/sections/pages/widgets/widgets.pages.draft_pages",
+        params: { widget_view_variant: :compact },
+        headers: { "Turbo-Frame" => "recording-studio-admin-widget" }
+
+    assert_response :success
+    refute_includes response.body, "aria-busy"
+    assert_includes response.body, "Drafts"
+    assert_includes response.body, ">#{draft_count}<"
   end
 
   test "the RS Admin hub is forbidden while the current root is a workspace" do
