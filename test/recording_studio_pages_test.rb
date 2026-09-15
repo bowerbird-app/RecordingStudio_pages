@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.3", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.4", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -58,7 +58,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.162"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.134"'
-    refute_includes gemfile, 'tag: "0.3.3"'
+    refute_includes gemfile, 'tag: "0.3.4"'
   end
 
   def test_section_opts_into_duplicatable_and_attachable
@@ -83,13 +83,16 @@ class RecordingStudioPagesTest < Minitest::Test
   def test_dummy_app_uses_recording_studio_default_layout
     application_controller_path = File.expand_path("dummy/app/controllers/application_controller.rb", __dir__)
     controller_source = File.read(application_controller_path)
+    home_controller_source = File.read(File.expand_path("dummy/app/controllers/home_controller.rb", __dir__))
 
     assert_includes controller_source, "include RecordingStudio::UsesDefaultLayout"
     assert_includes controller_source, '"recording_studio/default_layout"'
     assert_includes controller_source, "devise_controller? ? \"application\""
     refute_includes controller_source, "flat_pack_sidebar"
-    refute File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack_sidebar.html.erb", __dir__))
-    refute File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
+    assert_includes home_controller_source, 'layout "flat_pack_sidebar"'
+    assert File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack_sidebar.html.erb", __dir__))
+    assert File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
+    assert File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack/_top_nav.html.erb", __dir__))
   end
 
   def test_dummy_does_not_put_host_chrome_on_gem_screens
@@ -127,6 +130,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes layout, 'stylesheet_link_tag "tailwind"'
     assert_includes layout, "bg-(--surface-page-background-color)"
     assert_includes layout, "min-h-dvh"
+    assert_includes layout, "viewport-fit=cover"
     refute_includes layout, "max-w-md"
     variables_at = layout.index('stylesheet_link_tag "flat_pack/variables"')
     tailwind_at = layout.index('stylesheet_link_tag "tailwind"')
@@ -191,7 +195,8 @@ class RecordingStudioPagesTest < Minitest::Test
 
     assert_includes readme_source, "Page Builder"
     assert_includes readme_source, "/recording_studio"
-    refute_includes readme_source, "flat_pack_sidebar"
+    assert_includes readme_source, "sidebar"
+    assert_includes readme_source, "/site"
   end
 
   def test_product_readme_is_the_page_builder_guide
@@ -206,14 +211,27 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes readme, "v3 declarations"
   end
 
-  def test_dummy_studio_page_uses_sandbox_title
+  def test_dummy_studio_page_uses_example_page_buttons
     view_path = File.expand_path("dummy/app/views/home/index.html.erb", __dir__)
     view_source = File.read(view_path)
+    routes = File.read(File.expand_path("dummy/config/routes.rb", __dir__))
+    helper = File.read(File.expand_path("dummy/app/helpers/application_helper.rb", __dir__))
+    top_nav = File.read(File.expand_path("dummy/app/views/layouts/flat_pack/_top_nav.html.erb", __dir__))
+    sidebar = File.read(File.expand_path("dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
 
-    assert_includes view_source, 'title: "Page Builder studio"'
-    assert_includes view_source, "FlatPack::Card::Component"
-    assert_includes view_source, "dummy_page_nav"
-    refute_includes view_source, 'title: "Template Demo"'
+    assert_includes view_source, "dummy_example_pages"
+    assert_includes view_source, "FlatPack::Button::Component"
+    assert_includes view_source, "current_root_recordable"
+    refute_includes view_source, "dummy_page_nav"
+    refute_includes view_source, "FlatPack::Card::Component"
+    refute_includes view_source, 'title: "Page Builder studio"'
+    assert_includes helper, "dummy_example_pages"
+    assert_includes helper, '"/site"'
+    assert_includes top_nav, "recording_studio_root_switch_dropdown"
+    assert_includes sidebar, 'text: "Admin"'
+    assert_includes routes, 'root to: "home#index"'
+    assert_includes routes, 'root to: "recording_studio_pages/homepages#show"'
+    assert_includes routes, 'get "/site"'
   end
 
   def test_dummy_docs_pages_use_minimal_flatpack_documentation_components
@@ -355,6 +373,26 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes hero, "h-screen"
     refute_includes hero, 'content["image_url"]'
 
+    top_nav = File.read(
+      File.expand_path("../app/components/recording_studio_pages/sections/top_nav_component.rb", __dir__)
+    )
+    section_partial = File.read(
+      File.expand_path("../app/views/recording_studio_pages/pages/_section.html.erb", __dir__)
+    )
+    dummy_js = File.read(File.expand_path("dummy/app/javascript/controllers/index.js", __dir__))
+    dummy_application_js = File.read(File.expand_path("dummy/app/javascript/application.js", __dir__))
+    dummy_importmap = File.read(File.expand_path("dummy/config/importmap.rb", __dir__))
+    assert_includes top_nav, "FlatPack::TopNav"
+    assert_includes top_nav, "CtaRenderer"
+    assert_includes top_nav, "homepage_path"
+    refute_includes top_nav, "recording_studio_navigation"
+    assert_includes section_partial, "full_bleed?"
+    refute_includes section_partial, 'key == "hero"'
+    assert_includes dummy_js, 'lazyLoadControllersFrom("controllers/flat_pack"'
+    assert_includes dummy_application_js, 'import "@hotwired/turbo-rails"'
+    assert_includes dummy_importmap, 'pin "@hotwired/turbo-rails"'
+    assert_includes dummy_importmap, "controllers/recording_studio_admin"
+
     rich_text = File.read(
       File.expand_path("../app/components/recording_studio_pages/sections/rich_text_component.rb", __dir__)
     )
@@ -394,6 +432,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes attachment_field, "recording-studio-attachable--attachment-image-picker"
     refute_includes attachment_field, "Image url"
     assert_includes built_ins, "type: :attachment"
+    assert_includes built_ins, "key: :top_nav"
+    assert_includes built_ins, "name: \"Menu\""
+    assert_includes built_ins, "full_bleed: true"
     refute_includes built_ins, "image_url:"
     engine = File.read(File.expand_path("../lib/recording_studio_pages/engine.rb", __dir__))
     assert_includes engine, "restore_registries!"

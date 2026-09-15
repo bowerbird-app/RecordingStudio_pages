@@ -1,0 +1,52 @@
+<%= render FlatPack::Sidebar::Component.new(side: sidebar_side) do |sidebar| %>
+  <% sidebar.header do %>
+    <%= render FlatPack::Sidebar::Header::Component.new(
+      brand_abbr: "P",
+      title: "Pages"
+    ) %>
+  <% end %>
+
+  <% sidebar.items do %>
+    <nav class="py-4 space-y-1" aria-label="Main navigation">
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        text: "Home",
+        href: main_app.root_path,
+        icon: :home,
+        active: current_page?(main_app.root_path) || current_page?(main_app.studio_path)
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        text: "Pages",
+        href: recording_studio_pages.admin_pages_path,
+        icon: :document_text,
+        active: request.path.start_with?("/recording_studio_pages/admin")
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        text: "Admin",
+        href: "/admin",
+        icon: :cog_6_tooth,
+        active: request.path == "/admin" || request.path.start_with?("/admin/")
+      ) %>
+
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        text: "Live site",
+        href: main_app.site_path,
+        icon: :globe_alt,
+        active: current_page?(main_app.site_path)
+      ) %>
+    </nav>
+  <% end %>
+
+  <% sidebar.footer do %>
+    <%= render FlatPack::Sidebar::Footer::Component.new do %>
+      <%= render FlatPack::Sidebar::Item::Component.new(
+        text: "Sign out",
+        href: main_app.destroy_user_session_path,
+        icon: :lock,
+        class: "mx-0",
+        data: { turbo_method: :delete }
+      ) %>
+    <% end %>
+  <% end %>
+<% end %>

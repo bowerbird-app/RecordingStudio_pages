@@ -15,6 +15,7 @@ module RecordingStudioPages
     end
 
     def register_sections!
+      register_top_nav!
       register_hero!
       register_rich_text!
       register_image_text!
@@ -34,6 +35,17 @@ module RecordingStudioPages
         name: "Marketing home",
         source: "recording_studio_pages",
         sections: [
+          {
+            type: :top_nav,
+            content: {
+              name: "House",
+              links: [
+                { text: "About", url: "/" },
+                { text: "Tonight", url: "/" }
+              ],
+              cta: { type: "button", text: "Join", url: "/users/sign_in" }
+            }
+          },
           {
             type: :hero,
             content: {
@@ -112,6 +124,30 @@ module RecordingStudioPages
       )
     end
 
+    def register_top_nav!
+      RecordingStudioPages.register_section(
+        key: :top_nav,
+        name: "Menu",
+        category: "marketing",
+        source: "recording_studio_pages",
+        component: "RecordingStudioPages::Sections::TopNavComponent",
+        full_bleed: true,
+        fields: {
+          name: { type: :string, label: "Name" },
+          image: { type: :attachment, kind: :image, label: "Mark" },
+          links: {
+            type: :list,
+            label: "Links",
+            item: {
+              text: { type: :string, label: "Label" },
+              url: { type: :url, label: "URL" }
+            }
+          },
+          cta: { type: :cta, label: "Join" }
+        }
+      )
+    end
+
     def register_hero!
       RecordingStudioPages.register_section(
         key: :hero,
@@ -119,6 +155,7 @@ module RecordingStudioPages
         category: "marketing",
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::HeroComponent",
+        full_bleed: true,
         fields: {
           eyebrow: :string,
           title: { type: :string, required: true },

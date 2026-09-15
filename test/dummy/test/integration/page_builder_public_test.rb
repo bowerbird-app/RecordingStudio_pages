@@ -67,6 +67,49 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "data-recording-studio-default-layout"
   end
 
+  test "a published page can render a full-bleed menu above other sections" do
+    page_recording = create_page!(parent_recording: @root, title: "House home", homepage: true, actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "top_nav",
+      content: {
+        name: "House",
+        links: [
+          { text: "About", url: "/pages/about" },
+          { text: "Tonight", url: "/pages/tonight" }
+        ],
+        cta: { type: "button", text: "Join", url: "/users/sign_in" }
+      },
+      actor: @actor
+    )
+    add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: { title: "Under the bar", body: "The menu stays full width." },
+      actor: @actor
+    )
+    publish_page!(page_recording, slug: "house-home", actor: @actor)
+
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, "fp-top-nav"
+    assert_includes response.body, "House"
+    assert_includes response.body, "About"
+    assert_includes response.body, "Tonight"
+    assert_includes response.body, "Join"
+    assert_includes response.body, 'href="/pages/about"'
+    assert_includes response.body, 'href="/pages/tonight"'
+    assert_includes response.body, 'href="/users/sign_in"'
+    assert_includes response.body, 'href="/"'
+    assert_includes response.body, "flat-pack--top-nav"
+    assert_includes response.body, "Under the bar"
+    assert_includes response.body, "viewport-fit=cover"
+    nav_at = response.body.index("fp-top-nav")
+    box_at = response.body.index("max-w-6xl")
+    assert_operator nav_at, :<, box_at
+  end
+
   test "section variants change public markup" do
     page_recording = create_page!(parent_recording: @root, title: "Variant home", homepage: true, actor: @actor)
     add_section!(

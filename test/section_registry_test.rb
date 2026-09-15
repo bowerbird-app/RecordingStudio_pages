@@ -87,6 +87,20 @@ class SectionRegistryTest < Minitest::Test
     assert_equal({ "title" => "Probe" }, RecordingStudioPages.section(:probe).starter_content)
   end
 
+  def test_full_bleed_is_opt_in
+    RecordingStudioPages::BuiltIns.register!
+    RecordingStudioPages.register_section(
+      key: :probe,
+      name: "Probe",
+      component: "RecordingStudioPages::Sections::HeroComponent"
+    )
+
+    refute RecordingStudioPages.section(:probe).full_bleed?
+    assert_equal false, RecordingStudioPages.section(:probe).catalog[:full_bleed]
+    assert RecordingStudioPages.section(:hero).full_bleed?
+    assert RecordingStudioPages.section(:top_nav).full_bleed?
+  end
+
   def test_payload_validation_rejects_bad_urls
     RecordingStudioPages.register_section(
       key: :probe,
@@ -106,7 +120,7 @@ class SectionRegistryTest < Minitest::Test
   def test_built_ins_and_marketing_home_template_are_registered
     RecordingStudioPages::BuiltIns.register!
 
-    %w[hero rich_text image_text logo_cloud feature_grid call_to_action].each do |key|
+    %w[top_nav hero rich_text image_text logo_cloud feature_grid call_to_action].each do |key|
       assert RecordingStudioPages.section?(key), "expected #{key} to be registered"
     end
     assert_equal "marketing_home", RecordingStudioPages.template(:marketing_home).key
@@ -119,12 +133,15 @@ class SectionRegistryTest < Minitest::Test
 
     home = RecordingStudioPages.template(:marketing_home)
     types = home.sections.map { |entry| entry.fetch("type") }
-    hero_copy = home.sections.first.fetch("content").to_h.stringify_keys
-    feature_copy = home.sections[2].fetch("content").to_h.stringify_keys
-    cta_copy = home.sections[3].fetch("content").to_h.stringify_keys
-    blob = [hero_copy, feature_copy, cta_copy].to_json
+    menu_copy = home.sections.first.fetch("content").to_h.stringify_keys
+    hero_copy = home.sections[1].fetch("content").to_h.stringify_keys
+    feature_copy = home.sections[3].fetch("content").to_h.stringify_keys
+    cta_copy = home.sections[4].fetch("content").to_h.stringify_keys
+    blob = [menu_copy, hero_copy, feature_copy, cta_copy].to_json
 
-    assert_equal %w[hero logo_cloud feature_grid call_to_action], types
+    assert_equal %w[top_nav hero logo_cloud feature_grid call_to_action], types
+    assert_equal "House", menu_copy.fetch("name")
+    assert_equal "Join", menu_copy.fetch("cta").to_h.stringify_keys.fetch("text")
     assert_equal "The page is the front door", hero_copy.fetch("title")
     assert_equal "button", hero_copy.fetch("cta").to_h.stringify_keys.fetch("type")
     refute hero_copy.key?("primary_action")
@@ -143,7 +160,21 @@ class SectionRegistryTest < Minitest::Test
 
     assert_equal "hero", hero[:key]
     assert_equal "Hero", hero[:name]
+    assert_equal true, hero[:full_bleed]
     assert_includes hero[:variants], "split_image"
+    menu = catalog[:sections].find { |entry| entry[:key] == "top_nav" }
+
+    assert_equal "top_nav", menu[:key]
+    assert_equal "Menu", menu[:name]
+    assert_equal true, menu[:full_bleed]
+    assert_equal "string", menu[:fields][:name][:type]
+    assert_equal "Name", menu[:fields][:name][:label]
+    assert_equal "attachment", menu[:fields][:image][:type]
+    assert_equal "Mark", menu[:fields][:image][:label]
+    assert_equal "list", menu[:fields][:links][:type]
+    assert_equal "Links", menu[:fields][:links][:label]
+    assert_equal "cta", menu[:fields][:cta][:type]
+    assert_equal "Join", menu[:fields][:cta][:label]
     rich_text = catalog[:sections].find { |entry| entry[:key] == "rich_text" }
 
     assert_includes rich_text[:variants], "full_width"

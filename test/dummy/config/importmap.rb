@@ -1,6 +1,7 @@
 # Pin npm packages by running ./bin/importmap
 
 pin "application"
+pin "@hotwired/turbo-rails", to: "turbo.min.js"
 pin "@hotwired/stimulus", to: "stimulus.min.js"
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
@@ -12,6 +13,11 @@ pin "flat_pack/heroicons", to: "flat_pack/heroicons.js", preload: false
 pin_all_from RecordingStudioPages::Engine.root.join("app/javascript/recording_studio_pages/controllers"),
              under: "controllers/recording_studio_pages",
              to: "recording_studio_pages/controllers",
+             preload: false
+
+pin_all_from RecordingStudioAdmin::Engine.root.join("app/javascript/recording_studio_admin/controllers"),
+             under: "controllers/recording_studio_admin",
+             to: "recording_studio_admin/controllers",
              preload: false
 
 pin "@rails/activestorage", to: "activestorage.esm.js"

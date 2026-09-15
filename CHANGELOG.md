@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dummy pins Accessible `v0.9.1` and Attachable `v0.5.1` (Users requires Accessible `~> 0.8` and Attachable `~> 0.5.0`). Seed and tests grant access with `bootstrap_owner_access!` / `grant_access`.
 - Dummy sign-in is Users email-first chrome. Password is the second screen. Google and Apple Continue-with buttons follow dummy test/development credentials under `omniauth:`.
 - Dummy `social_logins` CTA calls Users OmniAuth helpers and draws Flatpack Continue-with buttons. It does not render the sign-in `continue_with_providers` partial (that partial includes an **Or** divider). The stack is `max-w-sm`, same as the Users auth shell, so the buttons do not fill a fullscreen hero.
-- Dummy page-builder screens use Recording Studio page nav only. Root switcher and Sign out stay on dummy `/studio` and `/docs`, not in the gem screen right slot.
+- Dummy page-builder screens use Recording Studio page nav only. Root switcher and Sign out stay on dummy host screens, not in the gem screen right slot.
 - The page editor uses a two-column Flatpack Grid: section list on the left, live page on the right. The live column has no heading. The section list sits in a Card with padding (`padding: :md`, not `:none`). Each row is the section type name with a three-dot actions menu. Small screens stack the columns.
 - Edit section uses the same Grid: form on the left, that one section on the right. The preview has no heading. Turned-off sections still preview. Small screens stack the columns.
 
@@ -27,6 +27,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Do not define `recording_studio_pages_page_nav` to inject a root switcher or Sign out onto Pages screens. Those screens use Recording Studio page nav. Host chrome belongs on host screens.
 - If you overrode `recording_studio_pages/admin/pages/_editor`, take the two-column Grid (edit left, live page right, no Preview heading) and the padded Card around the section list, or keep your layout on purpose.
 - If you overrode `recording_studio_pages/admin/sections/edit`, take the two-column Grid (form left, that section on the right, no Preview heading), or keep your layout on purpose.
+
+## [0.3.4] - 2026-09-15
+
+A Menu section puts a sticky top bar on a public page.
+
+### Added
+- Dummy signed-in `/` is a Flatpack sidebar shell with a root switcher in the top bar and buttons to the live example pages. Visitors still get the published homepage at `/`. Signed-in people preview that live page at `/site`.
+- Built-in **Menu** (`top_nav`): name, optional mark, links, and a Join call to action, drawn with Flatpack TopNav. Full-bleed, like Hero. Links fold into **More** on a phone; Join stays on the bar.
+- `register_section` accepts `full_bleed: true`. Hero and Menu set it. Other sections stay in `max-w-6xl`.
+- `marketing_home` starts with a Menu. Dummy seed points Home’s links at the seeded About, Tonight, and Join pages.
+
+### Changed
+- Public layout asks for `viewport-fit=cover` so the bar can sit in the safe area.
+- Dummy loads Flatpack Stimulus (`controllers/flat_pack`) so **More** works.
+- Dummy imports Turbo and pins RS Admin Stimulus so the Pages hub Live pages and Drafts cards leave the shimmer and show counts.
+
+### Upgrade notes
+- Add a Menu from **Add section**, or apply **Marketing home**. Pages that already exist keep their sections until you add one.
+- If you overrode `_section.html.erb`, take `full_bleed?` instead of hardcoding Hero.
+- Public pages should load Flatpack JS. Dummy does that with `lazyLoadControllersFrom("controllers/flat_pack", application)`.
+- Dummy only: signed-in `/` is the host home (sidebar, root switcher, example page buttons). Visitors still get the published homepage at `/`. Keep `root to: "recording_studio_pages/homepages#show"` in a host that wants the marketing page for everyone. Dummy uses `/site` for the live page while signed in.
+- Dummy (and hosts) need `import "@hotwired/turbo-rails"` on the JS that serves `/admin`, plus the Admin Stimulus pin from `recording_studio_admin:install`. Without them, hub widgets stay on the skeleton.
 
 ## [0.3.3] - 2026-09-15
 
