@@ -144,9 +144,25 @@ begin
       section_type: "rich_text",
       content: {
         title: "About this studio, in your words",
-        body: "This page sits with the rest of the site. Pieces stack underneath. Use a hero when you want a picture. Use this when you want the words."
+        body: "This page sits with the rest of the site. Pieces stack underneath. Use a hero when you want a picture. Use this when you want the words.",
+        image: "/images/rich-text-corner.png"
       },
       settings: { variant: "full_width", background: "muted" },
+      actor: user
+    ).value!
+  end
+
+  about_section = RecordingStudioPages::Composition.section_recordings_for(about_recording).find do |recording|
+    recording.recordable.section_type == "rich_text"
+  end
+  if about_section && about_section.recordable.content["image"].blank?
+    RecordingStudioPages::Services::ReviseSection.call(
+      section_recording: about_section,
+      content: about_section.recordable.content.merge(
+        "title" => "About this studio, in your words",
+        "image" => "/images/rich-text-corner.png"
+      ),
+      settings: about_section.recordable.settings.merge("variant" => "full_width", "background" => "muted"),
       actor: user
     ).value!
   end

@@ -171,6 +171,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Background"
     assert_includes response.body, "Muted"
     assert_includes response.body, "Inverted"
+    assert_includes response.body, "Choose image"
   end
 
   test "staff can change a hero call to action" do

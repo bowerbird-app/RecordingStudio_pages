@@ -362,6 +362,8 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes rich_text, "--text-5xl"
     assert_includes rich_text, "--text-2xl"
     assert_includes rich_text, "max-w-xl"
+    assert_includes rich_text, 'content["image"]'
+    assert_includes rich_text, "object-contain"
     refute_includes rich_text, "padding: :lg"
     refute_includes rich_text, "PageTitle"
 

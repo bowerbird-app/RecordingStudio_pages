@@ -147,6 +147,8 @@ class SectionRegistryTest < Minitest::Test
     rich_text = catalog[:sections].find { |entry| entry[:key] == "rich_text" }
 
     assert_includes rich_text[:variants], "full_width"
+    assert_equal "attachment", rich_text[:fields][:image][:type]
+    assert_equal "image", rich_text[:fields][:image][:kind]
     assert_equal "string", rich_text[:settings][:background][:type]
     assert_equal "default", rich_text[:settings][:background][:default]
     assert_equal(

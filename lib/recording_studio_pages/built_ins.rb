@@ -144,7 +144,8 @@ module RecordingStudioPages
         component: "RecordingStudioPages::Sections::RichTextComponent",
         fields: {
           title: { type: :string, required: true },
-          body: :rich_text
+          body: :rich_text,
+          image: { type: :attachment, kind: :image, label: "Image" }
         },
         settings: {
           variant: :string,

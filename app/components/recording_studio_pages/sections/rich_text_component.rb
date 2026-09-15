@@ -13,6 +13,11 @@ module RecordingStudioPages
         "mt-8 space-y-5 text-[length:var(--text-2xl)] leading-relaxed",
         "text-[var(--surface-muted-content-color)]"
       ].join(" ").freeze
+      IMAGE_CLASS = [
+        "pointer-events-none absolute -bottom-8 -right-8",
+        "h-48 w-48 sm:h-[75%] sm:w-[42%] sm:max-w-md",
+        "object-contain object-right-bottom select-none"
+      ].join(" ").freeze
 
       def initialize(rendered:)
         @rendered = rendered
@@ -22,10 +27,8 @@ module RecordingStudioPages
         helpers.content_tag(:div, class: wrapper_class) do
           render FlatPack::Card::Component.new(**card_attributes) do |card|
             card.body(padding: :none) do
-              helpers.content_tag(:div, class: "px-16 py-24") do
-                helpers.content_tag(:div, class: "max-w-xl") do
-                  helpers.safe_join([heading, body].compact)
-                end
+              helpers.content_tag(:div, class: frame_class) do
+                helpers.safe_join([copy, image].compact)
               end
             end
           end
@@ -33,6 +36,14 @@ module RecordingStudioPages
       end
 
       private
+
+      def copy
+        helpers.content_tag(:div, class: "relative z-10 px-16 py-24") do
+          helpers.content_tag(:div, class: "max-w-xl") do
+            helpers.safe_join([heading, body].compact)
+          end
+        end
+      end
 
       def heading
         helpers.content_tag(
@@ -49,8 +60,25 @@ module RecordingStudioPages
         helpers.content_tag(:div, html, class: BODY_CLASS)
       end
 
+      def image
+        url = image_url
+        return if url.blank?
+
+        helpers.image_tag(url, alt: @rendered.content["title"].to_s, class: IMAGE_CLASS)
+      end
+
+      def image_url
+        @rendered.content["image"].to_s.strip.presence
+      end
+
       def wrapper_class
-        narrow? ? "mx-auto w-full max-w-prose" : "w-full"
+        classes = [narrow? ? "mx-auto w-full max-w-prose" : "w-full"]
+        classes << "overflow-hidden rounded-[var(--radius-lg)]" if image_url
+        classes.join(" ")
+      end
+
+      def frame_class
+        image_url ? "relative min-h-[22rem] sm:min-h-[32rem]" : "relative"
       end
 
       def narrow?
