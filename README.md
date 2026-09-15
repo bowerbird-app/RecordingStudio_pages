@@ -51,7 +51,7 @@ recording_studio_admin_for :admin, at: "/admin", root_section: :pages
 root to: "recording_studio_pages/homepages#show"
 ```
 
-Point `/` at the homepage controller. Public pages use `recording_studio_pages/public`. That layout loads Flatpack tokens (`flat_pack/variables`, `flat_pack/application`) then Tailwind, and puts the host’s named Flatpack theme on `html` (`FlatPack.configuration.default_theme`, dummy `rounded`). Do not reuse the Devise `application` layout for public pages — it is `max-w-md` for sign-in. Heroes render with Flatpack's Hero component at full width; other sections sit in `max-w-6xl`. Publishable `config.layout` is for Publishable's own screens; dummy sets it to `recording_studio/default_layout`.
+Point `/` at the homepage controller. Public pages use `recording_studio_pages/public`. That layout loads Flatpack tokens (`flat_pack/variables`, `flat_pack/application`) then Tailwind, and puts the host’s named Flatpack theme on `html` (`FlatPack.configuration.default_theme`, dummy `rounded`). Do not reuse the Devise `application` layout for public pages — it is `max-w-md` for sign-in. Heroes and menus render with Flatpack at full width; other sections sit in `max-w-6xl`. Publishable `config.layout` is for Publishable's own screens; dummy sets it to `recording_studio/default_layout`.
 
 ## How a page is stored
 
@@ -112,6 +112,8 @@ Duplicate keys raise `RecordingStudioPages::DuplicateRegistration`. Unknown type
 
 `data:` is a proc. Use it when the section reads live records instead of only JSON. If the proc raises, render logs a warning, skips that payload, and still draws the saved content.
 
+`full_bleed: true` draws the section edge to edge. Hero and Menu do this. Leave it off for reading-width sections.
+
 `RecordingStudioPages.catalog` lists every registered section, template, and call to action, including field types, required flags, settings, and variants. That catalog is the machine-readable surface for future API and MCP tooling.
 
 ## Register a call to action
@@ -167,11 +169,13 @@ RecordingStudioPages.register_template(
 
 ## Built-in sections
 
-hero, rich_text, image_text, logo_cloud, feature_grid, call_to_action. Registered variants change layout: image left/right, full-width or narrow rich text, compact logos, feature column counts, and CTA banner vs card.
+hero, top_nav (Menu), rich_text, image_text, logo_cloud, feature_grid, call_to_action. Registered variants change layout: image left/right, full-width or narrow rich text, compact logos, feature column counts, and CTA banner vs card.
 
-Rich text is a full-width card with a display headline, muted body, and Hero inset (`px-16 py-24`). Copy stays `max-w-xl` so a wide card does not turn into a newspaper column. Background is Default, Muted, or Inverted. An optional corner image uses the same Attachable `image` field as hero; skip it and the card is words only. When the image is present, the card keeps extra space under the words so the mark stays in the corner. Narrow keeps a reading-width card. Copy is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero, image-and-text, logo-cloud, and rich-text photos are Attachable children of the section. The JSON stores the attachment id; public render turns it into an Active Storage path.
+A **Menu** is a sticky top bar (`FlatPack::TopNav`). Name and an optional mark sit on the left and link home. Links sit in the middle. Join on the right stays on the bar on a phone; the links fold into **More**. It is a section, not site chrome, so a page can skip it. It is full-bleed, like Hero. Hosts that `register_section` can set `full_bleed: true` to skip the `max-w-6xl` wrap.
 
-- Built-in templates: `marketing_home` (hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero). Dummy also registers `join` (centered hero with social logins), `walk_in` (fullscreen hero image with social logins), and `start_from_url` (hero with a URL field). Dummy seeds published **Tonight**, **Join**, **Walk in**, and **Start from a URL** pages. Open Tonight at `/pages/:uuid/tonight`, Join at `/pages/:uuid/join`, Walk in at `/pages/:uuid/walk-in`, and the URL landing at `/pages/:uuid/start-from-a-url`. Those public URLs are the page, not the editor preview. A fullscreen hero fills the viewport (`100dvh`); Flatpack’s image hero is otherwise `min-h-[560px]`. Dummy Home is the `marketing_home` sample; seed restores that template if the sections drift (a second hero from **Use a template**, old copy, and so on).
+Rich text is a full-width card with a display headline, muted body, and Hero inset (`px-16 py-24`). Copy stays `max-w-xl` so a wide card does not turn into a newspaper column. Background is Default, Muted, or Inverted. An optional corner image uses the same Attachable `image` field as hero; skip it and the card is words only. When the image is present, the card keeps extra space under the words so the mark stays in the corner. Narrow keeps a reading-width card. Copy is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero, image-and-text, logo-cloud, menu, and rich-text photos are Attachable children of the section. The JSON stores the attachment id; public render turns it into an Active Storage path.
+
+- Built-in templates: `marketing_home` (menu, hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero). Dummy also registers `join` (centered hero with social logins), `walk_in` (fullscreen hero image with social logins), and `start_from_url` (hero with a URL field). Dummy seeds published **Tonight**, **Join**, **Walk in**, and **Start from a URL** pages. Open Tonight at `/pages/:uuid/tonight`, Join at `/pages/:uuid/join`, Walk in at `/pages/:uuid/walk-in`, and the URL landing at `/pages/:uuid/start-from-a-url`. Those public URLs are the page, not the editor preview. A fullscreen hero fills the viewport (`100dvh`); Flatpack’s image hero is otherwise `min-h-[560px]`. Dummy Home is the `marketing_home` sample; seed restores that template if the sections drift (a second hero from **Use a template**, old copy, and so on), then points the Home menu at the seeded About, Tonight, and Join pages.
 
 List fields skip blank extra slots and items marked `_destroy`.
 
@@ -208,7 +212,7 @@ bin/dev
 
 Sign in with `admin@admin.com` / `Password`.
 
-- `/` published homepage
+- `/` published homepage (seeded Home starts with a Menu, then the hero)
 - `/pages/:uuid/tonight` one fullscreen hero (seeded **Tonight**)
 - `/pages/:uuid/join` one hero with sign-in buttons (seeded **Join**)
 - `/pages/:uuid/walk-in` one fullscreen hero with sign-in buttons (seeded **Walk in**)
@@ -232,7 +236,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.3. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
+0.3.4. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
 
 ## Upgrade
 
@@ -247,3 +251,4 @@ These are limits in sibling gems. This gem documents them instead of forking the
 9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and call the Users OmniAuth helpers from a CTA component. Dummy Join and Walk in do that. The `continue_with_providers` partial is for the sign-in screen. Continue-with buttons follow Rails credentials under `omniauth:`.
 10. Built-in `image` fields are `{ type: :attachment, kind: :image }`. Old `image_url` rows still render. The next save writes `image` when someone picks a file. Mount Attachable, register `RecordingStudioAttachable::Attachment`, start Active Storage, and eager-load its Stimulus controllers. Public pages resolve ids to `rails_blob_path`. Copying a section copies that section's photos and rewrites the ids.
 11. If you overrode the rich text component, take the extra bottom inset when a corner image is present (`pb-56`), or keep your layout on purpose.
+12. Built-in **Menu** (`top_nav`) is a full-bleed Flatpack TopNav section. Add it from **Add section**, or apply **Marketing home**. Old pages stay as they are until you add one. If you overrode `_section.html.erb`, take `full_bleed?` (Hero and Menu set `full_bleed: true`). Public layout should use `viewport-fit=cover`. Load Flatpack Stimulus (`controllers/flat_pack`) so **More** on a phone opens.

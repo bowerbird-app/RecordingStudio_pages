@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.3", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.4", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -58,7 +58,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.162"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.134"'
-    refute_includes gemfile, 'tag: "0.3.3"'
+    refute_includes gemfile, 'tag: "0.3.4"'
   end
 
   def test_section_opts_into_duplicatable_and_attachable
@@ -127,6 +127,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes layout, 'stylesheet_link_tag "tailwind"'
     assert_includes layout, "bg-(--surface-page-background-color)"
     assert_includes layout, "min-h-dvh"
+    assert_includes layout, "viewport-fit=cover"
     refute_includes layout, "max-w-md"
     variables_at = layout.index('stylesheet_link_tag "flat_pack/variables"')
     tailwind_at = layout.index('stylesheet_link_tag "tailwind"')
@@ -355,6 +356,21 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes hero, "h-screen"
     refute_includes hero, 'content["image_url"]'
 
+    top_nav = File.read(
+      File.expand_path("../app/components/recording_studio_pages/sections/top_nav_component.rb", __dir__)
+    )
+    section_partial = File.read(
+      File.expand_path("../app/views/recording_studio_pages/pages/_section.html.erb", __dir__)
+    )
+    dummy_js = File.read(File.expand_path("dummy/app/javascript/controllers/index.js", __dir__))
+    assert_includes top_nav, "FlatPack::TopNav"
+    assert_includes top_nav, "CtaRenderer"
+    assert_includes top_nav, "homepage_path"
+    refute_includes top_nav, "recording_studio_navigation"
+    assert_includes section_partial, "full_bleed?"
+    refute_includes section_partial, 'key == "hero"'
+    assert_includes dummy_js, 'lazyLoadControllersFrom("controllers/flat_pack"'
+
     rich_text = File.read(
       File.expand_path("../app/components/recording_studio_pages/sections/rich_text_component.rb", __dir__)
     )
@@ -394,6 +410,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes attachment_field, "recording-studio-attachable--attachment-image-picker"
     refute_includes attachment_field, "Image url"
     assert_includes built_ins, "type: :attachment"
+    assert_includes built_ins, "key: :top_nav"
+    assert_includes built_ins, "name: \"Menu\""
+    assert_includes built_ins, "full_bleed: true"
     refute_includes built_ins, "image_url:"
     engine = File.read(File.expand_path("../lib/recording_studio_pages/engine.rb", __dir__))
     assert_includes engine, "restore_registries!"

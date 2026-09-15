@@ -45,6 +45,40 @@ publish_page = lambda do |page_recording, slug, actor|
   ).value!
 end
 
+public_page_path = lambda do |page_recording|
+  child = page_recording&.publishable_child_recording
+  next if child.blank?
+
+  RecordingStudioPublishable::Routing.url_for(publishable_recording: child)
+end
+
+sync_house_menu = lambda do |page_recording, links, join_url, actor|
+  menu = RecordingStudioPages::Composition.section_recordings_for(page_recording).find do |recording|
+    recording.recordable.section_type == "top_nav"
+  end
+  next unless menu
+
+  desired_links = links.select { |link| link["url"].present? }
+  current = menu.recordable.content
+  current_cta = current["cta"] || {}
+  next if current["name"] == "House" &&
+          current["links"] == desired_links &&
+          current_cta["type"] == "button" &&
+          current_cta["text"] == "Join" &&
+          current_cta["url"] == join_url
+
+  RecordingStudioPages::Services::ReviseSection.call(
+    section_recording: menu,
+    content: current.merge(
+      "name" => "House",
+      "links" => desired_links,
+      "cta" => { "type" => "button", "text" => "Join", "url" => join_url }
+    ),
+    settings: menu.recordable.settings,
+    actor: actor
+  ).value!
+end
+
 restore_template_sections = lambda do |page_recording, template_key, actor|
   template = RecordingStudioPages.template(template_key)
   expected_types = template.sections.map { |entry| entry.fetch("type").to_s }
@@ -232,6 +266,13 @@ begin
   end
   restore_template_sections.call(start_recording, "start_from_url", user)
   publish_page.call(start_recording, "start-from-a-url", user)
+
+  join_url = public_page_path.call(join_recording) || "/users/sign_in"
+  house_links = [
+    { "text" => "About", "url" => public_page_path.call(about_recording) },
+    { "text" => "Tonight", "url" => public_page_path.call(tonight_recording) }
+  ]
+  sync_house_menu.call(homepage_recording, house_links, join_url, user)
 
   puts "Seeded Home, About, Tonight, Join, Walk in, and Start from a URL. Sign in as admin@admin.com / Password."
   puts "Seeded: Workspace '#{workspace.name}' with homepage '#{homepage_recording.recordable.title}'"

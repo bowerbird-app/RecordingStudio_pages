@@ -76,7 +76,15 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     homepage_hero = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
                                                      .find { |recording| recording.recordable.section_type == "hero" }
                                                      &.recordable
-    assert_equal %w[hero logo_cloud feature_grid call_to_action], homepage_types
+    assert_equal %w[top_nav hero logo_cloud feature_grid call_to_action], homepage_types
+    homepage_menu = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
+                                                    .find { |recording| recording.recordable.section_type == "top_nav" }
+                                                    &.recordable
+    assert_equal "House", homepage_menu.content["name"]
+    assert_equal "Join", homepage_menu.content.dig("cta", "text")
+    menu_links = Array(homepage_menu.content["links"])
+    assert_equal %w[About Tonight], menu_links.map { |item| item["text"] }
+    assert(menu_links.all? { |item| item["url"].to_s.start_with?("/pages/") })
     assert_equal "The page is the front door", homepage_hero.content["title"]
     assert_equal "button", homepage_hero.content.dig("cta", "type")
     assert_equal "Come in", homepage_hero.content.dig("cta", "text")

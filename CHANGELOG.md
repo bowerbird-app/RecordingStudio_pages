@@ -28,6 +28,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - If you overrode `recording_studio_pages/admin/pages/_editor`, take the two-column Grid (edit left, live page right, no Preview heading) and the padded Card around the section list, or keep your layout on purpose.
 - If you overrode `recording_studio_pages/admin/sections/edit`, take the two-column Grid (form left, that section on the right, no Preview heading), or keep your layout on purpose.
 
+## [0.3.4] - 2026-09-15
+
+A Menu section puts a sticky top bar on a public page.
+
+### Added
+- Built-in **Menu** (`top_nav`): name, optional mark, links, and a Join call to action, drawn with Flatpack TopNav. Full-bleed, like Hero. Links fold into **More** on a phone; Join stays on the bar.
+- `register_section` accepts `full_bleed: true`. Hero and Menu set it. Other sections stay in `max-w-6xl`.
+- `marketing_home` starts with a Menu. Dummy seed points Home’s links at the seeded About, Tonight, and Join pages.
+
+### Changed
+- Public layout asks for `viewport-fit=cover` so the bar can sit in the safe area.
+- Dummy loads Flatpack Stimulus (`controllers/flat_pack`) so **More** works.
+
+### Upgrade notes
+- Add a Menu from **Add section**, or apply **Marketing home**. Pages that already exist keep their sections until you add one.
+- If you overrode `_section.html.erb`, take `full_bleed?` instead of hardcoding Hero.
+- Public pages should load Flatpack JS. Dummy does that with `lazyLoadControllersFrom("controllers/flat_pack", application)`.
+
 ## [0.3.3] - 2026-09-15
 
 Rich text keeps the corner image off the words.

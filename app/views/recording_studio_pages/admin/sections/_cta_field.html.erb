@@ -5,7 +5,7 @@
 <div class="flex flex-col gap-4" data-controller="recording-studio-pages--cta-fields">
   <%= render FlatPack::Select::Component.new(
     name: "#{cta_name}[type]",
-    label: "Call to action",
+    label: spec[:label].presence || "Call to action",
     value: selected_type,
     placeholder: "None",
     options: RecordingStudioPages.ctas.map { |definition| [definition.name, definition.key] }

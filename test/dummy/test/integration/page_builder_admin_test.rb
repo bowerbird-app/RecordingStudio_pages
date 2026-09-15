@@ -84,6 +84,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Add section"
     assert_includes response.body, "Hero"
+    assert_includes response.body, "Menu"
     assert_includes response.body, "Call to action"
     assert_includes response.body, "add-section-#{page_recording.id}-hero"
     assert_includes response.body, 'id="page_editor"'
@@ -141,6 +142,27 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Image url"
     refute_includes response.body, "Sign out"
     refute_includes response.body, "/recording_studio_root_switchable/v1/root_switch"
+  end
+
+  test "staff can open a generated menu editor after adding a section" do
+    page_recording = create_page!(parent_recording: @root, title: "Menu form", actor: @actor)
+    post recording_studio_pages.admin_page_sections_path(page_recording), params: {
+      section: { section_type: "top_nav" }
+    }
+    follow_redirect!
+
+    section = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload).first
+    get recording_studio_pages.edit_admin_page_section_path(page_id: page_recording.id, id: section.id)
+
+    assert_response :success
+    assert_includes response.body, "Name"
+    assert_includes response.body, "Mark"
+    assert_includes response.body, "Add link"
+    assert_includes response.body, "Label"
+    assert_includes response.body, "Join"
+    assert_includes response.body, "Choose image"
+    refute_includes response.body, "Layout"
+    refute_includes response.body, "recordable"
   end
 
   test "the section editor previews a turned-off section" do
@@ -303,6 +325,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     types = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
                                              .map { |recording| recording.recordable.section_type }
     assert_includes types, "hero"
+    assert_includes types, "top_nav"
     assert_includes types, "call_to_action"
   end
 
