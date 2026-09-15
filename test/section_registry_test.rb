@@ -64,6 +64,19 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "centered", settings["variant"]
   end
 
+  def test_hero_alignment_and_on_use_named_choices
+    RecordingStudioPages::BuiltIns.register!
+
+    settings = RecordingStudioPages.section(:hero).read_settings(
+      variant: "fullscreen_image",
+      alignment: "mystery",
+      on: "mystery"
+    )
+
+    assert_equal "center", settings["alignment"]
+    assert_equal "dark", settings["on"]
+  end
+
   def test_rich_text_article_layout_becomes_full_width
     RecordingStudioPages::BuiltIns.register!
 
@@ -158,6 +171,12 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "string", hero[:fields][:title][:type]
     assert_equal true, hero[:fields][:title][:required]
     assert_equal "cta", hero[:fields][:cta][:type]
+    assert_equal "string", hero[:settings][:alignment][:type]
+    assert_equal "center", hero[:settings][:alignment][:default]
+    assert_equal [%w[Center center], %w[Left left]], hero[:settings][:alignment][:options]
+    assert_equal "string", hero[:settings][:on][:type]
+    assert_equal "dark", hero[:settings][:on][:default]
+    assert_equal [%w[Dark dark], %w[Light light]], hero[:settings][:on][:options]
     assert(catalog[:templates].any? { |entry| entry[:key] == "marketing_home" })
     assert(catalog[:templates].any? { |entry| entry[:key] == "full_bleed_hero" })
     assert(catalog[:ctas].any? { |entry| entry[:key] == "button" })

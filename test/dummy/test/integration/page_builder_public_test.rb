@@ -226,7 +226,9 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Take a seat"
     assert_includes response.body, "hero-tonight.jpg"
     assert_includes response.body, "background-image:"
-    assert_includes response.body, "bg-black/60"
+    assert_includes response.body, "fp-hero-overlay"
+    assert_includes response.body, "--hero-overlay-background-color"
+    refute_includes response.body, "bg-black/60"
     refute_includes response.body, "What this gem owns"
     refute_includes response.body, "max-w-6xl"
     refute_includes response.body, "data-recording-studio-default-layout"
@@ -237,6 +239,31 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     types = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
                                              .map { |recording| recording.recordable.section_type }
     assert_equal ["hero"], types
+  end
+
+  test "a fullscreen hero can dock copy on the left" do
+    page_recording = create_page!(parent_recording: @root, title: "Side door", actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: {
+        title: "Come in on this side",
+        body: "The door is on the left.",
+        image: "/images/hero-tonight.jpg"
+      },
+      settings: { variant: "fullscreen_image", alignment: "left", on: "dark" },
+      actor: @actor
+    )
+    publishable = publish_page!(page_recording, slug: "side-door", actor: @actor)
+
+    get "/pages/#{publishable.id}/side-door"
+
+    assert_response :success
+    assert_includes response.body, "Come in on this side"
+    assert_includes response.body, "text-left"
+    assert_includes response.body, "justify-start"
+    assert_includes response.body, "--hero-overlay-left-background"
+    refute_includes response.body, "bg-black/60"
   end
 
   test "unpublished inner page is not public" do

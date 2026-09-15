@@ -128,8 +128,24 @@ module RecordingStudioPages
         },
         settings: {
           variant: :string,
-          alignment: :string,
-          background: :string
+          alignment: {
+            type: :string,
+            label: "Copy",
+            default: "center",
+            options: [
+              %w[Center center],
+              %w[Left left]
+            ]
+          },
+          on: {
+            type: :string,
+            label: "On the photo",
+            default: "dark",
+            options: [
+              %w[Dark dark],
+              %w[Light light]
+            ]
+          }
         },
         variants: %w[centered split_image fullscreen_image]
       )
