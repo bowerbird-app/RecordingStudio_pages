@@ -155,6 +155,8 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "object-contain"
     assert_includes response.body, "sm:min-h-[32rem]"
     assert_includes response.body, "overflow-hidden rounded-[var(--radius-lg)]"
+    assert_includes response.body, "pb-56"
+    refute_includes response.body, "px-16 py-24"
   end
 
   test "published inner page is public at /pages/:uuid/:slug" do
