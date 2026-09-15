@@ -153,9 +153,9 @@ module RecordingStudioPages
             label: "Background",
             default: "default",
             options: [
-              ["Default", "default"],
-              ["Muted", "muted"],
-              ["Inverted", "inverted"]
+              %w[Default default],
+              %w[Muted muted],
+              %w[Inverted inverted]
             ]
           }
         },

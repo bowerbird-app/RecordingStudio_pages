@@ -150,7 +150,7 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "string", rich_text[:settings][:background][:type]
     assert_equal "default", rich_text[:settings][:background][:default]
     assert_equal(
-      [["Default", "default"], ["Muted", "muted"], ["Inverted", "inverted"]],
+      [%w[Default default], %w[Muted muted], %w[Inverted inverted]],
       rich_text[:settings][:background][:options]
     )
     assert_equal "string", hero[:fields][:title][:type]
