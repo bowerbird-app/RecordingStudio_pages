@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.2", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.3", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -58,7 +58,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.162"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.134"'
-    refute_includes gemfile, 'tag: "0.3.2"'
+    refute_includes gemfile, 'tag: "0.3.3"'
   end
 
   def test_section_opts_into_duplicatable_and_attachable
@@ -391,6 +391,8 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes field, ":attachment"
     assert_includes attachment_field, "Choose image"
     assert_includes attachment_field, "recording-studio-attachable--attachment-image-picker"
+    assert_includes attachment_field, "object-contain"
+    assert_includes attachment_field, "self-start"
     refute_includes attachment_field, "Image url"
     assert_includes built_ins, "type: :attachment"
     refute_includes built_ins, "image_url:"

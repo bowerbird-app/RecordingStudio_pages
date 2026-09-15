@@ -28,6 +28,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - If you overrode `recording_studio_pages/admin/pages/_editor`, take the two-column Grid (edit left, live page right, no Preview heading) and the padded Card around the section list, or keep your layout on purpose.
 - If you overrode `recording_studio_pages/admin/sections/edit`, take the two-column Grid (form left, that section on the right, no Preview heading), or keep your layout on purpose.
 
+## [0.3.3] - 2026-09-15
+
+The section editor image thumbnail keeps its aspect ratio.
+
+### Changed
+- The **Choose image** thumbnail uses `self-start`, `w-auto`, and `object-contain`, so a square picture is not stretched across the form column.
+
+### Upgrade notes
+- If you overrode `recording_studio_pages/admin/sections/_attachment_field`, take the unstretched thumbnail, or keep your layout on purpose.
+
 ## [0.3.2] - 2026-09-15
 
 Rich text is a full-width card with larger type and a named background.

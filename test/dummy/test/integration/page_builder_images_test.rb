@@ -36,6 +36,8 @@ class PageBuilderImagesTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "recording-studio-attachable--attachment-image-picker"
     assert_includes response.body, recording_studio_attachable.recording_attachment_picker_path(section)
     assert_includes response.body, "hero-tonight.jpg"
+    assert_includes response.body, "object-contain"
+    assert_includes response.body, "self-start"
     refute_includes response.body, "Image url"
     assert_equal "/images/hero-tonight.jpg", section.reload.recordable.content["image"]
   end

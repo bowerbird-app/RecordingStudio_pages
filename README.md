@@ -104,9 +104,9 @@ end
 
 `page_parent_types` is the allow list for new pages. `CreatePage` rejects anything else, including a blank parent. `homepage_path` is the public home URL shown in the editor when the page is marked as home.
 
-`fields.title` may be `:string` or `{ type: :string, required: true }`. `recording_ids` stores Recording ids. Resolve the actual records at render time, or with `data:`. Do not copy domain records into section JSON. `:attachment` stores an Attachable child id on the section. Built-in hero, image-and-text, and logo-cloud items use `image`. Old `image_url` values upgrade on read.
+`fields.title` may be `:string` or `{ type: :string, required: true }`. `recording_ids` stores Recording ids. Resolve the actual records at render time, or with `data:`. Do not copy domain records into section JSON. `:attachment` stores an Attachable child id on the section. Built-in hero, image-and-text, logo-cloud, and rich-text items use `image`. Old `image_url` values upgrade on read.
 
-`RecordingStudioPages::Section` opts into Attachable when that gem is loaded (`image/*` only). Other gems that `register_section` do not need to include Attachable themselves. Hosts mount Attachable, add `RecordingStudioAttachable::Attachment` to `recordable_types`, pin Active Storage, and eager-load `controllers/recording_studio_attachable`. The section editor **Choose image** button opens Attachable's picker against that section. Public visitors get an Active Storage blob path, not an Attachable preview route.
+`RecordingStudioPages::Section` opts into Attachable when that gem is loaded (`image/*` only). Other gems that `register_section` do not need to include Attachable themselves. Hosts mount Attachable, add `RecordingStudioAttachable::Attachment` to `recordable_types`, pin Active Storage, and eager-load `controllers/recording_studio_attachable`. The section editor **Choose image** button opens Attachable's picker against that section. The chosen picture thumbnail keeps its shape: it is not stretched to the form column. Public visitors get an Active Storage blob path, not an Attachable preview route.
 
 Duplicate keys raise `RecordingStudioPages::DuplicateRegistration`. Unknown types do not crash render or delete data. They stay on the page until you register the type again.
 
@@ -232,7 +232,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.2. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
+0.3.3. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
 
 ## Upgrade
 
@@ -246,3 +246,4 @@ These are limits in sibling gems. This gem documents them instead of forking the
 8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.
 9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and call the Users OmniAuth helpers from a CTA component. Dummy Join and Walk in do that. The `continue_with_providers` partial is for the sign-in screen. Continue-with buttons follow Rails credentials under `omniauth:`.
 10. Built-in `image` fields are `{ type: :attachment, kind: :image }`. Old `image_url` rows still render. The next save writes `image` when someone picks a file. Mount Attachable, register `RecordingStudioAttachable::Attachment`, start Active Storage, and eager-load its Stimulus controllers. Public pages resolve ids to `rails_blob_path`. Copying a section copies that section's photos and rewrites the ids.
+11. If you overrode `recording_studio_pages/admin/sections/_attachment_field`, take the thumbnail that keeps its shape (`self-start`, `w-auto`, `object-contain`), or keep your layout on purpose.
