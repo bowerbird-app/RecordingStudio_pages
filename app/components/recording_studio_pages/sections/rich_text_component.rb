@@ -12,28 +12,37 @@ module RecordingStudioPages
       def call
         helpers.content_tag(:div, class: wrapper_class) do
           render FlatPack::Card::Component.new(**card_attributes) do |card|
-            card.body(padding: :lg) do
-              helpers.safe_join(
-                [
-                  helpers.render(
-                    FlatPack::PageTitle::Component.new(
-                      title: @rendered.content["title"].presence || "Notes",
-                      variant: :h1
-                    )
-                  ),
-                  helpers.content_tag(
-                    :div,
-                    helpers.sanitize(@rendered.content["body"].to_s),
-                    class: "mt-6 space-y-4 text-xl leading-relaxed text-[var(--surface-content-color)]"
-                  )
-                ]
-              )
+            card.body(padding: :none) do
+              helpers.content_tag(:div, class: "px-16 py-24") do
+                helpers.content_tag(:div, class: "max-w-xl") do
+                  helpers.safe_join([heading, body].compact)
+                end
+              end
             end
           end
         end
       end
 
       private
+
+      def heading
+        helpers.content_tag(
+          :h1,
+          @rendered.content["title"].presence || "Notes",
+          class: "text-[length:var(--text-4xl)] sm:text-[length:var(--text-5xl)] font-semibold tracking-tight leading-[1.15] fp-text-balance text-[var(--surface-content-color)]"
+        )
+      end
+
+      def body
+        html = helpers.sanitize(@rendered.content["body"].to_s)
+        return if html.blank?
+
+        helpers.content_tag(
+          :div,
+          html,
+          class: "mt-8 space-y-5 text-[length:var(--text-2xl)] leading-relaxed text-[var(--surface-muted-content-color)]"
+        )
+      end
 
       def wrapper_class
         narrow? ? "mx-auto w-full max-w-prose" : "w-full"

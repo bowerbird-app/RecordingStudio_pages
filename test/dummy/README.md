@@ -35,7 +35,7 @@ Sign-in is email first (**Continue with email**), then password. Google and Appl
 ## Useful Routes
 
 - `/` - published homepage
-- `/pages/:uuid/about` - seeded **About** page: a full-width rich text card
+- `/pages/:uuid/about` - seeded **About** page: a full-width rich text card with display type and Hero inset
 - `/pages/:uuid/join` - seeded **Join** page: one centered hero whose call to action is Users Continue-with buttons
 - `/pages/:uuid/walk-in` - seeded **Walk in** page: one fullscreen hero image whose call to action is the same Continue-with buttons
 - `/pages/:uuid/start-from-a-url` - seeded **Start from a URL** page: one hero with a paste-a-link field

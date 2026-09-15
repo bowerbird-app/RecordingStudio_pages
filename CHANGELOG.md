@@ -34,12 +34,12 @@ Rich text is a full-width card with larger type and a named background.
 
 ### Changed
 - Rich text layout is **Full width** or **Narrow**. Old `article` layout reads as full width.
-- Rich text type is a page title (`h1`) and larger body copy.
+- Rich text type is a display headline (`--text-4xl` / `--text-5xl`) and muted body (`--text-2xl`). Inset matches Flatpack Hero (`px-16 py-24`), not Card `lg`.
 - Rich text background is **Default**, **Muted**, or **Inverted** (theme tokens, not a colour picker).
 
 ### Upgrade notes
 - Stored `variant: article` becomes full width on read.
-- If you overrode the rich text component or the section settings form, take the Background select and the larger card, or keep your layout on purpose.
+- If you overrode the rich text component or the section settings form, take the Background select, display type, and Hero inset (`px-16 py-24`), or keep your layout on purpose.
 
 ## [0.3.1] - 2026-09-09
 

@@ -355,6 +355,16 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes hero, "h-screen"
     refute_includes hero, 'content["image_url"]'
 
+    rich_text = File.read(
+      File.expand_path("../app/components/recording_studio_pages/sections/rich_text_component.rb", __dir__)
+    )
+    assert_includes rich_text, "px-16 py-24"
+    assert_includes rich_text, "--text-5xl"
+    assert_includes rich_text, "--text-2xl"
+    assert_includes rich_text, "max-w-xl"
+    refute_includes rich_text, "padding: :lg"
+    refute_includes rich_text, "PageTitle"
+
     cta_js = File.read(File.expand_path("../app/javascript/recording_studio_pages/controllers/cta_fields_controller.js", __dir__))
     assert_includes cta_js, "panelTargets"
     assert_includes cta_js, "field.disabled"
