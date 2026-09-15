@@ -83,13 +83,16 @@ class RecordingStudioPagesTest < Minitest::Test
   def test_dummy_app_uses_recording_studio_default_layout
     application_controller_path = File.expand_path("dummy/app/controllers/application_controller.rb", __dir__)
     controller_source = File.read(application_controller_path)
+    home_controller_source = File.read(File.expand_path("dummy/app/controllers/home_controller.rb", __dir__))
 
     assert_includes controller_source, "include RecordingStudio::UsesDefaultLayout"
     assert_includes controller_source, '"recording_studio/default_layout"'
     assert_includes controller_source, "devise_controller? ? \"application\""
     refute_includes controller_source, "flat_pack_sidebar"
-    refute File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack_sidebar.html.erb", __dir__))
-    refute File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
+    assert_includes home_controller_source, 'layout "flat_pack_sidebar"'
+    assert File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack_sidebar.html.erb", __dir__))
+    assert File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
+    assert File.exist?(File.expand_path("dummy/app/views/layouts/flat_pack/_top_nav.html.erb", __dir__))
   end
 
   def test_dummy_does_not_put_host_chrome_on_gem_screens
@@ -192,7 +195,8 @@ class RecordingStudioPagesTest < Minitest::Test
 
     assert_includes readme_source, "Page Builder"
     assert_includes readme_source, "/recording_studio"
-    refute_includes readme_source, "flat_pack_sidebar"
+    assert_includes readme_source, "sidebar"
+    assert_includes readme_source, "/site"
   end
 
   def test_product_readme_is_the_page_builder_guide
@@ -207,14 +211,27 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes readme, "v3 declarations"
   end
 
-  def test_dummy_studio_page_uses_sandbox_title
+  def test_dummy_studio_page_uses_example_page_buttons
     view_path = File.expand_path("dummy/app/views/home/index.html.erb", __dir__)
     view_source = File.read(view_path)
+    routes = File.read(File.expand_path("dummy/config/routes.rb", __dir__))
+    helper = File.read(File.expand_path("dummy/app/helpers/application_helper.rb", __dir__))
+    top_nav = File.read(File.expand_path("dummy/app/views/layouts/flat_pack/_top_nav.html.erb", __dir__))
+    sidebar = File.read(File.expand_path("dummy/app/views/layouts/flat_pack/_sidebar.html.erb", __dir__))
 
-    assert_includes view_source, 'title: "Page Builder studio"'
-    assert_includes view_source, "FlatPack::Card::Component"
-    assert_includes view_source, "dummy_page_nav"
-    refute_includes view_source, 'title: "Template Demo"'
+    assert_includes view_source, "dummy_example_pages"
+    assert_includes view_source, "FlatPack::Button::Component"
+    assert_includes view_source, "current_root_recordable"
+    refute_includes view_source, "dummy_page_nav"
+    refute_includes view_source, "FlatPack::Card::Component"
+    refute_includes view_source, 'title: "Page Builder studio"'
+    assert_includes helper, "dummy_example_pages"
+    assert_includes helper, '"/site"'
+    assert_includes top_nav, "recording_studio_root_switch_dropdown"
+    assert_includes sidebar, 'text: "Admin"'
+    assert_includes routes, 'root to: "home#index"'
+    assert_includes routes, 'root to: "recording_studio_pages/homepages#show"'
+    assert_includes routes, 'get "/site"'
   end
 
   def test_dummy_docs_pages_use_minimal_flatpack_documentation_components

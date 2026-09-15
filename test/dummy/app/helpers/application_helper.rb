@@ -3,6 +3,43 @@
 module ApplicationHelper
   include RecordingStudioUser::OmniauthHelper
 
+  EXAMPLE_PAGE_ORDER = [
+    "Home",
+    "About",
+    "Tonight",
+    "Join",
+    "Walk in",
+    "Start from a URL"
+  ].freeze
+
+  def dummy_example_pages
+    RecordingStudio::Recording.where(
+      recordable_type: "RecordingStudioPages::Page",
+      trashed_at: nil
+    ).includes(:recordable).filter_map do |recording|
+      href = dummy_example_page_path(recording)
+      next if href.blank?
+
+      title = recording.recordable&.title.to_s.strip
+      next if title.blank?
+
+      { title: title, href: href }
+    end.sort_by { |page| [ EXAMPLE_PAGE_ORDER.index(page[:title]) || EXAMPLE_PAGE_ORDER.size, page[:title] ] }
+  end
+
+  def dummy_example_page_path(recording)
+    return unless recording.respond_to?(:currently_published?) && recording.currently_published?
+
+    page = recording.recordable
+    return "/site" if page.respond_to?(:homepage?) && page.homepage?
+
+    publishable_recording = recording.publishable_child_recording
+    publishable = publishable_recording&.recordable
+    return if publishable.blank? || publishable.slug.blank?
+
+    "/pages/#{publishable_recording.id}/#{publishable.slug}"
+  end
+
   def dummy_page_nav(title:, back_url: nil, back_label: "Home")
     recording_studio_page_nav(
       title: title,

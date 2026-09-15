@@ -187,7 +187,7 @@ The editor is a two-column Flatpack Grid: the section list on the left, the live
 
 Edit section puts **Update** and **Cancel** under the title, then the same Grid: the form on the left, that one section on the right. The buttons are compact, not full width. Update stays on the section and refreshes the preview. Cancel goes back to the page. The preview column has no heading. It uses the same components as the public page, including a section that is turned off. Small screens stack those columns.
 
-Gem screens call `recording_studio_pages_nav`, which uses Recording Studio page nav (back and close). That default layout stays host-agnostic. Dummy `/studio` and `/docs` add a root switcher and Sign out through `dummy_page_nav`. Do not wrap that host chrome onto gem screens.
+Gem screens call `recording_studio_pages_nav`, which uses Recording Studio page nav (back and close). That default layout stays host-agnostic. Dummy signed-in `/` uses a Flatpack sidebar and a root switcher in the top bar. Dummy `/docs` still adds a root switcher and Sign out through `dummy_page_nav`. Do not wrap that host chrome onto gem screens.
 
 Writes need Accessible `:edit` on the configured admin root. Reads need `:view`.
 
@@ -212,15 +212,16 @@ bin/dev
 
 Sign in with `admin@admin.com` / `Password`.
 
-- `/` published homepage (seeded Home starts with a Menu, then the hero)
+- `/` visitors see the published homepage (seeded Home starts with a Menu, then the hero). Signed-in people see the host home: sidebar, root switcher, example page buttons.
+- `/site` the live marketing homepage while you are signed in
 - `/pages/:uuid/tonight` one fullscreen hero (seeded **Tonight**)
 - `/pages/:uuid/join` one hero with sign-in buttons (seeded **Join**)
 - `/pages/:uuid/walk-in` one fullscreen hero with sign-in buttons (seeded **Walk in**)
 - `/pages/:uuid/start-from-a-url` one hero with a URL field (seeded **Start from a URL**)
 - `/start` dummy catcher for that URL field
-- `/studio` dummy sandbox
+- `/studio` same signed-in home as `/`
 - `/recording_studio_pages/admin/pages` page builder
-- `/admin` RS Admin hub
+- `/admin` RS Admin hub. Switch to the Admin root from the top-bar switcher first.
 
 ## Upstream gaps
 
@@ -245,7 +246,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 3. `RecordingStudioPages::Section` already opts into Duplicatable and Attachable when those gems are loaded. Do not add a second copy path or a Pages-owned Image type. Do not enable Attachable on Page for section photos.
 4. Public pages load `flat_pack/application` and use the host Flatpack theme on `html` (`FlatPack.configuration.default_theme`). Dummy sets `rounded`.
 5. Pin Flatpack `v0.1.162` (or later) so List `orderable_url` persists drag. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`. Pin Attachable `v0.5.1` (or later) for the image picker.
-6. Gem screens use Recording Studio page nav. Dummy `/studio` and `/docs` keep host chrome (root switcher, Sign out). Do not put that on gem screens.
+6. Gem screens use Recording Studio page nav. Dummy signed-in `/` is a sidebar shell with a root switcher. Dummy `/docs` keeps page-nav host chrome. Do not put that on gem screens.
 7. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.
 8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.
 9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and call the Users OmniAuth helpers from a CTA component. Dummy Join and Walk in do that. The `continue_with_providers` partial is for the sign-in screen. Continue-with buttons follow Rails credentials under `omniauth:`.
