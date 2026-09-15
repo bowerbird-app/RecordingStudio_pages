@@ -167,6 +167,10 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'data-turbo="false"'
     refute_includes response.body, "Save section"
     refute_includes response.body, "Nothing to preview"
+    assert_includes response.body, "Full width"
+    assert_includes response.body, "Background"
+    assert_includes response.body, "Muted"
+    assert_includes response.body, "Inverted"
   end
 
   test "staff can change a hero call to action" do

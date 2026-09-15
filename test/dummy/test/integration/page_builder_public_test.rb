@@ -94,6 +94,37 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "bg-[var(--surface-muted-background-color)]"
   end
 
+  test "rich text full width uses a large card and named fills" do
+    page_recording = create_page!(parent_recording: @root, title: "Copy home", homepage: true, actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: { title: "About this studio", body: "Pieces stack underneath." },
+      settings: { variant: "full_width", background: "muted" },
+      actor: @actor
+    )
+    add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: { title: "On the brand", body: "Darker band." },
+      settings: { background: "inverted" },
+      actor: @actor
+    )
+    publish_page!(page_recording, slug: "copy-home", actor: @actor)
+
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, "About this studio"
+    assert_includes response.body, "Pieces stack underneath."
+    assert_includes response.body, "--page-title-h1-size"
+    assert_includes response.body, "text-xl"
+    assert_includes response.body, "bg-[var(--card-background-muted-color)]"
+    assert_includes response.body, "--card-background-muted-color: var(--color-primary)"
+    assert_includes response.body, "--surface-content-color: var(--color-primary-text)"
+    refute_includes response.body, "text-base leading-relaxed"
+  end
+
   test "published inner page is public at /pages/:uuid/:slug" do
     page_recording = create_page!(parent_recording: @root, title: "About", actor: @actor)
     add_section!(

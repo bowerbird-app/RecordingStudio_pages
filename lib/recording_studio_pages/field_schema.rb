@@ -100,8 +100,23 @@ module RecordingStudioPages
       when :attachment
         value.to_s.presence
       else
-        value.nil? ? default_for(spec) : value
+        coerce_choice(spec, value.nil? ? default_for(spec) : value)
       end
+    end
+
+    def coerce_choice(spec, value)
+      allowed = choice_values(spec)
+      return value if allowed.empty?
+
+      text = value.to_s
+      return spec[:default].to_s if text.blank?
+      return text if allowed.include?(text)
+
+      spec[:default].to_s.presence || allowed.first
+    end
+
+    def choice_values(spec)
+      Array(spec[:options]).map { |option| Array(option).last.to_s }
     end
 
     def coerce_link(value)
@@ -266,6 +281,7 @@ module RecordingStudioPages
       catalog[:required] = true if spec[:required]
       catalog[:label] = spec[:label] if spec[:label]
       catalog[:kind] = spec[:kind].to_s if spec[:kind]
+      catalog[:options] = spec[:options] if spec[:options]
       catalog
     end
 

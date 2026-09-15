@@ -147,9 +147,19 @@ module RecordingStudioPages
           body: :rich_text
         },
         settings: {
-          variant: :string
+          variant: :string,
+          background: {
+            type: :string,
+            label: "Background",
+            default: "default",
+            options: [
+              ["Default", "default"],
+              ["Muted", "muted"],
+              ["Inverted", "inverted"]
+            ]
+          }
         },
-        variants: %w[article narrow]
+        variants: %w[full_width narrow]
       )
     end
 

@@ -142,7 +142,11 @@ begin
     RecordingStudioPages::Services::AddSection.call(
       page_recording: about_recording,
       section_type: "rich_text",
-      content: { title: "About this studio", body: "This page sits with the rest of the site. Pieces stack underneath." },
+      content: {
+        title: "About this studio",
+        body: "This page sits with the rest of the site. Pieces stack underneath. Use a hero when you want a picture. Use this when you want the words."
+      },
+      settings: { variant: "full_width", background: "muted" },
       actor: user
     ).value!
   end
