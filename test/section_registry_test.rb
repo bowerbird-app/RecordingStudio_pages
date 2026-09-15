@@ -64,6 +64,18 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "centered", settings["variant"]
   end
 
+  def test_rich_text_article_layout_becomes_full_width
+    RecordingStudioPages::BuiltIns.register!
+
+    settings = RecordingStudioPages.section(:rich_text).read_settings(
+      variant: "article",
+      background: "mystery"
+    )
+
+    assert_equal "full_width", settings["variant"]
+    assert_equal "default", settings["background"]
+  end
+
   def test_starter_content_fills_required_copy
     RecordingStudioPages.register_section(
       key: :probe,
@@ -132,6 +144,17 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "hero", hero[:key]
     assert_equal "Hero", hero[:name]
     assert_includes hero[:variants], "split_image"
+    rich_text = catalog[:sections].find { |entry| entry[:key] == "rich_text" }
+
+    assert_includes rich_text[:variants], "full_width"
+    assert_equal "attachment", rich_text[:fields][:image][:type]
+    assert_equal "image", rich_text[:fields][:image][:kind]
+    assert_equal "string", rich_text[:settings][:background][:type]
+    assert_equal "default", rich_text[:settings][:background][:default]
+    assert_equal(
+      [%w[Default default], %w[Muted muted], %w[Inverted inverted]],
+      rich_text[:settings][:background][:options]
+    )
     assert_equal "string", hero[:fields][:title][:type]
     assert_equal true, hero[:fields][:title][:required]
     assert_equal "cta", hero[:fields][:cta][:type]

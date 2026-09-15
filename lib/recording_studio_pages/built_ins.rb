@@ -144,12 +144,23 @@ module RecordingStudioPages
         component: "RecordingStudioPages::Sections::RichTextComponent",
         fields: {
           title: { type: :string, required: true },
-          body: :rich_text
+          body: :rich_text,
+          image: { type: :attachment, kind: :image, label: "Image" }
         },
         settings: {
-          variant: :string
+          variant: :string,
+          background: {
+            type: :string,
+            label: "Background",
+            default: "default",
+            options: [
+              %w[Default default],
+              %w[Muted muted],
+              %w[Inverted inverted]
+            ]
+          }
         },
-        variants: %w[article narrow]
+        variants: %w[full_width narrow]
       )
     end
 

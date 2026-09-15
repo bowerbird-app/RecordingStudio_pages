@@ -167,11 +167,11 @@ RecordingStudioPages.register_template(
 
 ## Built-in sections
 
-hero, rich_text, image_text, logo_cloud, feature_grid, call_to_action. Registered variants change layout: image left/right, narrow rich text, compact logos, feature column counts, and CTA banner vs card.
+hero, rich_text, image_text, logo_cloud, feature_grid, call_to_action. Registered variants change layout: image left/right, full-width or narrow rich text, compact logos, feature column counts, and CTA banner vs card.
+
+Rich text is a full-width card with a display headline, muted body, and Hero inset (`px-16 py-24`). Copy stays `max-w-xl` so a wide card does not turn into a newspaper column. Background is Default, Muted, or Inverted. An optional corner image uses the same Attachable `image` field as hero; skip it and the card is words only. Narrow keeps a reading-width card. Copy is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero, image-and-text, logo-cloud, and rich-text photos are Attachable children of the section. The JSON stores the attachment id; public render turns it into an Active Storage path.
 
 - Built-in templates: `marketing_home` (hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero). Dummy also registers `join` (centered hero with social logins), `walk_in` (fullscreen hero image with social logins), and `start_from_url` (hero with a URL field). Dummy seeds published **Tonight**, **Join**, **Walk in**, and **Start from a URL** pages. Open Tonight at `/pages/:uuid/tonight`, Join at `/pages/:uuid/join`, Walk in at `/pages/:uuid/walk-in`, and the URL landing at `/pages/:uuid/start-from-a-url`. Those public URLs are the page, not the editor preview. A fullscreen hero fills the viewport (`100dvh`); Flatpack’s image hero is otherwise `min-h-[560px]`. Dummy Home is the `marketing_home` sample; seed restores that template if the sections drift (a second hero from **Use a template**, old copy, and so on).
-
-Rich text is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero, image-and-text, and logo-cloud photos are Attachable children of the section. The JSON stores the attachment id; public render turns it into an Active Storage path.
 
 List fields skip blank extra slots and items marked `_destroy`.
 
@@ -232,7 +232,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.1. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
+0.3.2. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
 
 ## Upgrade
 

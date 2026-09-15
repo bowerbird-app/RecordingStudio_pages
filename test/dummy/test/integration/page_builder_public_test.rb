@@ -94,6 +94,69 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "bg-[var(--surface-muted-background-color)]"
   end
 
+  test "rich text full width uses a large card and named fills" do
+    page_recording = create_page!(parent_recording: @root, title: "Copy home", homepage: true, actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: { title: "About this studio", body: "Pieces stack underneath." },
+      settings: { variant: "full_width", background: "muted" },
+      actor: @actor
+    )
+    add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: { title: "On the brand", body: "Darker band." },
+      settings: { background: "inverted" },
+      actor: @actor
+    )
+    publish_page!(page_recording, slug: "copy-home", actor: @actor)
+
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, "About this studio"
+    assert_includes response.body, "Pieces stack underneath."
+    assert_includes response.body, "--text-4xl"
+    assert_includes response.body, "--text-5xl"
+    assert_includes response.body, "--text-2xl"
+    assert_includes response.body, "px-16 py-24"
+    assert_includes response.body, "max-w-xl"
+    assert_includes response.body, "--surface-muted-content-color"
+    assert_includes response.body, "bg-[var(--card-background-muted-color)]"
+    assert_includes response.body, "--card-background-muted-color: var(--color-primary)"
+    assert_includes response.body, "--surface-content-color: var(--color-primary-text)"
+    refute_includes response.body, "text-base leading-relaxed"
+    refute_includes response.body, "-bottom-8"
+    refute_includes response.body, "sm:min-h-[32rem]"
+  end
+
+  test "rich text can render an optional corner image" do
+    page_recording = create_page!(parent_recording: @root, title: "Picture home", homepage: true, actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: {
+        title: "About this studio, in your words",
+        body: "Pieces stack underneath.",
+        image: "/images/rich-text-corner.png"
+      },
+      settings: { variant: "full_width", background: "muted" },
+      actor: @actor
+    )
+    publish_page!(page_recording, slug: "picture-home", actor: @actor)
+
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, "About this studio, in your words"
+    assert_includes response.body, "/images/rich-text-corner.png"
+    assert_includes response.body, "-bottom-8"
+    assert_includes response.body, "object-contain"
+    assert_includes response.body, "sm:min-h-[32rem]"
+    assert_includes response.body, "overflow-hidden rounded-[var(--radius-lg)]"
+  end
+
   test "published inner page is public at /pages/:uuid/:slug" do
     page_recording = create_page!(parent_recording: @root, title: "About", actor: @actor)
     add_section!(

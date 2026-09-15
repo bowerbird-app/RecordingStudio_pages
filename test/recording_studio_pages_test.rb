@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.1", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.2", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -58,7 +58,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.162"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.134"'
-    refute_includes gemfile, 'tag: "0.3.1"'
+    refute_includes gemfile, 'tag: "0.3.2"'
   end
 
   def test_section_opts_into_duplicatable_and_attachable
@@ -354,6 +354,18 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes hero, 'content["image"]'
     refute_includes hero, "h-screen"
     refute_includes hero, 'content["image_url"]'
+
+    rich_text = File.read(
+      File.expand_path("../app/components/recording_studio_pages/sections/rich_text_component.rb", __dir__)
+    )
+    assert_includes rich_text, "px-16 py-24"
+    assert_includes rich_text, "--text-5xl"
+    assert_includes rich_text, "--text-2xl"
+    assert_includes rich_text, "max-w-xl"
+    assert_includes rich_text, 'content["image"]'
+    assert_includes rich_text, "object-contain"
+    refute_includes rich_text, "padding: :lg"
+    refute_includes rich_text, "PageTitle"
 
     cta_js = File.read(File.expand_path("../app/javascript/recording_studio_pages/controllers/cta_fields_controller.js", __dir__))
     assert_includes cta_js, "panelTargets"
