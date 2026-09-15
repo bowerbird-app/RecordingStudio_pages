@@ -147,7 +147,7 @@ Hero content looks like `cta: { type: "button", text: "Come in", url: "/users/si
 
 New page still starts from a **template**. The template names the CTA. Editing the hero is where you change Button / Social logins / URL field. Add section does not list CTAs.
 
-Dummy registers `social_logins` and `url_form`, plus **Join**, **Walk in**, and **Start from a URL** templates, so a one-section landing can be a button, sign-in buttons, or a paste-a-link field. Dummy `social_logins` calls Recording Studio Users OmniAuth helpers (`recording_studio_user_omniauth_provider_names`, `recording_studio_user_omniauth_authorize_path`, and the provider label/logo helpers) and draws stacked Flatpack Continue-with buttons. The stack is `max-w-sm` (same cap as the Users auth shell) so `w-full` buttons stay equal without stretching across a fullscreen hero. It does not render `recording_studio_user/omniauth/continue_with_providers` — that partial is for the sign-in screen and includes an **Or** divider. Dummy test and development credentials enable Google and Apple so Join and Walk in can show those buttons. Hosts leave `omniauth_providers` empty and put real secrets in credentials; do not copy dummy client ids.
+Dummy registers `social_logins` and `url_form`, plus **Join**, **Walk in**, and **Start from a URL** templates, so a one-section landing can be a button, sign-in buttons, or a paste-a-link field. Dummy `social_logins` calls Recording Studio Users OmniAuth helpers (`recording_studio_user_omniauth_provider_names`, `recording_studio_user_omniauth_authorize_path`, and the provider label/logo helpers) and draws stacked Flatpack Continue-with buttons. The stack is `max-w-sm` (same cap as the Users auth shell) so `w-full` buttons stay equal. The hero slot places the stack with the words. It does not render `recording_studio_user/omniauth/continue_with_providers` — that partial is for the sign-in screen and includes an **Or** divider. Dummy test and development credentials enable Google and Apple so Join and Walk in can show those buttons. Hosts leave `omniauth_providers` empty and put real secrets in credentials; do not copy dummy client ids.
 
 ## Register a template
 
@@ -168,6 +168,8 @@ RecordingStudioPages.register_template(
 ## Built-in sections
 
 hero, rich_text, image_text, logo_cloud, feature_grid, call_to_action. Registered variants change layout: image left/right, full-width or narrow rich text, compact logos, feature column counts, and CTA banner vs card.
+
+Hero copy is Center or Left. A fullscreen photo can wash Dark or Light. Split layout ignores copy alignment. Dummy Continue-with buttons follow that copy alignment (they are `max-w-sm`, not `mx-auto`).
 
 Rich text is a full-width card with a display headline, muted body, and Hero inset (`px-16 py-24`). Copy stays `max-w-xl` so a wide card does not turn into a newspaper column. Background is Default, Muted, or Inverted. An optional corner image uses the same Attachable `image` field as hero; skip it and the card is words only. When the image is present, the card keeps extra space under the words so the mark stays in the corner. Narrow keeps a reading-width card. Copy is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero, image-and-text, logo-cloud, and rich-text photos are Attachable children of the section. The JSON stores the attachment id; public render turns it into an Active Storage path.
 
@@ -232,7 +234,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.3. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
+0.3.4. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.184`.
 
 ## Upgrade
 
@@ -240,10 +242,11 @@ These are limits in sibling gems. This gem documents them instead of forking the
 2. Mount Pages, Duplicatable, and Publishable. Keep Pages off `/`.
 3. `RecordingStudioPages::Section` already opts into Duplicatable and Attachable when those gems are loaded. Do not add a second copy path or a Pages-owned Image type. Do not enable Attachable on Page for section photos.
 4. Public pages load `flat_pack/application` and use the host Flatpack theme on `html` (`FlatPack.configuration.default_theme`). Dummy sets `rounded`.
-5. Pin Flatpack `v0.1.162` (or later) so List `orderable_url` persists drag. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`. Pin Attachable `v0.5.1` (or later) for the image picker.
+5. Pin Flatpack `v0.1.184` (or later) so Hero can `align:` copy and wash a photo with `on:`. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`. Pin Attachable `v0.5.1` (or later) for the image picker.
 6. Gem screens use Recording Studio page nav. Dummy `/studio` and `/docs` keep host chrome (root switcher, Sign out). Do not put that on gem screens.
 7. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.
 8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.
 9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and call the Users OmniAuth helpers from a CTA component. Dummy Join and Walk in do that. The `continue_with_providers` partial is for the sign-in screen. Continue-with buttons follow Rails credentials under `omniauth:`.
 10. Built-in `image` fields are `{ type: :attachment, kind: :image }`. Old `image_url` rows still render. The next save writes `image` when someone picks a file. Mount Attachable, register `RecordingStudioAttachable::Attachment`, start Active Storage, and eager-load its Stimulus controllers. Public pages resolve ids to `rails_blob_path`. Copying a section copies that section's photos and rewrites the ids.
 11. If you overrode the rich text component, take the extra bottom inset when a corner image is present (`pb-56`), or keep your layout on purpose.
+12. Pin Flatpack `v0.1.184`. Hero **Copy** is Center or Left. Fullscreen **On the photo** is Dark or Light. If you overrode the hero component, take `align:` and `on:`, or keep your layout on purpose. Drop inverted button overrides on a photo hero.

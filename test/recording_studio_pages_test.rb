@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.3", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.4", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -55,10 +55,11 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_duplicatable", tag: "v0.4.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.0.2"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_users", tag: "v0.11.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.162"'
+    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.184"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.134"'
-    refute_includes gemfile, 'tag: "0.3.3"'
+    refute_includes gemfile, 'tag: "v0.1.162"'
+    refute_includes gemfile, 'tag: "0.3.4"'
   end
 
   def test_section_opts_into_duplicatable_and_attachable
@@ -352,6 +353,8 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes hero, '"h-full"'
     assert_includes hero, "CtaRenderer"
     assert_includes hero, 'content["image"]'
+    assert_includes hero, "align:"
+    assert_includes hero, "overlay"
     refute_includes hero, "h-screen"
     refute_includes hero, 'content["image_url"]'
 

@@ -10,11 +10,11 @@ module Dummy
       # Landing CTAs use the Users OmniAuth helpers, not the sign-in partial.
       # That partial leads with an Or divider, which belongs on the auth screen.
       # Cap the stack at max-w-sm, same as the Users auth shell, so w-full
-      # buttons stay equal without filling a fullscreen hero.
+      # buttons stay equal. The hero's slot alignment places the stack.
       def call
         return unless helpers.recording_studio_user_omniauth_configured?
 
-        helpers.content_tag(:div, class: "mx-auto flex w-full max-w-sm flex-col gap-2") do
+        helpers.content_tag(:div, class: "flex w-full max-w-sm flex-col gap-2") do
           helpers.safe_join(provider_buttons)
         end
       end

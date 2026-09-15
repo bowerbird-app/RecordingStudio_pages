@@ -8,6 +8,8 @@ module RecordingStudioPages
         "split_image" => :split_image,
         "fullscreen_image" => :centered_image
       }.freeze
+      ALIGNS = %w[center left].freeze
+      OVERLAYS = %w[dark light].freeze
 
       def initialize(rendered:)
         @rendered = rendered
@@ -39,18 +41,30 @@ module RecordingStudioPages
       def hero_attributes
         attributes = {
           variant: variant,
+          align: align,
           tagline: content["eyebrow"].presence,
           headline: title,
           description: description
         }
         if fullscreen_image?
           attributes[:background_image_url] = image_url
+          attributes[:on] = overlay
           attributes[:class] = "h-full"
         else
           attributes[:image_url] = image_url
           attributes[:image_alt] = title
         end
         attributes
+      end
+
+      def align
+        value = settings["alignment"].to_s
+        ALIGNS.include?(value) ? value.to_sym : :center
+      end
+
+      def overlay
+        value = settings["on"].to_s
+        OVERLAYS.include?(value) ? value.to_sym : :dark
       end
 
       def fullscreen_image?

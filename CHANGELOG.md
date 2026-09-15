@@ -28,6 +28,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - If you overrode `recording_studio_pages/admin/pages/_editor`, take the two-column Grid (edit left, live page right, no Preview heading) and the padded Card around the section list, or keep your layout on purpose.
 - If you overrode `recording_studio_pages/admin/sections/edit`, take the two-column Grid (form left, that section on the right, no Preview heading), or keep your layout on purpose.
 
+## [0.3.4] - 2026-09-15
+
+Hero uses Flatpack 0.1.184 copy alignment and photo wash.
+
+### Changed
+- Dummy pins Flatpack `v0.1.184`.
+- Hero **Copy** is Center or Left (`align:`). **On the photo** is Dark or Light (`on:`) for a fullscreen picture. Split layout ignores copy alignment. Words-only and split heroes ignore the photo wash.
+- Fullscreen overlay follows Flatpack overlay tokens, not `bg-black/60`.
+- Dummy Continue-with buttons no longer force `mx-auto`, so a left hero can dock them with the words.
+
+### Upgrade notes
+- Pin Flatpack `v0.1.184` (or later). Overlay type and buttons come from the kit. Drop inverted button overrides on a photo hero.
+- If you overrode the hero component or the section settings form, take `align:` / `on:` and the Copy / On the photo selects, or keep your layout on purpose.
+- The unused hero **Background** text field is gone. A stored `background` key on a hero is not a registered setting.
+
 ## [0.3.3] - 2026-09-15
 
 Rich text keeps the corner image off the words.
