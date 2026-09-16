@@ -25,12 +25,12 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
   test "unpublished homepage is not public" do
     create_page!(parent_recording: @root, title: "Draft Home", homepage: true, actor: @actor)
 
-    get root_path
+    get site_path
 
     assert_response :not_found
   end
 
-  test "published homepage renders enabled sections in order at /" do
+  test "published homepage renders enabled sections in order at /site" do
     page_recording = create_page!(parent_recording: @root, title: "Live Home", homepage: true, actor: @actor)
     add_section!(
       page_recording: page_recording,
@@ -53,7 +53,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     )
     publish_page!(page_recording, slug: "live-home", actor: @actor)
 
-    get root_path
+    get site_path
 
     assert_response :success
     assert_includes response.body, "Welcome home"
@@ -90,7 +90,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     )
     publish_page!(page_recording, slug: "house-home", actor: @actor)
 
-    get root_path
+    get site_path
 
     assert_response :success
     assert_includes response.body, "fp-top-nav"
@@ -101,7 +101,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'href="/pages/about"'
     assert_includes response.body, 'href="/pages/tonight"'
     assert_includes response.body, 'href="/users/sign_in"'
-    assert_includes response.body, 'href="/"'
+    assert_includes response.body, 'href="/site"'
     assert_includes response.body, "flat-pack--top-nav"
     assert_includes response.body, "Under the bar"
     assert_includes response.body, "viewport-fit=cover"
@@ -128,7 +128,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     )
     publish_page!(page_recording, slug: "variant-home", actor: @actor)
 
-    get root_path
+    get site_path
 
     assert_response :success
     assert_includes response.body, "Narrow notes"
@@ -155,7 +155,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     )
     publish_page!(page_recording, slug: "copy-home", actor: @actor)
 
-    get root_path
+    get site_path
 
     assert_response :success
     assert_includes response.body, "About this studio"
@@ -189,7 +189,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     )
     publish_page!(page_recording, slug: "picture-home", actor: @actor)
 
-    get root_path
+    get site_path
 
     assert_response :success
     assert_includes response.body, "About this studio, in your words"
@@ -234,7 +234,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     )
     publish_page!(page_recording, slug: "themed-home", actor: @actor)
 
-    get root_path
+    get site_path
 
     assert_response :success
     assert_includes response.body, 'data-theme="featured-in"'

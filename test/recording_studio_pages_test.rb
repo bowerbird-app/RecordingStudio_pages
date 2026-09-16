@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.4", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.5", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -58,7 +58,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.162"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.134"'
-    refute_includes gemfile, 'tag: "0.3.4"'
+    refute_includes gemfile, 'tag: "0.3.5"'
   end
 
   def test_section_opts_into_duplicatable_and_attachable
@@ -230,8 +230,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes top_nav, "recording_studio_root_switch_dropdown"
     assert_includes sidebar, 'text: "Admin"'
     assert_includes routes, 'root to: "home#index"'
-    assert_includes routes, 'root to: "recording_studio_pages/homepages#show"'
+    assert_includes routes, 'root to: "recording_studio_user/auth/sessions#new"'
     assert_includes routes, 'get "/site"'
+    refute_includes routes, 'root to: "recording_studio_pages/homepages#show"'
   end
 
   def test_dummy_docs_pages_use_minimal_flatpack_documentation_components

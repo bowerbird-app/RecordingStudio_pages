@@ -34,5 +34,5 @@ Rails.application.routes.draw do
   authenticated :user do
     root to: "home#index", as: :authenticated_root
   end
-  root to: "recording_studio_pages/homepages#show"
+  root to: "recording_studio_user/auth/sessions#new"
 end

@@ -2,7 +2,7 @@
 
 RecordingStudioPages.configure do |config|
   config.page_parent_types = %w[Workspace Folder]
-  config.homepage_path = "/"
+  config.homepage_path = "/site"
   config.register_built_in_sections = true
 
   config.hooks.on(:register_ctas) do

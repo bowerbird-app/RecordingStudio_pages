@@ -176,5 +176,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_includes routes, 'get "/start"'
     assert_includes routes, "recording_studio_user_auth_for :users"
     assert_includes routes, "RecordingStudioUser::Engine"
+    assert_includes routes, 'root to: "recording_studio_user/auth/sessions#new"'
+    assert_equal "/site", RecordingStudioPages.homepage_path
   end
 end

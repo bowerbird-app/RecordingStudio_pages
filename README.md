@@ -51,7 +51,7 @@ recording_studio_admin_for :admin, at: "/admin", root_section: :pages
 root to: "recording_studio_pages/homepages#show"
 ```
 
-Point `/` at the homepage controller. Public pages use `recording_studio_pages/public`. That layout loads Flatpack tokens (`flat_pack/variables`, `flat_pack/application`) then Tailwind, and puts the host’s named Flatpack theme on `html` (`FlatPack.configuration.default_theme`, dummy `rounded`). Do not reuse the Devise `application` layout for public pages — it is `max-w-md` for sign-in. Heroes and menus render with Flatpack at full width; other sections sit in `max-w-6xl`. Publishable `config.layout` is for Publishable's own screens; dummy sets it to `recording_studio/default_layout`.
+Point `/` at the homepage controller. Dummy does not: unsigned `/` is Users sign-in, and `homepage_path` is `/site`. Public pages use `recording_studio_pages/public`. That layout loads Flatpack tokens (`flat_pack/variables`, `flat_pack/application`) then Tailwind, and puts the host’s named Flatpack theme on `html` (`FlatPack.configuration.default_theme`, dummy `rounded`). Do not reuse the Devise `application` layout for public pages — it is `max-w-md` for sign-in. Heroes and menus render with Flatpack at full width; other sections sit in `max-w-6xl`. Publishable `config.layout` is for Publishable's own screens; dummy sets it to `recording_studio/default_layout`.
 
 ## How a page is stored
 
@@ -195,7 +195,7 @@ Writes need Accessible `:edit` on the configured admin root. Reads need `:view`.
 
 The hub’s Live pages and Drafts cards load through Turbo frames. Dummy imports `@hotwired/turbo-rails` and pins RS Admin Stimulus (`controllers/recording_studio_admin`, the same pin `recording_studio_admin:install` adds). Without those, the cards stay on the shimmer. Hosts that already ran the Admin install already have the Stimulus pin; they still need Turbo on the layout that serves `/admin`.
 
-Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`. Public inner pages at `/pages/:uuid/:slug` use the same `recording_studio_pages/public` layout as `/`, so a fullscreen hero can actually go edge to edge.
+Publishing and SEO stay on the RS Publishable child. The editor links to `/recordings/:id/publishable/edit`. Public inner pages at `/pages/:uuid/:slug` use the same `recording_studio_pages/public` layout as the homepage controller, so a fullscreen hero can actually go edge to edge.
 
 Drag-reorder persists through Flatpack List `orderable_url`. The Pages Stimulus controller only blocks row-menu drags and reloads if that save fails.
 
@@ -214,8 +214,8 @@ bin/dev
 
 Sign in with `admin@admin.com` / `Password`.
 
-- `/` visitors see the published homepage (seeded Home starts with a Menu, then the hero). Signed-in people see the host home: sidebar, root switcher, example page buttons.
-- `/site` the live marketing homepage while you are signed in
+- `/` visitors see Users sign-in. Signed-in people see the host home: sidebar, root switcher, example page buttons.
+- `/site` the live marketing homepage, even when you are signed in
 - `/pages/:uuid/tonight` one fullscreen hero (seeded **Tonight**)
 - `/pages/:uuid/join` one hero with sign-in buttons (seeded **Join**)
 - `/pages/:uuid/walk-in` one fullscreen hero with sign-in buttons (seeded **Walk in**)
@@ -239,7 +239,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.4. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
+0.3.5. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
 
 ## Upgrade
 
@@ -248,7 +248,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 3. `RecordingStudioPages::Section` already opts into Duplicatable and Attachable when those gems are loaded. Do not add a second copy path or a Pages-owned Image type. Do not enable Attachable on Page for section photos.
 4. Public pages load `flat_pack/application` and use the host Flatpack theme on `html` (`FlatPack.configuration.default_theme`). Dummy sets `rounded`.
 5. Pin Flatpack `v0.1.162` (or later) so List `orderable_url` persists drag. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`. Pin Attachable `v0.5.1` (or later) for the image picker.
-6. Gem screens use Recording Studio page nav. Dummy signed-in `/` is a sidebar shell with a root switcher. Dummy `/docs` keeps page-nav host chrome. Do not put that on gem screens.
+6. Gem screens use Recording Studio page nav. Dummy signed-in `/` is a sidebar shell with a root switcher. Dummy unsigned `/` is Users sign-in; the live Home is `/site`. Dummy `/docs` keeps page-nav host chrome. Do not put that on gem screens.
 7. Install Recording Studio Trashable if you want `trash!` instead of a `trashed_at` write.
 8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.
 9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and call the Users OmniAuth helpers from a CTA component. Dummy Join and Walk in do that. The `continue_with_providers` partial is for the sign-in screen. Continue-with buttons follow Rails credentials under `omniauth:`.

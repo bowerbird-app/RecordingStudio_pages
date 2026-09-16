@@ -91,7 +91,7 @@ class DummyHomeTest < ActionDispatch::IntegrationTest
     refute_includes response.body, @root.recordable.name
   end
 
-  test "visitors still see the published homepage at /" do
+  test "visitors see sign-in at /" do
     page_recording = create_page!(parent_recording: @root, title: "Live Home", homepage: true, actor: @actor)
     add_section!(
       page_recording: page_recording,
@@ -106,9 +106,19 @@ class DummyHomeTest < ActionDispatch::IntegrationTest
     get "/"
 
     assert_response :success
-    assert_includes response.body, "Welcome home"
+    assert_includes response.body, "Welcome back"
+    assert_includes response.body, "Continue with email"
+    refute_includes response.body, "Welcome home"
     refute_includes response.body, "data-controller=\"flat-pack--sidebar-layout\""
     refute_includes response.body, @root.recordable.name
     refute_includes response.body, 'href="/admin"'
+
+    get "/site"
+
+    assert_response :success
+    assert_includes response.body, "Welcome home"
+    refute_includes response.body, "Welcome back"
+    refute_includes response.body, "Continue with email"
+    refute_includes response.body, "data-controller=\"flat-pack--sidebar-layout\""
   end
 end

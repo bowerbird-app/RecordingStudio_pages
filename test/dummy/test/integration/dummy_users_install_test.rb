@@ -9,6 +9,16 @@ class DummyUsersInstallTest < ActionDispatch::IntegrationTest
     assert User.devise_modules.include?(:omniauthable)
   end
 
+  test "public root is the Users sign-in screen" do
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, "Welcome back"
+    assert_includes response.body, "Continue with email"
+    assert_includes response.body, 'action="/users/sign_in"'
+    assert_includes response.body, "Continue with Google"
+  end
+
   test "sign in and hero social CTAs post to the same Users OmniAuth paths" do
     get new_user_session_path
 
