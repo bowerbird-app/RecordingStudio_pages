@@ -175,7 +175,7 @@ A **Menu** is a sticky top bar (`FlatPack::TopNav`). Name and an optional mark s
 
 Rich text is a full-width card with a display headline, muted body, and Hero inset (`px-16 py-24`). Copy stays `max-w-xl` so a wide card does not turn into a newspaper column. Background is Default, Muted, or Inverted. An optional corner image uses the same Attachable `image` field as hero; skip it and the card is words only. When the image is present, the card keeps extra space under the words so the mark stays in the corner. Narrow keeps a reading-width card. Copy is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero, image-and-text, logo-cloud, menu, and rich-text photos are Attachable children of the section. The JSON stores the attachment id; public render turns it into an Active Storage path.
 
-- Built-in templates: `marketing_home` (menu, hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero). Dummy also registers `join` (centered hero with social logins), `walk_in` (fullscreen hero image with social logins), and `start_from_url` (hero with a URL field). Dummy seeds published **Tonight**, **Join**, **Walk in**, and **Start from a URL** pages. Open Tonight at `/pages/:uuid/tonight`, Join at `/pages/:uuid/join`, Walk in at `/pages/:uuid/walk-in`, and the URL landing at `/pages/:uuid/start-from-a-url`. Those public URLs are the page, not the editor preview. A fullscreen hero fills the viewport (`100dvh`); Flatpack’s image hero is otherwise `min-h-[560px]`. Dummy Home is the `marketing_home` sample; seed restores that template if the sections drift (a second hero from **Use a template**, old copy, and so on), then points the Home menu at the seeded About, Tonight, and Join pages.
+- Built-in templates: `marketing_home` (menu, hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero). Dummy also registers `home` (menu plus a fullscreen hero image), `join` (centered hero with social logins), `walk_in` (fullscreen hero image with social logins), and `start_from_url` (hero with a URL field). Dummy seeds published **Tonight**, **Join**, **Walk in**, and **Start from a URL** pages. Open Tonight at `/pages/:uuid/tonight`, Join at `/pages/:uuid/join`, Walk in at `/pages/:uuid/walk-in`, and the URL landing at `/pages/:uuid/start-from-a-url`. Those public URLs are the page, not the editor preview. A fullscreen hero fills the viewport (`100dvh`); Flatpack’s image hero is otherwise `min-h-[560px]`. Dummy Home is the `home` sample: Menu, then a fullscreen image with a headline and subtitle. Seed restores that template if the sections drift, then points the Home menu at the seeded About, Tonight, and Join pages.
 
 List fields skip blank extra slots and items marked `_destroy`.
 
@@ -215,7 +215,7 @@ bin/dev
 Sign in with `admin@admin.com` / `Password`.
 
 - `/` visitors see Users sign-in. Signed-in people see the host home: sidebar, root switcher, example page buttons.
-- `/site` the live marketing homepage, even when you are signed in
+- `/site` the live Home: Menu plus a fullscreen hero
 - `/pages/:uuid/tonight` one fullscreen hero (seeded **Tonight**)
 - `/pages/:uuid/join` one hero with sign-in buttons (seeded **Join**)
 - `/pages/:uuid/walk-in` one fullscreen hero with sign-in buttons (seeded **Walk in**)

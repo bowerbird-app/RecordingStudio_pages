@@ -8,7 +8,7 @@ This Rails app exists to validate the Recording Studio Page Builder in a real ho
 - A seeded admin person (`admin@admin.com` / `Password`) with a Profile under the shared People root
 - `Current.actor` wiring for Recording Studio events
 - Workspace roots plus seeded page and section recordings
-- Public homepage at `/site`, from a published page recording. Dummy seed restores the sample Home template if sections drift. Home starts with a Menu (House, About, Tonight, Join), then the hero.
+- Public homepage at `/site`, from a published page recording. Dummy seed restores Home if sections drift: a Menu (House, About, Tonight, Join) over a fullscreen hero (headline, subtitle, image).
 - Unsigned `/` is Users sign-in. Signed-in `/` is the host home: a Flatpack sidebar, a root switcher in the top bar, and buttons to the live example pages. Switch to **Admin** in that switcher, then open **Admin** in the sidebar to reach `/admin`.
 - Staff page composition at `/recording_studio_pages/admin/pages`. Add a section from the editor dropdown. Use a template. Edit the section list in a padded Card in the first column and see enabled sections in the second. Open a section for **Update** and **Cancel** under the title, the form on the left, and a live preview on the right. Update stays on that section. **Choose image** on hero, image-and-text, logo items, and rich text opens the Attachable picker for that section. Drag sections to reorder. Copy a section from the row’s three-dot menu (Recording Studio Duplicatable; photos come along). Remove a page from Edit page.
 - RS Admin Pages section at `/admin`. Switch to the Admin root first. The hub also lists **Users**. Dummy loads Turbo and RS Admin Stimulus so Live pages and Drafts leave the shimmer and show counts.
@@ -36,7 +36,7 @@ Sign-in is email first (**Continue with email**), then password. Google and Appl
 ## Useful Routes
 
 - `/` - visitors see Users sign-in. Signed-in people see the host home (sidebar, root switcher, example page buttons).
-- `/site` - the live marketing homepage, even when you are signed in
+- `/site` - the live Home (Menu plus a fullscreen hero), even when you are signed in
 - `/pages/:uuid/about` - seeded **About** page: a full-width rich text card with display type, Hero inset, and a corner picture
 - `/pages/:uuid/join` - seeded **Join** page: one centered hero whose call to action is Users Continue-with buttons
 - `/pages/:uuid/walk-in` - seeded **Walk in** page: one fullscreen hero image whose call to action is the same Continue-with buttons

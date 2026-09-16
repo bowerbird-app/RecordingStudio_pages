@@ -76,7 +76,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     homepage_hero = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
                                                      .find { |recording| recording.recordable.section_type == "hero" }
                                                      &.recordable
-    assert_equal %w[top_nav hero logo_cloud feature_grid call_to_action], homepage_types
+    assert_equal %w[top_nav hero], homepage_types
     homepage_menu = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
                                                     .find { |recording| recording.recordable.section_type == "top_nav" }
                                                     &.recordable
@@ -86,8 +86,10 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal %w[About Tonight], menu_links.map { |item| item["text"] }
     assert(menu_links.all? { |item| item["url"].to_s.start_with?("/pages/") })
     assert_equal "The page is the front door", homepage_hero.content["title"]
-    assert_equal "button", homepage_hero.content.dig("cta", "type")
-    assert_equal "Come in", homepage_hero.content.dig("cta", "text")
+    assert_equal "Come in if you want a seat.", homepage_hero.content["body"]
+    assert_equal "fullscreen_image", homepage_hero.settings["variant"]
+    assert_equal "/images/hero-tonight.jpg", homepage_hero.content["image"] || homepage_hero.content["image_url"]
+    refute homepage_hero.content.dig("cta", "type").present?
     join_recording = RecordingStudio::Recording.where(
       recordable_type: "RecordingStudioPages::Page",
       trashed_at: nil
@@ -165,6 +167,16 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal "join", RecordingStudioPages.template(:join).key
     assert_equal "walk_in", RecordingStudioPages.template(:walk_in).key
     assert_equal "start_from_url", RecordingStudioPages.template(:start_from_url).key
+    assert_equal "home", RecordingStudioPages.template(:home).key
+    home = RecordingStudioPages.template(:home)
+    home_types = home.sections.map { |entry| entry.fetch("type").to_s }
+    home_hero = home.sections.find { |entry| entry.fetch("type").to_s == "hero" }
+    home_hero_content = home_hero.fetch("content").to_h.stringify_keys
+    assert_equal %w[top_nav hero], home_types
+    assert_equal "fullscreen_image", home_hero.fetch("settings").to_h.stringify_keys.fetch("variant")
+    assert_equal "The page is the front door", home_hero_content.fetch("title")
+    refute home_hero_content.key?("cta")
+    refute home_hero_content.key?("eyebrow")
     walk_in = RecordingStudioPages.template(:walk_in)
     walk_in_hero = walk_in.sections.first
     walk_in_content = walk_in_hero.fetch("content").to_h.stringify_keys

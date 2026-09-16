@@ -26,6 +26,33 @@ RecordingStudioPages.configure do |config|
 
   config.hooks.on(:register_sections) do
     RecordingStudioPages.register_template(
+      key: :home,
+      name: "Home",
+      source: "dummy",
+      sections: [
+        {
+          type: :top_nav,
+          content: {
+            name: "House",
+            links: [
+              { text: "About", url: "/" },
+              { text: "Tonight", url: "/" }
+            ],
+            cta: { type: "button", text: "Join", url: "/users/sign_in" }
+          }
+        },
+        {
+          type: :hero,
+          content: {
+            title: "The page is the front door",
+            body: "Come in if you want a seat.",
+            image: "/images/hero-tonight.jpg"
+          },
+          settings: { variant: "fullscreen_image" }
+        }
+      ]
+    )
+    RecordingStudioPages.register_template(
       key: :join,
       name: "Join",
       source: "dummy",

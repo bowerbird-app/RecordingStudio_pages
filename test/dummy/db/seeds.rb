@@ -85,7 +85,9 @@ restore_template_sections = lambda do |page_recording, template_key, actor|
   hero_entry = template.sections.find { |entry| entry.fetch("type").to_s == "hero" }
   expected_hero = (hero_entry&.fetch("content") || {}).to_h.stringify_keys
   expected_hero_title = expected_hero["title"]
-  expected_cta_type = expected_hero.dig("cta", "type")
+  expected_cta = expected_hero["cta"]
+  expected_cta = expected_cta.to_h.stringify_keys if expected_cta.is_a?(Hash)
+  expected_cta_type = expected_cta.is_a?(Hash) ? expected_cta["type"] : nil
   expected_image_url = expected_hero["image"] || expected_hero["image_url"]
   expected_variant = (hero_entry&.fetch("settings") || {}).to_h.stringify_keys["variant"]
   sections = RecordingStudioPages::Composition.section_recordings_for(page_recording)
@@ -96,7 +98,11 @@ restore_template_sections = lambda do |page_recording, template_key, actor|
   hero_image = hero&.content&.[]("image").presence || hero&.content&.[]("image_url")
   hero_variant = hero&.settings&.[]("variant")
   legacy_cta = hero&.content&.[]("primary_action").present? && hero_cta_type.blank?
-  cta_drift = expected_cta_type.present? && hero_cta_type != expected_cta_type
+  cta_drift = if expected_cta_type.present?
+    hero_cta_type != expected_cta_type
+  else
+    hero_cta_type.present?
+  end
   image_drift = expected_image_url.present? && hero_image != expected_image_url
   variant_drift = expected_variant.present? && hero_variant != expected_variant
   return if types == expected_types && hero_title == expected_hero_title && !legacy_cta && !cta_drift &&
@@ -161,7 +167,7 @@ begin
     ).value!
   end
 
-  restore_template_sections.call(homepage_recording, "marketing_home", user)
+  restore_template_sections.call(homepage_recording, "home", user)
   publish_page.call(homepage_recording, "home", user)
 
   about_recording = find_page_recording.call("About")
