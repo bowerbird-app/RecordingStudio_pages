@@ -4,6 +4,10 @@ module RecordingStudioPages
   module Composition
     module_function
 
+    STATUS_LIVE = "Live"
+    STATUS_DRAFT = "Draft"
+    STATUS_OPTIONS = [STATUS_LIVE, STATUS_DRAFT].freeze
+
     def section_recordings_for(page_recording)
       scope = ordered_children(page_recording)
       scope = scope.where(trashed_at: nil) if scope.klass.column_names.include?("trashed_at")
@@ -28,9 +32,7 @@ module RecordingStudioPages
       )
       scope = scope.where(root_recording_id: root_recording.id) if root_recording
       candidates = scope.includes(:recordable).select { |recording| recording.recordable&.homepage? }
-      published, others = candidates.partition do |recording|
-        recording.respond_to?(:currently_published?) && recording.currently_published?
-      end
+      published, others = candidates.partition { |recording| live_page?(recording) }
       published.first || others.first
     end
 
@@ -42,19 +44,46 @@ module RecordingStudioPages
     end
 
     def published_pages_count
+      live_page_recording_ids.except(:select).distinct.count(:parent_recording_id)
+    end
+
+    def draft_pages_count
+      [page_recordings.count - published_pages_count, 0].max
+    end
+
+    def live_page_recording_ids
       live_ids = currently_live_publishable_ids
-      return 0 if live_ids.blank?
+      return RecordingStudio::Recording.none.select(:parent_recording_id) if live_ids.blank?
 
       RecordingStudio::Recording.where(
         recordable_type: "RecordingStudioPublishable::Publishable",
         recordable_id: live_ids,
         trashed_at: nil,
         parent_recording_id: page_recordings.select(:id)
-      ).distinct.count(:parent_recording_id)
+      ).distinct.select(:parent_recording_id)
     end
 
-    def draft_pages_count
-      [page_recordings.count - published_pages_count, 0].max
+    def filter_page_recordings_by_status(relation, value)
+      case value.to_s
+      when STATUS_LIVE
+        relation.where(id: live_page_recording_ids)
+      when STATUS_DRAFT
+        relation.where.not(id: live_page_recording_ids)
+      else
+        relation
+      end
+    end
+
+    def page_status(recording)
+      live_page?(recording) ? STATUS_LIVE : STATUS_DRAFT
+    end
+
+    def page_status_badge_style(status)
+      status.to_s == STATUS_LIVE ? :success : :info
+    end
+
+    def live_page?(recording)
+      recording.respond_to?(:currently_published?) && recording.currently_published?
     end
 
     def currently_live_publishable_ids

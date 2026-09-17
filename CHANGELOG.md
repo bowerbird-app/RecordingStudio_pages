@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.6] - 2026-09-17
+
+Pages hub cards open the Pages list. Drafts arrives with the Draft status filter on.
+
+### Added
+- The Admin Pages list has a **Status** filter: Live or Draft. The table shows that status on each row.
+- Live pages and Drafts cards on the Pages hub open the Pages list. Drafts opens it with Draft selected.
+
+### Upgrade notes
+- If you overrode the Admin Pages screen, take the Status filter and Status column, or keep your list on purpose.
+- If you overrode the Live pages or Drafts widgets, take `link_to` to the Pages screen (Drafts passes `status=Draft`).
+
 ## [0.3.5] - 2026-09-17
 
 The page editor uses Publishable’s Draft/Published control. Hero look lives under Style.
@@ -233,7 +245,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.5...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.6...HEAD
+[0.3.6]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.5...v0.3.6
 [0.3.5]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.4...v0.3.5
 [0.3.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/bowerbird-app/RecordingStudio_pages/releases/tag/v0.2.1

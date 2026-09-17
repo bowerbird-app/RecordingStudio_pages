@@ -575,6 +575,37 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
         headers: { "Turbo-Frame" => "screen-table" }
     assert_response :success
     assert_includes response.body, titled.recordable.title
+    assert_includes response.body, "Status"
+  end
+
+  test "the Pages list can filter live and draft pages" do
+    live = create_page!(parent_recording: @root, title: "Live Listed #{SecureRandom.hex(4)}", actor: @actor)
+    draft = create_page!(parent_recording: @root, title: "Draft Listed #{SecureRandom.hex(4)}", actor: @actor)
+    publish_page!(live, slug: "live-listed-#{SecureRandom.hex(4)}", actor: @actor)
+
+    switch_to_admin_root!
+
+    get RecordingStudioPages::Admin.screen_path
+    assert_response :success
+    assert_includes response.body, "Status"
+    assert_includes response.body, "Live"
+    assert_includes response.body, "Draft"
+
+    get "/admin/screens/pages/table",
+        params: { status: RecordingStudioPages::Composition::STATUS_DRAFT },
+        headers: { "Turbo-Frame" => "screen-table" }
+    assert_response :success
+    assert_includes response.body, draft.recordable.title
+    refute_includes response.body, live.recordable.title
+    assert_includes response.body, "Draft"
+
+    get "/admin/screens/pages/table",
+        params: { status: RecordingStudioPages::Composition::STATUS_LIVE },
+        headers: { "Turbo-Frame" => "screen-table" }
+    assert_response :success
+    assert_includes response.body, live.recordable.title
+    refute_includes response.body, draft.recordable.title
+    assert_includes response.body, "Live"
   end
 
   test "creating a page without ticking home still saves from the Admin root" do
@@ -622,6 +653,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "aria-busy"
     assert_includes response.body, "Live pages"
     assert_includes response.body, ">#{published_count}<"
+    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.screen_path}\""
 
     get "/admin/sections/pages/widgets/widgets.pages.draft_pages",
         params: { widget_view_variant: :compact },
@@ -631,6 +663,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "aria-busy"
     assert_includes response.body, "Drafts"
     assert_includes response.body, ">#{draft_count}<"
+    assert_includes response.body,
+                    "href=\"#{RecordingStudioPages::Admin.screen_path(status: RecordingStudioPages::Composition::STATUS_DRAFT)}\""
   end
 
   test "the RS Admin hub is forbidden while the current root is a workspace" do

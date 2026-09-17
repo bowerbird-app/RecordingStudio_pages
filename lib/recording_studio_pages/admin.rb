@@ -16,9 +16,20 @@ module RecordingStudioPages
       RecordingStudioAdmin.register_section(PagesSection)
     end
 
-    def self.screen_path
-      "#{admin_mount_path}/screens/#{SCREEN_KEY}"
+    def self.screen_path(status: nil)
+      append_status_query("#{admin_mount_path}/screens/#{SCREEN_KEY}", status)
     end
+
+    def self.screen_path_for(context, status: nil)
+      append_status_query(context.admin_screen_path(SCREEN_KEY), status)
+    end
+
+    def self.append_status_query(path, status)
+      return path if status.blank?
+
+      "#{path}?#{ { status: status }.to_query }"
+    end
+    private_class_method :append_status_query
 
     def self.new_page_path
       "#{ENGINE_MOUNT_PATH}/admin/pages/new"
@@ -52,6 +63,18 @@ module RecordingStudioPages
       button :new_page, text: "Page", url: ->(_context) { RecordingStudioPages::Admin.new_page_path },
                         style: :primary
 
+      STATUS_FILTER = lambda { |relation, value, _context|
+        RecordingStudioPages::Composition.filter_page_recordings_by_status(relation, value)
+      }
+      STATUS_VALUE = ->(recording, _context) { RecordingStudioPages::Composition.page_status(recording) }
+      STATUS_BADGE = lambda { |_recording, _context, value|
+        {
+          text: value,
+          style: RecordingStudioPages::Composition.page_status_badge_style(value),
+          size: :sm
+        }
+      }
+
       query do |_context|
         RecordingStudio::Recording.where(recordable_type: "RecordingStudioPages::Page", trashed_at: nil)
                                   .includes(:recordable)
@@ -60,8 +83,14 @@ module RecordingStudioPages
 
       table do
         default_sort :updated_at
+        filter :status,
+               options: RecordingStudioPages::Composition::STATUS_OPTIONS,
+               placeholder: "Status",
+               apply: STATUS_FILTER
         column :title, title: "Page", sortable: false,
                        value: ->(recording, _context) { recording.recordable&.title }
+        column :status, title: "Status", sortable: false, display: :badge,
+                        display_options: STATUS_BADGE, value: STATUS_VALUE
         column :homepage, title: "Home", sortable: false,
                           value: ->(recording, _context) { recording.recordable&.homepage? ? "Home" : "" }
         column :updated_at
@@ -85,6 +114,8 @@ module RecordingStudioPages
       value do |_context|
         RecordingStudioPages::Composition.published_pages_count
       end
+      link_to { |context| RecordingStudioPages::Admin.screen_path_for(context) }
+      link_label "Pages"
     end
 
     DraftPagesWidget = RecordingStudioAdmin::Widget.new("widgets.pages.draft_pages") do
@@ -94,6 +125,10 @@ module RecordingStudioPages
       value do |_context|
         RecordingStudioPages::Composition.draft_pages_count
       end
+      link_to do |context|
+        RecordingStudioPages::Admin.screen_path_for(context, status: RecordingStudioPages::Composition::STATUS_DRAFT)
+      end
+      link_label "Drafts"
     end
   end
 end

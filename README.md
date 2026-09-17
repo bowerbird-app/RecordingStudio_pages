@@ -195,7 +195,9 @@ Writes need Accessible `:edit` on the configured admin root. Reads need `:view`.
 
 `/admin` is the RS Admin hub. Switch the current root to **Admin** first. RS Admin forbids the hub while the current root is a workspace. The page builder editor does not require that switch.
 
-The hub’s Live pages and Drafts cards load through Turbo frames. Dummy imports `@hotwired/turbo-rails` and pins RS Admin Stimulus (`controllers/recording_studio_admin`, the same pin `recording_studio_admin:install` adds). Without those, the cards stay on the shimmer. Hosts that already ran the Admin install already have the Stimulus pin; they still need Turbo on the layout that serves `/admin`.
+The hub’s Live pages and Drafts cards load through Turbo frames. Each card opens the Pages list. Drafts arrives with Draft selected so you only see pages that are not live yet. Dummy imports `@hotwired/turbo-rails` and pins RS Admin Stimulus (`controllers/recording_studio_admin`, the same pin `recording_studio_admin:install` adds). Without those, the cards stay on the shimmer. Hosts that already ran the Admin install already have the Stimulus pin; they still need Turbo on the layout that serves `/admin`.
+
+The Pages list can filter by status: Live or Draft. The table shows that status on each row.
 
 Publishing and SEO stay on the RS Publishable child. The editor uses `render_publishable_quick_actions` so staff can publish, schedule, or unpublish without leaving the page. Draft and scheduled menus open Preview in a new tab. Live menus open View at the public URL. Public pages at `/` and `/pages/:uuid/:slug` share `recording_studio_pages/public`, which sets the document title and head tags from Publishable and draws a **Preview** badge on staff previews. A fullscreen hero can go edge to edge.
 
@@ -225,7 +227,7 @@ Sign in with `admin@admin.com` / `Password`.
 - `/start` dummy catcher for that URL field
 - `/studio` same signed-in home as `/`
 - `/recording_studio_pages/admin/pages` page builder
-- `/admin` RS Admin hub. Switch to the Admin root from the top-bar switcher first. **Page** opens the new-page form. **View all** opens the Admin Pages list. Dummy loads Turbo and RS Admin Stimulus so Live pages and Drafts show counts instead of staying on the shimmer.
+- `/admin` RS Admin hub. Switch to the Admin root from the top-bar switcher first. **Page** opens the new-page form. **View all** opens the Admin Pages list. Dummy loads Turbo and RS Admin Stimulus so Live pages and Drafts show counts instead of staying on the shimmer. Those cards open the Pages list; Drafts arrives with Draft selected.
 
 ## Upstream gaps
 
@@ -241,7 +243,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.5. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.3.0`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.186`.
+0.3.6. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.3.0`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.186`.
 
 ## Upgrade
 
@@ -257,6 +259,6 @@ These are limits in sibling gems. This gem documents them instead of forking the
 10. Built-in `image` fields are `{ type: :attachment, kind: :image }`. Old `image_url` rows still render. The next save writes `image` when someone picks a file. Mount Attachable, register `RecordingStudioAttachable::Attachment`, start Active Storage, and eager-load its Stimulus controllers. Public pages resolve ids to `rails_blob_path`. Copying a section copies that section's photos and rewrites the ids.
 11. If you overrode the rich text component, take the extra bottom inset when a corner image is present (`pb-56`), or keep your layout on purpose.
 12. Built-in **Menu** (`top_nav`) is a full-bleed Flatpack TopNav section. Add it from **Section**, or apply **Marketing home**. Old pages stay as they are until you add one. If you overrode `_section.html.erb`, take `full_bleed?` (Hero and Menu set `full_bleed: true`). Public layout should use `viewport-fit=cover`. Load Flatpack Stimulus (`controllers/flat_pack`) so **More** on a phone opens and so the bar frosts after scroll.
-13. RS Admin hub widgets need Turbo on the admin layout. Dummy imports `@hotwired/turbo-rails` and pins `controllers/recording_studio_admin`. Run `recording_studio_admin:install` in a host for that Stimulus pin. Without Turbo, Live pages and Drafts stay on the shimmer.
+13. RS Admin hub widgets need Turbo on the admin layout. Dummy imports `@hotwired/turbo-rails` and pins `controllers/recording_studio_admin`. Run `recording_studio_admin:install` in a host for that Stimulus pin. Without Turbo, Live pages and Drafts stay on the shimmer. Those cards open `/admin/screens/pages`. Drafts adds `status=Draft`. If you overrode the Pages screen, take the Status filter (Live / Draft) and Status column.
 14. A fullscreen image hero fills the viewport with `--hero-overlay-min-height: 100dvh` on the Flatpack section. Do not wrap the hero, and do not pass a competing `min-h-*` class. Overlay copy sits high, left or center. Hero **Preset** (On a dark photo / On a light photo) maps to `on: :dark` or `:light` and only shows when Layout is fullscreen and there is a picture. Optional `title_color` sets `--hero-overlay-text-color` or `--surface-content-color`. `eyebrow_color` and `body_color` wrap the eyebrow and subtitle so they do not share Flatpack’s muted token. If you overrode the hero component or the section form, take the **Call to action** divider, Style, the gated preset, and those colour paths, or keep your layout on purpose.
 15. Pin Publishable `v0.3.0` (or later). Include `RecordingStudioPublishable::ApplicationHelper` on Pages controllers. The editor uses `render_publishable_quick_actions` instead of a **Publish** button. Public `recording_studio_pages/public` should call `publishable_document_title`, `publishable_head_tags`, and `publishable_preview_badge`. Import Turbo so the Draft/Published control can publish without leaving the editor.

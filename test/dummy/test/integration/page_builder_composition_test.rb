@@ -273,11 +273,23 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
 
   test "published and draft page counts use live publishable children" do
     live = create_page!(parent_recording: @root, title: "Live count", actor: @actor)
-    create_page!(parent_recording: @root, title: "Draft count", actor: @actor)
+    draft = create_page!(parent_recording: @root, title: "Draft count", actor: @actor)
     publish_page!(live, slug: "live-count-#{SecureRandom.hex(4)}", actor: @actor)
 
     assert RecordingStudioPages::Composition.published_pages_count >= 1
     assert RecordingStudioPages::Composition.draft_pages_count >= 1
+    assert_equal "Live", RecordingStudioPages::Composition.page_status(live.reload)
+    assert_equal "Draft", RecordingStudioPages::Composition.page_status(draft)
+
+    pages = RecordingStudioPages::Composition.page_recordings
+    draft_pages = RecordingStudioPages::Composition.filter_page_recordings_by_status(pages, "Draft")
+    live_pages = RecordingStudioPages::Composition.filter_page_recordings_by_status(pages, "Live")
+
+    assert_includes live_pages.map(&:id), live.id
+    refute_includes draft_pages.map(&:id), live.id
+    assert_includes draft_pages.map(&:id), draft.id
+    refute_includes live_pages.map(&:id), draft.id
+    assert_equal pages.count, live_pages.count + draft_pages.count
   end
 
   test "duplicating a section requires edit access" do
