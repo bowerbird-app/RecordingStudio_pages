@@ -186,6 +186,11 @@ module RecordingStudioPages
               ["On a light photo", "light"]
             ]
           },
+          eyebrow_color: {
+            type: :color,
+            label: "Eyebrow",
+            group: :style
+          },
           title_color: {
             type: :color,
             label: "Headline",
@@ -193,7 +198,7 @@ module RecordingStudioPages
           },
           body_color: {
             type: :color,
-            label: "Quieter line",
+            label: "Subtitle",
             group: :style
           }
         },

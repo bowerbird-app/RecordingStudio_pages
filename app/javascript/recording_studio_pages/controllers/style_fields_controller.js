@@ -62,12 +62,13 @@ export default class extends Controller {
   previewFor(kind) {
     const variant = this.layoutSelect?.value || ""
     const preset = this.presetSelect?.value || "dark"
-    if (variant === "fullscreen_image") {
-      if (kind === "title_color") return preset === "light" ? "#222222" : "#ffffff"
-      return preset === "light" ? "#555555" : "#cccccc"
+    if (kind === "title_color") {
+      if (variant === "fullscreen_image") return preset === "light" ? "#222222" : "#ffffff"
+      return "#171717"
     }
 
-    return kind === "title_color" ? "#171717" : "#6b7280"
+    if (variant === "fullscreen_image") return preset === "light" ? "#555555" : "#cccccc"
+    return "#6b7280"
   }
 
   get layoutSelect() {

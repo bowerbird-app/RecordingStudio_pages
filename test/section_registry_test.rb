@@ -208,11 +208,14 @@ class SectionRegistryTest < Minitest::Test
       [["On a dark photo", "dark"], ["On a light photo", "light"]],
       hero[:settings][:background][:options]
     )
+    assert_equal "color", hero[:settings][:eyebrow_color][:type]
+    assert_equal "Eyebrow", hero[:settings][:eyebrow_color][:label]
+    assert_equal "style", hero[:settings][:eyebrow_color][:group]
     assert_equal "color", hero[:settings][:title_color][:type]
     assert_equal "Headline", hero[:settings][:title_color][:label]
     assert_equal "style", hero[:settings][:title_color][:group]
     assert_equal "color", hero[:settings][:body_color][:type]
-    assert_equal "Quieter line", hero[:settings][:body_color][:label]
+    assert_equal "Subtitle", hero[:settings][:body_color][:label]
     assert_equal "style", hero[:settings][:body_color][:group]
     assert(catalog[:templates].any? { |entry| entry[:key] == "marketing_home" })
     assert(catalog[:templates].any? { |entry| entry[:key] == "full_bleed_hero" })

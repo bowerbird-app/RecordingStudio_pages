@@ -180,10 +180,15 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "On a dark photo"
     assert_includes response.body, "On a light photo"
     assert_includes response.body, "Headline"
-    assert_includes response.body, "Quieter line"
+    assert_includes response.body, "Subtitle"
+    assert_includes response.body, "Eyebrow"
+    refute_includes response.body, "Quieter line"
+    assert_select "[data-recording-studio-pages--style-fields-target=colour]", count: 3
     assert_includes response.body, "data-recording-studio-pages--style-fields-target=\"gated\""
     assert_select "[data-show-when-variant=fullscreen_image][hidden]", count: 1
     refute_includes response.body, ">Photo<"
+    assert_select "[role=separator][aria-label='Call to action']", count: 1
+    assert_select "[role=separator][aria-label='Style']", count: 1
     assert_includes response.body, "Call to action"
     assert_includes response.body, "Button"
     assert_includes response.body, "Social logins"
@@ -217,6 +222,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Add link"
     assert_includes response.body, "Label"
     assert_includes response.body, "Join"
+    assert_select "[role=separator][aria-label='Call to action']", count: 1
     assert_includes response.body, "Choose image"
     refute_includes response.body, "Layout"
     refute_includes response.body, "recordable"
@@ -311,6 +317,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
                 variant: "fullscreen_image",
                 alignment: "left",
                 background: "light",
+                eyebrow_color: "#abc",
                 title_color: "#f00",
                 body_color: "#334455"
               }
@@ -325,6 +332,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_equal "fullscreen_image", saved["variant"]
     assert_equal "left", saved["alignment"]
     assert_equal "light", saved["background"]
+    assert_equal "#aabbcc", saved["eyebrow_color"]
     assert_equal "#ff0000", saved["title_color"]
     assert_equal "#334455", saved["body_color"]
     follow_redirect!

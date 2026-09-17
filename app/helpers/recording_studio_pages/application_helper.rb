@@ -46,6 +46,7 @@ module RecordingStudioPages
     end
 
     COLOUR_PREVIEWS = {
+      "eyebrow_color" => { "dark" => "#cccccc", "light" => "#555555", "plain" => "#6b7280" },
       "title_color" => { "dark" => "#ffffff", "light" => "#222222", "plain" => "#171717" },
       "body_color" => { "dark" => "#cccccc", "light" => "#555555", "plain" => "#6b7280" }
     }.freeze

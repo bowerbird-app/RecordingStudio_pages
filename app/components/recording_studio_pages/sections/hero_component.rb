@@ -34,7 +34,7 @@ module RecordingStudioPages
         attributes = {
           variant: variant,
           align: align,
-          tagline: content["eyebrow"].presence,
+          tagline: tagline,
           headline: title,
           description: description
         }
@@ -65,23 +65,26 @@ module RecordingStudioPages
       end
 
       def overlay_colour_styles
-        styles = []
-        styles << "--hero-overlay-text-color: #{title_color}" if title_color
-        styles << "--hero-overlay-muted-text-color: #{body_color}" if body_color
-        styles << "--hero-overlay-on-light-text-color: #{title_color}" if title_color
-        styles << "--hero-overlay-on-light-muted-text-color: #{body_color}" if body_color
-        styles
+        return [] unless title_color
+
+        [
+          "--hero-overlay-text-color: #{title_color}",
+          "--hero-overlay-on-light-text-color: #{title_color}"
+        ]
       end
 
       def surface_colour_styles
-        styles = []
-        styles << "--surface-content-color: #{title_color}" if title_color
-        styles << "--surface-muted-content-color: #{body_color}" if body_color
-        styles
+        return [] unless title_color
+
+        ["--surface-content-color: #{title_color}"]
       end
 
       def title_color
         settings["title_color"].to_s.presence
+      end
+
+      def eyebrow_color
+        settings["eyebrow_color"].to_s.presence
       end
 
       def body_color
@@ -111,8 +114,20 @@ module RecordingStudioPages
         content["title"].presence || "Untitled"
       end
 
+      def tagline
+        coloured_line(content["eyebrow"], eyebrow_color)
+      end
+
       def description
-        helpers.strip_tags(content["body"].to_s).presence
+        coloured_line(helpers.strip_tags(content["body"].to_s), body_color)
+      end
+
+      def coloured_line(text, color)
+        line = text.to_s.presence
+        return unless line
+        return line unless color
+
+        helpers.content_tag(:span, line, style: "color: #{color}")
       end
 
       def image_url

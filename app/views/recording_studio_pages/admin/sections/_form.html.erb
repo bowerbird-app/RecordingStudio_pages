@@ -7,6 +7,9 @@
   <%= hidden_field_tag "section[section_type]", definition.key %>
   <div class="flex flex-col gap-4" data-controller="recording-studio-pages--style-fields">
     <% definition.fields.fields.each do |key, spec| %>
+      <% if spec[:type].to_s == "cta" %>
+        <%= render FlatPack::Divider::Component.new(label: "Call to action") %>
+      <% end %>
       <%= render "recording_studio_pages/admin/sections/field",
                  prefix: "section[content]",
                  key: key,

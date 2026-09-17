@@ -378,6 +378,8 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes form, "form_with"
     assert_includes form, "novalidate: true"
     assert_includes form, 'label: "Style"'
+    assert_includes form, 'label: "Call to action"'
+    assert_includes form, 'spec[:type].to_s == "cta"'
     assert_includes form, "style-fields"
     controller = File.read(
       File.expand_path("../app/controllers/recording_studio_pages/admin/sections_controller.rb", __dir__)
@@ -453,8 +455,12 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes hero, "overlay_on"
     assert_includes hero, "--hero-overlay-text-color"
     assert_includes hero, "--surface-content-color"
+    assert_includes hero, "eyebrow_color"
     assert_includes hero, "title_color"
     assert_includes hero, "body_color"
+    assert_includes hero, "coloured_line"
+    refute_includes hero, "--hero-overlay-muted-text-color"
+    refute_includes hero, "--surface-muted-content-color"
     assert_includes hero, "CtaRenderer"
     assert_includes hero, "align: align"
     assert_includes hero, 'content["image"]'
@@ -536,6 +542,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes built_ins, 'label: "Preset"'
     assert_includes built_ins, "On a dark photo"
     assert_includes built_ins, "group: :style"
+    assert_includes built_ins, 'label: "Eyebrow"'
+    assert_includes built_ins, 'label: "Subtitle"'
+    refute_includes built_ins, "Quieter line"
     refute_includes built_ins, 'label: "Photo"'
     refute_includes built_ins, "image_url:"
     engine = File.read(File.expand_path("../lib/recording_studio_pages/engine.rb", __dir__))
