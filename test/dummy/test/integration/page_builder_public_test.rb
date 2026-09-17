@@ -108,6 +108,61 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     nav_at = response.body.index("fp-top-nav")
     box_at = response.body.index("max-w-6xl")
     assert_operator nav_at, :<, box_at
+    refute_includes response.body, "data-pages-menu-overlay"
+  end
+
+  test "a menu over a fullscreen hero sits on the image" do
+    page_recording = create_page!(parent_recording: @root, title: "Live Home", homepage: true, actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "top_nav",
+      content: {
+        name: "House",
+        links: [
+          { text: "About", url: "/pages/about" },
+          { text: "Tonight", url: "/pages/tonight" }
+        ],
+        cta: { type: "button", text: "Join", url: "/users/sign_in" }
+      },
+      actor: @actor
+    )
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: {
+        title: "The page is the front door",
+        body: "Come in if you want a seat.",
+        image: "/images/hero-tonight.jpg"
+      },
+      settings: { variant: "fullscreen_image" },
+      actor: @actor
+    )
+    publish_page!(page_recording, slug: "live-home", actor: @actor)
+
+    get site_path
+
+    assert_response :success
+    assert_includes response.body, "fp-top-nav"
+    assert_includes response.body, 'data-pages-menu-overlay="true"'
+    assert_includes response.body, "height: 0"
+    assert_includes response.body, "from-black/50"
+    assert_includes response.body, "--button-ghost-text-color: white"
+    assert_includes response.body, "The page is the front door"
+    assert_includes response.body, "hero-tonight.jpg"
+    assert_includes response.body, "h-dvh w-full"
+    assert_includes response.body, "fp-top-nav"
+    assert_includes response.body, 'data-pages-menu-overlay="true"'
+    assert_includes response.body, "height: 0"
+    assert_includes response.body, "from-black/50"
+    assert_includes response.body, "--button-ghost-text-color: white"
+    assert_includes response.body, "The page is the front door"
+    assert_includes response.body, "hero-tonight.jpg"
+    assert_includes response.body, "h-dvh w-full overflow-hidden"
+    overlay_at = response.body.index('data-pages-menu-overlay="true"')
+    nav_at = response.body.index("fp-top-nav sticky")
+    hero_at = response.body.index("h-dvh w-full overflow-hidden")
+    assert_operator overlay_at, :<, nav_at
+    assert_operator nav_at, :<, hero_at
   end
 
   test "section variants change public markup" do

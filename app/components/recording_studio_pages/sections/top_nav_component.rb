@@ -3,13 +3,49 @@
 module RecordingStudioPages
   module Sections
     class TopNavComponent < ViewComponent::Base
-      def initialize(rendered:)
+      # Flatpack TopNav is sticky in document flow, so a Menu above a
+      # fullscreen hero would otherwise sit in its own band and push the
+      # image down. Overlay takes the bar out of flow and sits it on the
+      # photo. Ghost buttons over a photo need a top scrim (taste).
+      OVERLAY_TOKENS = {
+        "--top-nav-background-color" => "transparent",
+        "--top-nav-item-icon-color" => "white",
+        "--top-nav-item-hover-text-color" => "white",
+        "--top-nav-item-hover-background-color" => "rgb(255 255 255 / 0.12)",
+        "--button-ghost-text-color" => "white",
+        "--button-ghost-hover-text-color" => "white",
+        "--button-ghost-hover-background-color" => "rgb(255 255 255 / 0.12)",
+        "--button-ghost-border-color" => "transparent",
+        "--button-primary-background-color" => "white",
+        "--button-primary-text-color" => "oklch(0.25 0.01 80)",
+        "--button-primary-hover-background-color" => "oklch(0.96 0.01 80)",
+        "--button-primary-border-color" => "transparent",
+        "--surface-background-color" => "oklch(0.22 0.02 80)",
+        "--surface-content-color" => "white",
+        "--surface-border-color" => "rgb(255 255 255 / 0.14)"
+      }.freeze
+
+      def initialize(rendered:, overlay: false)
         @rendered = rendered
+        @overlay = overlay
       end
 
       def call
         return if empty?
+        return render_nav unless overlay?
 
+        helpers.content_tag(:div, **overlay_wrap_attributes) do
+          helpers.content_tag(
+            :div,
+            class: "bg-gradient-to-b from-black/50 to-transparent pb-10",
+            style: overlay_token_style
+          ) { render_nav }
+        end
+      end
+
+      private
+
+      def render_nav
         render FlatPack::TopNav::Component.new(mobile_menu_label: "More") do |nav|
           nav.left { brand } if brand?
           nav.center { links } if links?
@@ -17,7 +53,21 @@ module RecordingStudioPages
         end
       end
 
-      private
+      def overlay_wrap_attributes
+        {
+          class: "sticky top-0 z-20 overflow-visible",
+          style: "height: 0",
+          data: { pages_menu_overlay: true }
+        }
+      end
+
+      def overlay_token_style
+        OVERLAY_TOKENS.map { |name, value| "#{name}: #{value}" }.join("; ")
+      end
+
+      def overlay?
+        @overlay
+      end
 
       def empty?
         !brand? && !links? && !join?

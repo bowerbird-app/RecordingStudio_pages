@@ -380,14 +380,25 @@ class RecordingStudioPagesTest < Minitest::Test
     section_partial = File.read(
       File.expand_path("../app/views/recording_studio_pages/pages/_section.html.erb", __dir__)
     )
+    sections_partial = File.read(
+      File.expand_path("../app/views/recording_studio_pages/pages/_sections.html.erb", __dir__)
+    )
     dummy_js = File.read(File.expand_path("dummy/app/javascript/controllers/index.js", __dir__))
     dummy_application_js = File.read(File.expand_path("dummy/app/javascript/application.js", __dir__))
     dummy_importmap = File.read(File.expand_path("dummy/config/importmap.rb", __dir__))
     assert_includes top_nav, "FlatPack::TopNav"
     assert_includes top_nav, "CtaRenderer"
     assert_includes top_nav, "homepage_path"
+    assert_includes top_nav, "pages_menu_overlay"
+    assert_includes top_nav, "from-black/50"
+    overlay = File.read(
+      File.expand_path("../lib/recording_studio_pages/menu_overlay.rb", __dir__)
+    )
+    assert_includes overlay, "fullscreen_image"
     refute_includes top_nav, "recording_studio_navigation"
     assert_includes section_partial, "full_bleed?"
+    assert_includes section_partial, "kwargs[:overlay]"
+    assert_includes sections_partial, "MenuOverlay.overlay?"
     refute_includes section_partial, 'key == "hero"'
     assert_includes dummy_js, 'lazyLoadControllersFrom("controllers/flat_pack"'
     assert_includes dummy_application_js, 'import "@hotwired/turbo-rails"'
