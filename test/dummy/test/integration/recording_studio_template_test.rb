@@ -86,6 +86,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal %w[About Tonight], menu_links.map { |item| item["text"] }
     assert(menu_links.all? { |item| item["url"].to_s.start_with?("/pages/") })
     assert_equal "The page is the front door", homepage_hero.content["title"]
+    assert_equal "left", homepage_hero.settings["alignment"]
     assert_equal "button", homepage_hero.content.dig("cta", "type")
     assert_equal "Come in", homepage_hero.content.dig("cta", "text")
     join_recording = RecordingStudio::Recording.where(
@@ -115,12 +116,14 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal "social_logins", join_hero.content.dig("cta", "type")
     assert_equal "social_logins", walk_in_hero.content.dig("cta", "type")
     assert_equal "fullscreen_image", walk_in_hero.settings["variant"]
+    assert_equal "left", walk_in_hero.settings["alignment"]
     assert_equal "/images/hero-tonight.jpg", walk_in_hero.content["image"] || walk_in_hero.content["image_url"]
     assert_equal "The lights are already on", walk_in_hero.content["title"]
     assert_equal "url_form", start_hero.content.dig("cta", "type")
     assert_equal 1, tonight_sections.size
     assert_equal "hero", tonight_hero.section_type
     assert_equal "fullscreen_image", tonight_hero.settings["variant"]
+    assert_equal "left", tonight_hero.settings["alignment"]
     assert_equal "/images/hero-tonight.jpg", tonight_hero.content["image"] || tonight_hero.content["image_url"]
     assert_equal "The floor is already warm", tonight_hero.content["title"]
     assert_equal 3, Workspace.count
@@ -170,6 +173,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     walk_in_content = walk_in_hero.fetch("content").to_h.stringify_keys
     assert_equal "hero", walk_in_hero.fetch("type").to_s
     assert_equal "fullscreen_image", walk_in_hero.fetch("settings").to_h.stringify_keys.fetch("variant")
+    assert_equal "left", walk_in_hero.fetch("settings").to_h.stringify_keys.fetch("alignment")
     assert_equal "social_logins", walk_in_content.fetch("cta").to_h.stringify_keys.fetch("type")
     routes = File.read(Rails.root.join("config/routes.rb"))
 

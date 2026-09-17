@@ -9,16 +9,16 @@ module Dummy
 
       def call
         helpers.form_with url: "/start", method: :get, local: true do
-          helpers.tag.div(class: "flex flex-col gap-3 sm:flex-row sm:items-end") do
+          helpers.tag.div(class: "flex flex-col gap-3 sm:flex-row sm:items-center") do
             helpers.safe_join(
               [
                 helpers.render(
                   FlatPack::UrlInput::Component.new(
                     name: "url",
-                    label: "Link",
                     value: nil,
                     placeholder: placeholder,
-                    required: true
+                    required: true,
+                    aria: { label: "Paste a link" }
                   )
                 ),
                 helpers.render(

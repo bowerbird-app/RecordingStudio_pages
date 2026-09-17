@@ -14,10 +14,18 @@ module RecordingStudioPages
 
       @page_recording = recording
       @page = recording.recordable
+      assign_publishable(recording)
       @rendered_sections = Renderer.call(recording, context: self)
     end
 
     private
+
+    def assign_publishable(recording)
+      return unless recording.respond_to?(:publishable_child_recording)
+
+      @publishable_recording = recording.publishable_child_recording
+      @publishable = @publishable_recording&.recordable
+    end
 
     def publicly_visible?(recording)
       return false unless defined?(RecordingStudioPublishable)

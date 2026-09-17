@@ -3,7 +3,7 @@
     <%= form_with url: apply_template_admin_page_path(id: page_recording.id),
                   method: :post,
                   html: { id: "apply-template-#{page_recording.id}-#{template.key}", class: "hidden" },
-                  data: { turbo_frame: "page_editor" } do %>
+                  data: { turbo_stream: true } do %>
       <%= hidden_field_tag :template_key, template.key %>
     <% end %>
   <% end %>

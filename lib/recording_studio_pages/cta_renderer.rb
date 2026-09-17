@@ -2,13 +2,14 @@
 
 module RecordingStudioPages
   class CtaRenderer
-    def self.call(view, raw)
-      new(view, raw).call
+    def self.call(view, raw, **context)
+      new(view, raw, **context).call
     end
 
-    def initialize(view, raw)
+    def initialize(view, raw, **context)
       @view = view
       @raw = raw
+      @context = context
     end
 
     def call
@@ -25,8 +26,22 @@ module RecordingStudioPages
     private
 
     def render_cta
-      html = @view.render(component_class.new(cta: payload))
+      html = @view.render(component_class.new(**component_arguments))
       html.presence
+    end
+
+    def component_arguments
+      { cta: payload }.merge(accepted_context)
+    end
+
+    def accepted_context
+      return {} if @context.empty?
+
+      parameters = component_class.instance_method(:initialize).parameters
+      return @context if parameters.any? { |kind, _name| kind == :keyrest }
+
+      names = parameters.filter_map { |kind, name| name if %i[key keyreq].include?(kind) }
+      @context.slice(*names)
     end
 
     def type

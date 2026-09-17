@@ -2,13 +2,14 @@
   <%= form_with url: admin_page_sections_path(page_id: page_recording.id),
                 method: :post,
                 html: { id: add_section_form_id(definition), class: "hidden" },
-                data: { turbo_frame: "page_editor" } do %>
+                data: { turbo_stream: true } do %>
     <%= hidden_field_tag "section[section_type]", definition.key %>
   <% end %>
 <% end %>
 
 <%= render FlatPack::Button::Dropdown::Component.new(
-  text: "Add section",
+  text: "Section",
+  icon: "plus",
   style: :primary,
   size: :md,
   placement: :bottom_left

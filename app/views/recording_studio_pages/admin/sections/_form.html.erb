@@ -1,8 +1,15 @@
 <%= form_with url: url, method: method, local: true, html: { id: local_assigns[:form_id], novalidate: true } do %>
   <% content_values = definition.read_content(recordable&.content) %>
+  <% settings_values = definition.read_settings(recordable&.settings) %>
+  <% setting_fields = definition.settings.fields.except(:variant) %>
+  <% ungrouped_settings = setting_fields.reject { |_key, spec| spec[:group].to_s == "style" } %>
+  <% style_settings = setting_fields.select { |_key, spec| spec[:group].to_s == "style" } %>
   <%= hidden_field_tag "section[section_type]", definition.key %>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col gap-4" data-controller="recording-studio-pages--style-fields">
     <% definition.fields.fields.each do |key, spec| %>
+      <% if spec[:type].to_s == "cta" %>
+        <%= render FlatPack::Divider::Component.new(label: "Call to action") %>
+      <% end %>
       <%= render "recording_studio_pages/admin/sections/field",
                  prefix: "section[content]",
                  key: key,
@@ -11,7 +18,6 @@
                  section_recording: local_assigns[:section_recording] %>
     <% end %>
 
-    <% settings_values = definition.read_settings(recordable&.settings) %>
     <% if definition.variants.any? %>
       <%= render FlatPack::Select::Component.new(
         name: "section[settings][variant]",
@@ -21,21 +27,40 @@
       ) %>
     <% end %>
 
-    <% definition.settings.fields.except(:variant).each do |key, spec| %>
-      <% if spec[:options].present? %>
-        <%= render FlatPack::Select::Component.new(
-          name: "section[settings][#{key}]",
-          label: spec[:label].presence || key.to_s.humanize,
-          value: settings_values[key.to_s],
-          options: spec[:options]
-        ) %>
-      <% else %>
-        <%= render "recording_studio_pages/admin/sections/field",
-                   prefix: "section[settings]",
-                   key: key,
-                   spec: spec,
-                   value: settings_values[key.to_s],
-                   section_recording: local_assigns[:section_recording] %>
+    <% ungrouped_settings.each do |key, spec| %>
+      <%= render "recording_studio_pages/admin/sections/setting_field",
+                 key: key,
+                 spec: spec,
+                 value: settings_values[key.to_s],
+                 settings_values: settings_values,
+                 section_recording: local_assigns[:section_recording] %>
+    <% end %>
+
+    <% if style_settings.any? %>
+      <%= render FlatPack::Divider::Component.new(label: "Style") %>
+      <% style_settings.each do |key, spec| %>
+        <% if spec[:show_when] %>
+          <% show_when = spec[:show_when].to_h.symbolize_keys %>
+          <div
+            data-recording-studio-pages--style-fields-target="gated"
+            data-show-when-variant="<%= show_when[:variant] %>"
+            data-show-when-image="<%= show_when[:image] ? "true" : "false" %>"
+            <% unless pages_setting_visible?(spec, settings: settings_values, content: content_values) %>hidden<% end %>>
+            <%= render "recording_studio_pages/admin/sections/setting_field",
+                       key: key,
+                       spec: spec,
+                       value: settings_values[key.to_s],
+                       settings_values: settings_values,
+                       section_recording: local_assigns[:section_recording] %>
+          </div>
+        <% else %>
+          <%= render "recording_studio_pages/admin/sections/setting_field",
+                     key: key,
+                     spec: spec,
+                     value: settings_values[key.to_s],
+                     settings_values: settings_values,
+                     section_recording: local_assigns[:section_recording] %>
+        <% end %>
       <% end %>
     <% end %>
   </div>

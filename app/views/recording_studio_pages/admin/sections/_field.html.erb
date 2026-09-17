@@ -72,6 +72,24 @@
              section_recording: section_recording %>
 <% elsif type == :attachment %>
   <%= render FlatPack::UrlInput::Component.new(name: name, label: label, value: value, disabled: disabled) %>
+<% elsif type == :color %>
+  <% preview = value.presence || local_assigns[:preview].presence || "#ffffff" %>
+  <div
+    class="flex flex-col gap-1.5"
+    data-recording-studio-pages--style-fields-target="colour"
+    data-colour-kind="<%= key %>">
+    <p class="text-sm font-medium text-[var(--surface-content-color)]"><%= label %></p>
+    <%= hidden_field_tag name, value, disabled: disabled, data: { colour_value: true } %>
+    <%= render FlatPack::ColorSwatch::Component.new(
+      color: preview,
+      value: preview,
+      text: label,
+      size: :md,
+      disabled: disabled,
+      show_tooltip: true
+    ) %>
+  </div>
 <% else %>
   <%= render FlatPack::TextInput::Component.new(name: name, label: label, value: value, disabled: disabled) %>
 <% end %>
+

@@ -17,7 +17,7 @@ module RecordingStudioPages
         result = Services::CreatePage.call(
           parent_recording: create_parent_recording,
           title: page_params[:title],
-          homepage: boolean_param(page_params[:homepage]),
+          homepage: checked?(page_params[:homepage]),
           template_key: page_params[:template_key].presence,
           actor: current_admin_actor
         )
@@ -46,7 +46,7 @@ module RecordingStudioPages
         result = Services::RevisePage.call(
           page_recording: page_recording,
           title: page_params[:title],
-          homepage: boolean_param(page_params[:homepage]),
+          homepage: checked?(page_params[:homepage]),
           actor: current_admin_actor
         )
         return render_failure(result, :edit) if result.failure?
@@ -71,7 +71,7 @@ module RecordingStudioPages
 
         load_editor
         respond_to do |format|
-          format.turbo_stream
+          format.turbo_stream { flash.now[:notice] = "Template sections added." }
           format.html { redirect_to admin_page_path(page_recording), notice: "Template sections added." }
         end
       end
@@ -88,8 +88,8 @@ module RecordingStudioPages
         params.fetch(:page, {}).permit(:title, :homepage, :template_key)
       end
 
-      def boolean_param(value)
-        ActiveModel::Type::Boolean.new.cast(value)
+      def checked?(value)
+        ActiveModel::Type::Boolean.new.cast(value) == true
       end
 
       def create_parent_recording

@@ -2,6 +2,10 @@
 
 module RecordingStudioPages
   module Admin
+    SECTION_KEY = "pages"
+    SCREEN_KEY = "pages"
+    ENGINE_MOUNT_PATH = "/recording_studio_pages"
+
     def self.register!
       return unless defined?(RecordingStudioAdmin)
 
@@ -12,26 +16,40 @@ module RecordingStudioPages
       RecordingStudioAdmin.register_section(PagesSection)
     end
 
+    def self.screen_path
+      "#{admin_mount_path}/screens/#{SCREEN_KEY}"
+    end
+
+    def self.new_page_path
+      "#{ENGINE_MOUNT_PATH}/admin/pages/new"
+    end
+
+    def self.admin_mount_path
+      return "/admin" unless defined?(RecordingStudioAdmin)
+
+      RecordingStudioAdmin.configuration.default_mount_path.to_s.chomp("/")
+    end
+
     class PagesSection < RecordingStudioAdmin::Section
-      key "pages"
+      key SECTION_KEY
       icon :document_text
       title "Pages"
       subtitle "Compose public pages from registered sections"
       blast_radius :site
-      link :pages, text: "View pages", url: ->(_context) { "/recording_studio_pages/admin/pages" },
-                   style: :secondary
-      link :new_page, text: "New page", url: ->(_context) { "/recording_studio_pages/admin/pages/new" },
+      link :new_page, text: "Page", url: ->(_context) { RecordingStudioPages::Admin.new_page_path },
                       style: :primary
+      link :pages, text: "View all", url: ->(context) { context.admin_screen_path(SCREEN_KEY) },
+                   style: :secondary
       widget "widgets.pages.published_pages", view_variant: :compact
       widget "widgets.pages.draft_pages", view_variant: :compact
     end
 
     class PagesScreen < RecordingStudioAdmin::Screen
-      key "pages"
+      key SCREEN_KEY
       title "Pages"
       subtitle "Compose public pages from sections."
       blast_radius :site
-      button :new_page, text: "New page", url: ->(_context) { "/recording_studio_pages/admin/pages/new" },
+      button :new_page, text: "Page", url: ->(_context) { RecordingStudioPages::Admin.new_page_path },
                         style: :primary
 
       query do |_context|
@@ -41,20 +59,23 @@ module RecordingStudioPages
       end
 
       table do
-        column :title, value: ->(recording) { recording.recordable&.title }
-        column :homepage, value: ->(recording) { recording.recordable&.homepage? ? "Home" : "" }
+        default_sort :updated_at
+        column :title, title: "Page", sortable: false,
+                       value: ->(recording, _context) { recording.recordable&.title }
+        column :homepage, title: "Home", sortable: false,
+                          value: ->(recording, _context) { recording.recordable&.homepage? ? "Home" : "" }
         column :updated_at
       end
     end
 
     class PagesResource < RecordingStudioAdmin::Resource
-      key "pages"
-      section "pages"
+      key SCREEN_KEY
+      section SECTION_KEY
 
       action :open,
              text: "Open",
              icon: "eye",
-             url: ->(recording, _context) { "/recording_studio_pages/admin/pages/#{recording.id}" }
+             url: ->(recording, _context) { "#{ENGINE_MOUNT_PATH}/admin/pages/#{recording.id}" }
     end
 
     PublishedPagesWidget = RecordingStudioAdmin::Widget.new("widgets.pages.published_pages") do

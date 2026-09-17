@@ -25,7 +25,7 @@ module RecordingStudioPages
             parent_recording: @parent_recording
           ) do |page|
             page.title = @title.to_s
-            page.homepage = @homepage
+            page.homepage = homepage?
             page.template_key = @template_key.to_s.presence
           end
           ClearOtherHomepages.call(page_recording: recording, actor: actor).value! if recording.recordable.homepage?
@@ -34,6 +34,10 @@ module RecordingStudioPages
       end
 
       private
+
+      def homepage?
+        ActiveModel::Type::Boolean.new.cast(@homepage) == true
+      end
 
       def actor
         @actor || current_actor

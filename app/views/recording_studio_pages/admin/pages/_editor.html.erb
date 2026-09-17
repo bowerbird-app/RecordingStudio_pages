@@ -1,39 +1,27 @@
 <div class="flex w-full flex-col gap-6">
-  <% editor_notice = local_assigns[:notice].presence %>
-  <% if editor_notice.present? %>
-    <%= render FlatPack::Alert::Component.new(
-      style: :success,
-      title: editor_notice
-    ) %>
-  <% end %>
-
   <%= render FlatPack::PageTitle::Component.new(
     title: @page_recording.recordable.title,
     subtitle: @editor_subtitle,
     variant: :h1
   ) %>
 
+  <div class="flex flex-wrap items-center gap-3">
+    <%= render "recording_studio_pages/admin/pages/add_section_dropdown" %>
+    <%= render "recording_studio_pages/admin/pages/add_template_dropdown" %>
+    <%= render FlatPack::Button::Component.new(
+      text: "Settings",
+      href: edit_admin_page_path(id: page_recording.id),
+      style: :secondary,
+      size: :md,
+      data: { turbo_frame: "_top" }
+    ) %>
+    <% if defined?(RecordingStudioPublishable) %>
+      <%= render_publishable_quick_actions(page_recording) %>
+    <% end %>
+  </div>
+
   <%= render FlatPack::Grid::Component.new(cols: 2, gap: :lg, align: :start) do %>
     <div class="flex min-w-0 flex-col gap-6">
-      <div class="flex flex-wrap items-center gap-3">
-        <%= render "recording_studio_pages/admin/pages/add_section_dropdown" %>
-        <%= render "recording_studio_pages/admin/pages/add_template_dropdown" %>
-        <%= render FlatPack::Button::Component.new(
-          text: "Edit page",
-          href: edit_admin_page_path(id: page_recording.id),
-          style: :secondary,
-          size: :md,
-          data: { turbo_frame: "_top" }
-        ) %>
-        <%= render FlatPack::Button::Component.new(
-          text: "Publish",
-          href: "/recordings/#{@page_recording.id}/publishable/edit",
-          style: :secondary,
-          size: :md,
-          data: { turbo_frame: "_top" }
-        ) %>
-      </div>
-
       <% if @unknown_sections.any? %>
         <%= render FlatPack::Alert::Component.new(
           style: :warning,
@@ -62,21 +50,20 @@
           </div>
         <% end %>
       <% else %>
-        <%= render FlatPack::Alert::Component.new(
-          style: :info,
-          title: "Nothing here yet",
-          description: "Open Add section and pick a type."
+        <%= render FlatPack::EmptyState::Component.new(
+          title: "Add your first section",
+          description: "Open Section and pick a type."
         ) %>
       <% end %>
-    </div><div class="min-w-0 md:sticky md:top-6">
+    </div>
+    <div class="min-w-0 md:sticky md:top-6">
       <% if @rendered_sections.present? %>
         <div class="max-h-[80vh] overflow-auto rounded-[var(--radius-lg)] border border-[var(--surface-border-color)]">
           <%= render "recording_studio_pages/pages/sections" %>
         </div>
       <% else %>
-        <%= render FlatPack::Alert::Component.new(
-          style: :info,
-          title: "Nothing live yet",
+        <%= render FlatPack::EmptyState::Component.new(
+          title: "Preview",
           description: "Turn a section on and it shows up here."
         ) %>
       <% end %>

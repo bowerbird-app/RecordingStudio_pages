@@ -259,6 +259,18 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
     assert_match(/workspace or folder/i, result.error.to_s)
   end
 
+  test "creating a page with a missing home flag stores false" do
+    result = RecordingStudioPages::Services::CreatePage.call(
+      parent_recording: @root,
+      title: "No home #{SecureRandom.hex(4)}",
+      homepage: nil,
+      actor: @actor
+    )
+
+    assert result.success?
+    assert_equal false, result.value.recordable.homepage?
+  end
+
   test "published and draft page counts use live publishable children" do
     live = create_page!(parent_recording: @root, title: "Live count", actor: @actor)
     create_page!(parent_recording: @root, title: "Draft count", actor: @actor)

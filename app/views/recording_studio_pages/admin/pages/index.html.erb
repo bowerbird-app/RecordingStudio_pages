@@ -5,14 +5,17 @@
     title: "Pages",
     subtitle: "Compose a public page from registered sections.",
     variant: :h1
-  ) %>
-
-  <%= render FlatPack::Button::Component.new(
-    text: "New page",
-    href: new_admin_page_path,
-    style: :primary,
-    size: :md
-  ) %>
+  ) do |page_title| %>
+    <% page_title.slot do %>
+      <%= render FlatPack::Button::Component.new(
+        text: "Page",
+        icon: "plus",
+        href: new_admin_page_path,
+        style: :primary,
+        size: :md
+      ) %>
+    <% end %>
+  <% end %>
 
   <% if @page_recordings.empty? %>
     <%= render FlatPack::Alert::Component.new(

@@ -65,6 +65,8 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "max-w-md"
     assert_includes response.body, "flat_pack/application"
     refute_includes response.body, "data-recording-studio-default-layout"
+    assert_includes response.body, 'property="og:title"'
+    refute_includes response.body, "noindex,nofollow"
   end
 
   test "a published page can render a full-bleed menu above other sections" do
@@ -220,6 +222,51 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "max-w-md"
     refute_includes response.body, "data-recording-studio-default-layout"
     assert_includes response.body, 'data-theme="rounded"'
+    assert_includes response.body, 'property="og:title"'
+    refute_includes response.body, "noindex,nofollow"
+    refute_match(/>(?:\s*)Preview(?:\s*)</, response.body)
+  end
+
+  test "staff preview of a draft page shows a Preview badge" do
+    page_recording = create_page!(parent_recording: @root, title: "Soon", actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Hold the door" },
+      actor: @actor
+    )
+    RecordingStudioPublishable::Services::Publishables::EnsureChild.call(
+      parent_recording: page_recording,
+      actor: @actor
+    ).value!
+
+    sign_in @actor
+    get "/recordings/#{page_recording.id}/publishable/preview"
+
+    assert_response :success
+    assert_includes response.body, "Hold the door"
+    assert_includes response.body, "Preview"
+    assert_includes response.body, "noindex,nofollow"
+    refute_includes response.body, 'property="og:title"'
+  end
+
+  test "visitors cannot open a draft preview" do
+    page_recording = create_page!(parent_recording: @root, title: "Soon", actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Hold the door" },
+      actor: @actor
+    )
+    RecordingStudioPublishable::Services::Publishables::EnsureChild.call(
+      parent_recording: page_recording,
+      actor: @actor
+    ).value!
+
+    get "/recordings/#{page_recording.id}/publishable/preview"
+
+    assert_response :not_found
+    refute_includes response.body.to_s, "Hold the door"
   end
 
   test "public pages use the host Flatpack theme" do
@@ -269,13 +316,15 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Take a seat"
     assert_includes response.body, "hero-tonight.jpg"
     assert_includes response.body, "background-image:"
-    assert_includes response.body, "bg-black/60"
+    assert_includes response.body, "--hero-overlay-min-height: 100dvh"
+    assert_includes response.body, "fp-hero-overlay"
+    assert_includes response.body, "text-left"
+    refute_includes response.body, "bg-black/60"
     refute_includes response.body, "What this gem owns"
     refute_includes response.body, "max-w-6xl"
     refute_includes response.body, "data-recording-studio-default-layout"
-    assert_includes response.body, "h-dvh"
-    assert_includes response.body, "h-full"
-    assert_includes response.body, "bg-black"
+    refute_includes response.body, "h-dvh w-full overflow-hidden bg-black"
+    refute_includes response.body, "fp-hero-overlay-on-light"
     refute_includes response.body, "h-screen"
     types = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
                                              .map { |recording| recording.recordable.section_type }
@@ -315,7 +364,8 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Come as you are"
     assert_includes response.body, "Continue with Google"
     assert_includes response.body, "Continue with Apple"
-    assert_includes response.body, "max-w-sm"
+    assert_includes response.body, "mx-auto flex w-full max-w-sm flex-col gap-2"
+    refute_includes response.body, "mr-auto flex w-full max-w-sm flex-col gap-2"
     assert_includes response.body, "/users/auth/google_oauth2"
     assert_includes response.body, "/users/auth/apple"
     refute_includes response.body, 'href="/users/sign_in"'
@@ -337,10 +387,12 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "The lights are already on"
     assert_includes response.body, "hero-tonight.jpg"
     assert_includes response.body, "background-image:"
-    assert_includes response.body, "h-dvh"
+    assert_includes response.body, "--hero-overlay-min-height: 100dvh"
+    assert_includes response.body, "text-left"
     assert_includes response.body, "Continue with Google"
     assert_includes response.body, "Continue with Apple"
-    assert_includes response.body, "max-w-sm"
+    assert_includes response.body, "mr-auto flex w-full max-w-sm flex-col gap-2"
+    refute_includes response.body, "mx-auto flex w-full max-w-sm flex-col gap-2"
     assert_includes response.body, 'action="/users/auth/google_oauth2"'
     assert_includes response.body, 'action="/users/auth/apple"'
     refute_includes response.body, 'href="/users/sign_in"'
@@ -364,6 +416,10 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'action="/start"'
     assert_includes response.body, "Open it"
     assert_includes response.body, 'name="url"'
+    assert_includes response.body, "sm:items-center"
+    assert_includes response.body, 'aria-label="Paste a link"'
+    refute_includes response.body, ">Link</label>"
+    refute_includes response.body, "sm:items-end"
   end
 
   test "a saved primary_action hero still renders a button" do
@@ -441,5 +497,85 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Still here"
     refute_includes response.body, "Hidden ask"
+  end
+
+  test "a hero can dock copy left or sit on a light photo" do
+    page_recording = create_page!(parent_recording: @root, title: "Doors", homepage: true, actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Left on the page", body: "Docked." },
+      settings: { variant: "centered", alignment: "left" },
+      actor: @actor
+    )
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: {
+        title: "Light on the photo",
+        image: "/images/hero-tonight.jpg"
+      },
+      settings: { variant: "fullscreen_image", alignment: "center", background: "light" },
+      actor: @actor
+    )
+    publish_page!(page_recording, slug: "doors", actor: @actor)
+
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, "Left on the page"
+    assert_includes response.body, "text-left"
+    assert_includes response.body, "fp-hero-overlay-on-light"
+    assert_includes response.body, "--hero-overlay-min-height: 100dvh"
+    refute_includes response.body, "h-dvh w-full overflow-hidden bg-black"
+  end
+
+  test "hero text colours paint the headline token and wrap eyebrow and subtitle" do
+    page_recording = create_page!(parent_recording: @root, title: "Painted", homepage: true, actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { eyebrow: "Open tonight", title: "Plain headline", body: "The rest of the line." },
+      settings: {
+        variant: "centered",
+        eyebrow_color: "#aa1100",
+        title_color: "#112233",
+        body_color: "#445566"
+      },
+      actor: @actor
+    )
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: {
+        eyebrow: "Doors at eight",
+        title: "Photo headline",
+        body: "Over the picture.",
+        image: "/images/hero-tonight.jpg"
+      },
+      settings: {
+        variant: "fullscreen_image",
+        background: "light",
+        eyebrow_color: "#1122aa",
+        title_color: "#ffeedd",
+        body_color: "#8899aa"
+      },
+      actor: @actor
+    )
+    publish_page!(page_recording, slug: "painted", actor: @actor)
+
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, "--surface-content-color: #112233"
+    refute_includes response.body, "--surface-muted-content-color: #445566"
+    assert_includes response.body, 'style="color: #aa1100"'
+    assert_includes response.body, 'style="color: #445566"'
+    assert_includes response.body, "--hero-overlay-text-color: #ffeedd"
+    refute_includes response.body, "--hero-overlay-muted-text-color: #8899aa"
+    assert_includes response.body, 'style="color: #1122aa"'
+    assert_includes response.body, 'style="color: #8899aa"'
+    assert_includes response.body, "--hero-overlay-on-light-text-color: #ffeedd"
+    assert_includes response.body, "fp-hero-overlay-on-light"
   end
 end

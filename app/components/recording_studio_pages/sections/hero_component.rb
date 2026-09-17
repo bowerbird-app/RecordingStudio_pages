@@ -15,15 +15,9 @@ module RecordingStudioPages
 
       def call
         cta = rendered_cta
-        hero = render FlatPack::Hero::Component.new(**hero_attributes) do |component|
+        render FlatPack::Hero::Component.new(**hero_attributes) do |component|
           component.slot { cta } if cta
         end
-        return hero unless fullscreen_image?
-
-        # Flatpack :centered_image is min-h-[560px] and TailwindMerge applies
-        # that after our classes, so a min-height on the section cannot win.
-        # A 100dvh wrap plus h-full on the section fills the public viewport.
-        helpers.content_tag(:div, hero, class: "h-dvh w-full overflow-hidden bg-black")
       end
 
       private
@@ -39,18 +33,42 @@ module RecordingStudioPages
       def hero_attributes
         attributes = {
           variant: variant,
-          tagline: content["eyebrow"].presence,
+          align: align,
+          tagline: tagline,
           headline: title,
           description: description
         }
         if fullscreen_image?
           attributes[:background_image_url] = image_url
-          attributes[:class] = "h-full"
+          attributes[:on] = overlay_on
         else
           attributes[:image_url] = image_url
           attributes[:image_alt] = title
         end
-        attributes
+        attributes[:style] = hero_style
+        attributes.compact
+      end
+
+      def hero_style
+        parts = []
+        parts << "--hero-overlay-min-height: 100dvh" if fullscreen_image?
+        parts.concat(headline_colour_styles)
+        parts.join("; ").presence
+      end
+
+      def headline_colour_styles
+        color = colour("title_color")
+        return [] unless color
+        return ["--surface-content-color: #{color}"] unless fullscreen_image?
+
+        [
+          "--hero-overlay-text-color: #{color}",
+          "--hero-overlay-on-light-text-color: #{color}"
+        ]
+      end
+
+      def colour(key)
+        settings[key].to_s.presence
       end
 
       def fullscreen_image?
@@ -64,12 +82,31 @@ module RecordingStudioPages
         mapped
       end
 
+      def align
+        settings["alignment"].to_s == "left" ? :left : :center
+      end
+
+      def overlay_on
+        settings["background"].to_s == "light" ? :light : :dark
+      end
+
       def title
         content["title"].presence || "Untitled"
       end
 
+      def tagline
+        coloured_line(content["eyebrow"], colour("eyebrow_color"))
+      end
+
       def description
-        helpers.strip_tags(content["body"].to_s).presence
+        coloured_line(helpers.strip_tags(content["body"].to_s), colour("body_color"))
+      end
+
+      def coloured_line(text, color)
+        line = text.to_s.presence
+        return line unless line && color
+
+        helpers.content_tag(:span, line, style: "color: #{color}")
       end
 
       def image_url
@@ -77,7 +114,7 @@ module RecordingStudioPages
       end
 
       def rendered_cta
-        RecordingStudioPages::CtaRenderer.call(self, content["cta"])
+        RecordingStudioPages::CtaRenderer.call(self, content["cta"], align: align)
       end
     end
   end

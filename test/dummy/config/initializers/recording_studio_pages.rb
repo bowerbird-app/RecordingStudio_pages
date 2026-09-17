@@ -77,7 +77,7 @@ RecordingStudioPages.configure do |config|
             image_url: "/images/hero-tonight.jpg",
             cta: { type: "social_logins" }
           },
-          settings: { variant: "fullscreen_image" }
+          settings: { variant: "fullscreen_image", alignment: "left" }
         }
       ]
     )
