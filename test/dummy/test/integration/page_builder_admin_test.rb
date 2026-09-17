@@ -138,6 +138,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Title"
     assert_includes response.body, "Layout"
+    assert_includes response.body, "Align"
+    assert_includes response.body, "Photo"
     assert_includes response.body, "Call to action"
     assert_includes response.body, "Button"
     assert_includes response.body, "Social logins"

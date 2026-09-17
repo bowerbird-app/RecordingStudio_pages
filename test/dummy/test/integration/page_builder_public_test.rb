@@ -269,13 +269,15 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Take a seat"
     assert_includes response.body, "hero-tonight.jpg"
     assert_includes response.body, "background-image:"
-    assert_includes response.body, "bg-black/60"
+    assert_includes response.body, "--hero-overlay-min-height: 100dvh"
+    assert_includes response.body, "fp-hero-overlay"
+    assert_includes response.body, "text-left"
+    refute_includes response.body, "bg-black/60"
     refute_includes response.body, "What this gem owns"
     refute_includes response.body, "max-w-6xl"
     refute_includes response.body, "data-recording-studio-default-layout"
-    assert_includes response.body, "h-dvh"
-    assert_includes response.body, "h-full"
-    assert_includes response.body, "bg-black"
+    refute_includes response.body, "h-dvh w-full overflow-hidden bg-black"
+    refute_includes response.body, "fp-hero-overlay-on-light"
     refute_includes response.body, "h-screen"
     types = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
                                              .map { |recording| recording.recordable.section_type }
@@ -337,7 +339,8 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "The lights are already on"
     assert_includes response.body, "hero-tonight.jpg"
     assert_includes response.body, "background-image:"
-    assert_includes response.body, "h-dvh"
+    assert_includes response.body, "--hero-overlay-min-height: 100dvh"
+    assert_includes response.body, "text-left"
     assert_includes response.body, "Continue with Google"
     assert_includes response.body, "Continue with Apple"
     assert_includes response.body, "max-w-sm"
@@ -441,5 +444,36 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Still here"
     refute_includes response.body, "Hidden ask"
+  end
+
+  test "a hero can dock copy left or sit on a light photo" do
+    page_recording = create_page!(parent_recording: @root, title: "Doors", homepage: true, actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Left on the page", body: "Docked." },
+      settings: { variant: "centered", alignment: "left" },
+      actor: @actor
+    )
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: {
+        title: "Light on the photo",
+        image: "/images/hero-tonight.jpg"
+      },
+      settings: { variant: "fullscreen_image", alignment: "center", background: "light" },
+      actor: @actor
+    )
+    publish_page!(page_recording, slug: "doors", actor: @actor)
+
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, "Left on the page"
+    assert_includes response.body, "text-left"
+    assert_includes response.body, "fp-hero-overlay-on-light"
+    assert_includes response.body, "--hero-overlay-min-height: 100dvh"
+    refute_includes response.body, "h-dvh w-full overflow-hidden bg-black"
   end
 end

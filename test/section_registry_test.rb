@@ -130,11 +130,13 @@ class SectionRegistryTest < Minitest::Test
     assert_equal 1, hero_only.sections.length
     assert_equal "hero", hero_only.sections.first.fetch("type")
     assert_equal "fullscreen_image", hero_only.sections.first.fetch("settings").to_h.stringify_keys.fetch("variant")
+    assert_equal "left", hero_only.sections.first.fetch("settings").to_h.stringify_keys.fetch("alignment")
 
     home = RecordingStudioPages.template(:marketing_home)
     types = home.sections.map { |entry| entry.fetch("type") }
     menu_copy = home.sections.first.fetch("content").to_h.stringify_keys
     hero_copy = home.sections[1].fetch("content").to_h.stringify_keys
+    home_hero_settings = home.sections[1].fetch("settings").to_h.stringify_keys
     feature_copy = home.sections[3].fetch("content").to_h.stringify_keys
     cta_copy = home.sections[4].fetch("content").to_h.stringify_keys
     blob = [menu_copy, hero_copy, feature_copy, cta_copy].to_json
@@ -143,6 +145,8 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "House", menu_copy.fetch("name")
     assert_equal "Join", menu_copy.fetch("cta").to_h.stringify_keys.fetch("text")
     assert_equal "The page is the front door", hero_copy.fetch("title")
+    assert_equal "centered", home_hero_settings.fetch("variant")
+    assert_equal "left", home_hero_settings.fetch("alignment")
     assert_equal "button", hero_copy.fetch("cta").to_h.stringify_keys.fetch("type")
     refute hero_copy.key?("primary_action")
     refute_includes blob, "recording"
@@ -189,6 +193,16 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "string", hero[:fields][:title][:type]
     assert_equal true, hero[:fields][:title][:required]
     assert_equal "cta", hero[:fields][:cta][:type]
+    assert_equal "center", hero[:settings][:alignment][:default]
+    assert_equal(
+      [%w[Center center], %w[Left left]],
+      hero[:settings][:alignment][:options]
+    )
+    assert_equal "dark", hero[:settings][:background][:default]
+    assert_equal(
+      [%w[Dark dark], %w[Light light]],
+      hero[:settings][:background][:options]
+    )
     assert(catalog[:templates].any? { |entry| entry[:key] == "marketing_home" })
     assert(catalog[:templates].any? { |entry| entry[:key] == "full_bleed_hero" })
     assert(catalog[:ctas].any? { |entry| entry[:key] == "button" })
@@ -220,6 +234,9 @@ class SectionRegistryTest < Minitest::Test
 
     assert_equal "/images/hero-tonight.jpg", content["image"]
     refute content.key?("image_url")
+    settings = definition.read_settings(alignment: "right", background: "mystery")
+    assert_equal "center", settings["alignment"]
+    assert_equal "dark", settings["background"]
     catalog = definition.fields.catalog
     assert_equal "attachment", catalog[:image][:type]
     assert_equal "image", catalog[:image][:kind]

@@ -55,7 +55,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_duplicatable", tag: "v0.4.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.0.2"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_users", tag: "v0.11.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.162"'
+    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.186"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.134"'
     refute_includes gemfile, 'tag: "0.3.5"'
@@ -389,10 +389,13 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes page_model, 'public_layout: "recording_studio_pages/public"'
 
     hero = File.read(File.expand_path("../app/components/recording_studio_pages/sections/hero_component.rb", __dir__))
-    assert_includes hero, "h-dvh"
-    assert_includes hero, '"h-full"'
+    assert_includes hero, "--hero-overlay-min-height: 100dvh"
+    assert_includes hero, "align:"
+    assert_includes hero, "overlay_on"
     assert_includes hero, "CtaRenderer"
     assert_includes hero, 'content["image"]'
+    refute_includes hero, "h-dvh"
+    refute_includes hero, '"h-full"'
     refute_includes hero, "h-screen"
     refute_includes hero, 'content["image_url"]'
 

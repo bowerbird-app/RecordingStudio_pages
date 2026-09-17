@@ -105,7 +105,7 @@ module RecordingStudioPages
               body: "One picture. One line. Come in if you want a seat.",
               cta: { type: "button", text: "Take a seat", url: "/users/sign_in" }
             },
-            settings: { variant: "fullscreen_image" }
+            settings: { variant: "fullscreen_image", alignment: "left" }
           }
         ]
       )
@@ -165,8 +165,24 @@ module RecordingStudioPages
         },
         settings: {
           variant: :string,
-          alignment: :string,
-          background: :string
+          alignment: {
+            type: :string,
+            label: "Align",
+            default: "center",
+            options: [
+              %w[Center center],
+              %w[Left left]
+            ]
+          },
+          background: {
+            type: :string,
+            label: "Photo",
+            default: "dark",
+            options: [
+              %w[Dark dark],
+              %w[Light light]
+            ]
+          }
         },
         variants: %w[centered split_image fullscreen_image]
       )
