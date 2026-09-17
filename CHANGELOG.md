@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-09-17
+
+The page editor uses Publishable’s Draft/Published control. Hero look lives under Style.
+
 ### Added
 - Dummy installs Recording Studio Users `v0.11.0` so hero social CTAs can render Users Continue-with buttons instead of fake links to `/users/sign_in`.
 - Dummy **Walk in** template and seeded page: a fullscreen hero image whose call to action is those Continue-with buttons.
@@ -229,7 +233,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.5...HEAD
+[0.3.5]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.4...v0.3.5
 [0.3.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/bowerbird-app/RecordingStudio_pages/releases/tag/v0.2.1
 [0.2.0]: https://github.com/bowerbird-app/RecordingStudio_pages/releases/tag/v0.2.0
