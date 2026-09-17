@@ -3,10 +3,11 @@
 module RecordingStudioPages
   module HeroLayout
     LEFT_CLASS = [
-      "text-left",
-      "[&_.text-center]:text-left",
-      "[&_.justify-center]:justify-start",
-      "[&_.mx-auto]:ml-0"
+      "[&]:!text-left",
+      "[&_.text-center]:!text-left",
+      "[&_.justify-center]:!justify-start",
+      "[&_.mx-auto]:!ml-0",
+      "[&_.mx-auto]:!mr-auto"
     ].join(" ").freeze
 
     module_function
@@ -31,7 +32,7 @@ module RecordingStudioPages
       [
         "h-dvh w-full overflow-hidden",
         fill,
-        (left_aligned?(settings) ? "[&_section]:justify-start" : nil)
+        (left_aligned?(settings) ? "[&_section]:!justify-start [&_section]:!text-left" : nil)
       ].compact.join(" ")
     end
 

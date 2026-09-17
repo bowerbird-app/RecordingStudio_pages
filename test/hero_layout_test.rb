@@ -9,9 +9,9 @@ class HeroLayoutTest < Minitest::Test
     assert RecordingStudioPages::HeroLayout.left_aligned?(settings)
     refute RecordingStudioPages::HeroLayout.light_tone?(settings)
     assert_includes RecordingStudioPages::HeroLayout.hero_class(fullscreen: true, settings: settings), "h-full"
-    assert_includes RecordingStudioPages::HeroLayout.hero_class(fullscreen: true, settings: settings), "text-left"
+    assert_includes RecordingStudioPages::HeroLayout.hero_class(fullscreen: true, settings: settings), "[&]:!text-left"
     assert_includes RecordingStudioPages::HeroLayout.wrap_class(settings: settings), "bg-black"
-    assert_includes RecordingStudioPages::HeroLayout.wrap_class(settings: settings), "[&_section]:justify-start"
+    assert_includes RecordingStudioPages::HeroLayout.wrap_class(settings: settings), "[&_section]:!justify-start"
   end
 
   def test_light_center_wrap_uses_the_photo_not_a_black_fill

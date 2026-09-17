@@ -199,7 +199,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "bg-cover bg-center"
     assert_includes response.body, "flex items-center"
     assert_includes response.body, "text-left"
-    assert_includes response.body, "[&amp;_section]:justify-start"
+    assert_includes response.body, "[&amp;_section]:!justify-start"
     assert_includes response.body, 'data-pages-menu-overlay="true"'
     assert_includes response.body, "from-white/70"
     refute_includes response.body, "--button-ghost-text-color: white"
@@ -227,8 +227,8 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Meet us in the middle"
     assert_includes response.body, "hero-home-center-pastel.png"
     assert_includes response.body, "bg-cover bg-center"
-    refute_includes response.body, "text-left"
-    refute_includes response.body, "[&amp;_section]:justify-start"
+    refute_includes response.body, "[&amp;]:!text-left"
+    refute_includes response.body, "[&amp;_section]:!justify-start"
     refute_includes response.body, "bg-black/60"
   end
 
