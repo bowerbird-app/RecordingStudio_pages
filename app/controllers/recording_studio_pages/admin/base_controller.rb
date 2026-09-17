@@ -43,11 +43,9 @@ module RecordingStudioPages
       end
 
       def editor_subtitle
-        parts = []
-        parts << "Public home is #{RecordingStudioPages.homepage_path}." if page_recording.recordable.homepage?
-        unpublished = !page_recording.respond_to?(:currently_published?) || !page_recording.currently_published?
-        parts << "Not public yet." if unpublished
-        parts.join(" ").presence
+        return unless page_recording.recordable.homepage?
+
+        "Public home is #{RecordingStudioPages.homepage_path}."
       end
 
       def require_admin_access!

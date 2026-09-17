@@ -106,6 +106,9 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Add your first section"
     assert_includes response.body, "Preview"
     assert_includes response.body, "Settings"
+    assert_includes response.body, "publishable_quick_actions_#{page_recording.id}"
+    assert_includes response.body, "Draft"
+    refute_includes response.body, "Not public yet."
     refute_includes response.body, "Add section"
     refute_includes response.body, "Edit page"
     refute_includes response.body, "Nothing live yet"
@@ -135,6 +138,19 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     sections = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
     assert_equal %w[hero], sections.map { |recording| recording.recordable.section_type }
     assert_equal "Hero", sections.first.recordable.content["title"]
+  end
+
+  test "page editor shows a Published control after the page is live" do
+    page_recording = create_page!(parent_recording: @root, title: "Live control", actor: @actor)
+    publish_page!(page_recording, slug: "live-control", actor: @actor)
+
+    get recording_studio_pages.admin_page_path(page_recording)
+
+    assert_response :success
+    assert_includes response.body, "publishable_quick_actions_#{page_recording.id}"
+    assert_includes response.body, "Published"
+    refute_includes response.body, "Not public yet."
+    refute_includes response.body, "/recordings/#{page_recording.id}/publishable/edit"
   end
 
   test "page editor keeps one flash slot after create and add section" do

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html data-theme="<%= RecordingStudioPages.theme %>">
   <head>
-    <title><%= content_for(:title).presence || @page&.title.presence || "Page" %></title>
+    <title><%= (respond_to?(:publishable_document_title) && publishable_document_title).presence || content_for(:title).presence || @page&.title.presence || "Page" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -9,10 +9,12 @@
     <%= stylesheet_link_tag "flat_pack/application", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "flat_pack/rich_text", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= publishable_head_tags if respond_to?(:publishable_head_tags) %>
     <%= yield :head %>
     <%= javascript_importmap_tags if respond_to?(:javascript_importmap_tags) %>
   </head>
   <body class="m-0 min-h-dvh overflow-x-hidden bg-(--surface-page-background-color) text-(--surface-content-color)">
+    <%= publishable_preview_badge if respond_to?(:publishable_preview_badge) %>
     <%= yield %>
   </body>
 </html>

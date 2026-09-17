@@ -50,7 +50,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.9.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.5.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_attachable", tag: "v0.5.1"'
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_publishable", tag: "v0.2.1"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_publishable", tag: "v0.3.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_orderable", tag: "v0.2.2"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_duplicatable", tag: "v0.4.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.0.2"'
@@ -131,6 +131,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes layout, "bg-(--surface-page-background-color)"
     assert_includes layout, "min-h-dvh"
     assert_includes layout, "viewport-fit=cover"
+    assert_includes layout, "publishable_head_tags"
+    assert_includes layout, "publishable_document_title"
+    assert_includes layout, "publishable_preview_badge"
     refute_includes layout, "max-w-md"
     variables_at = layout.index('stylesheet_link_tag "flat_pack/variables"')
     tailwind_at = layout.index('stylesheet_link_tag "tailwind"')
@@ -314,7 +317,10 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes editor, 'title: "Add your first section"'
     assert_includes editor, 'title: "Preview"'
     assert_includes editor, 'text: "Settings"'
+    assert_includes editor, "render_publishable_quick_actions"
     assert_operator editor.index('text: "Settings"'), :<, editor.index("FlatPack::Grid::Component.new(cols: 2")
+    refute_includes editor, 'text: "Publish"'
+    refute_includes editor, "/publishable/edit"
     refute_includes editor, "padding: :none"
     refute_includes editor, 'text: "Edit page"'
     refute_includes editor, "Off sections stay off"
@@ -548,8 +554,20 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes built_ins, 'label: "Photo"'
     refute_includes built_ins, "image_url:"
     engine = File.read(File.expand_path("../lib/recording_studio_pages/engine.rb", __dir__))
+    pages_controller = File.read(
+      File.expand_path("../app/controllers/recording_studio_pages/application_controller.rb", __dir__)
+    )
+    homepage_controller = File.read(
+      File.expand_path("../app/controllers/recording_studio_pages/homepages_controller.rb", __dir__)
+    )
+    admin_base = File.read(
+      File.expand_path("../app/controllers/recording_studio_pages/admin/base_controller.rb", __dir__)
+    )
     assert_includes engine, "restore_registries!"
     assert_includes engine, "helper RecordingStudioPages::ApplicationHelper"
+    assert_includes pages_controller, "helper RecordingStudioPublishable::ApplicationHelper"
+    assert_includes homepage_controller, "assign_publishable"
+    refute_includes admin_base, "Not public yet."
     attachment_js = File.read(
       File.expand_path("../app/javascript/recording_studio_pages/controllers/attachment_field_controller.js", __dir__)
     )

@@ -15,13 +15,9 @@
       size: :md,
       data: { turbo_frame: "_top" }
     ) %>
-    <%= render FlatPack::Button::Component.new(
-      text: "Publish",
-      href: "/recordings/#{@page_recording.id}/publishable/edit",
-      style: :secondary,
-      size: :md,
-      data: { turbo_frame: "_top" }
-    ) %>
+    <% if defined?(RecordingStudioPublishable) %>
+      <%= render_publishable_quick_actions(page_recording) %>
+    <% end %>
   </div>
 
   <%= render FlatPack::Grid::Component.new(cols: 2, gap: :lg, align: :start) do %>

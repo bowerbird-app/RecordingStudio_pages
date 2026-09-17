@@ -4,6 +4,7 @@ module RecordingStudioPages
   class ApplicationController < (defined?(::ApplicationController) ? ::ApplicationController : ActionController::Base)
     include RecordingStudio::UsesDefaultLayout if defined?(RecordingStudio::UsesDefaultLayout)
     helper RecordingStudioPages::ApplicationHelper
+    helper RecordingStudioPublishable::ApplicationHelper if defined?(RecordingStudioPublishable)
 
     protect_from_forgery with: :exception
   end

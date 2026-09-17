@@ -65,6 +65,8 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "max-w-md"
     assert_includes response.body, "flat_pack/application"
     refute_includes response.body, "data-recording-studio-default-layout"
+    assert_includes response.body, 'property="og:title"'
+    refute_includes response.body, "noindex,nofollow"
   end
 
   test "a published page can render a full-bleed menu above other sections" do
@@ -220,6 +222,51 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "max-w-md"
     refute_includes response.body, "data-recording-studio-default-layout"
     assert_includes response.body, 'data-theme="rounded"'
+    assert_includes response.body, 'property="og:title"'
+    refute_includes response.body, "noindex,nofollow"
+    refute_match(/>(?:\s*)Preview(?:\s*)</, response.body)
+  end
+
+  test "staff preview of a draft page shows a Preview badge" do
+    page_recording = create_page!(parent_recording: @root, title: "Soon", actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Hold the door" },
+      actor: @actor
+    )
+    RecordingStudioPublishable::Services::Publishables::EnsureChild.call(
+      parent_recording: page_recording,
+      actor: @actor
+    ).value!
+
+    sign_in @actor
+    get "/recordings/#{page_recording.id}/publishable/preview"
+
+    assert_response :success
+    assert_includes response.body, "Hold the door"
+    assert_includes response.body, "Preview"
+    assert_includes response.body, "noindex,nofollow"
+    refute_includes response.body, 'property="og:title"'
+  end
+
+  test "visitors cannot open a draft preview" do
+    page_recording = create_page!(parent_recording: @root, title: "Soon", actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Hold the door" },
+      actor: @actor
+    )
+    RecordingStudioPublishable::Services::Publishables::EnsureChild.call(
+      parent_recording: page_recording,
+      actor: @actor
+    ).value!
+
+    get "/recordings/#{page_recording.id}/publishable/preview"
+
+    assert_response :not_found
+    refute_includes response.body.to_s, "Hold the door"
   end
 
   test "public pages use the host Flatpack theme" do
