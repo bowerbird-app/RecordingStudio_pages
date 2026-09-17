@@ -369,7 +369,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'action="/start"'
     assert_includes response.body, "Open it"
     assert_includes response.body, 'name="url"'
-    assert_includes response.body, "sm:items-stretch"
+    assert_includes response.body, "sm:items-center"
     assert_includes response.body, 'aria-label="Paste a link"'
     refute_includes response.body, ">Link</label>"
     refute_includes response.body, "sm:items-end"

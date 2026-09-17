@@ -66,8 +66,8 @@ class CtaRegistryTest < Minitest::Test
     view.define_singleton_method(:render) { |_component| raise "should not render" }
 
     assert_nil RecordingStudioPages::CtaRenderer.call(view, nil)
-    assert_nil RecordingStudioPages::CtaRenderer.call(view, "type" => "")
-    assert_nil RecordingStudioPages::CtaRenderer.call(view, "type" => "missing_widget")
+    assert_nil RecordingStudioPages::CtaRenderer.call(view, { "type" => "" })
+    assert_nil RecordingStudioPages::CtaRenderer.call(view, { "type" => "missing_widget" })
   end
 
   def test_cta_renderer_skips_when_the_component_raises
@@ -87,7 +87,7 @@ class CtaRegistryTest < Minitest::Test
     previous_logger = Rails.logger
     Rails.logger = logger
 
-    assert_nil RecordingStudioPages::CtaRenderer.call(view, "type" => "boom")
+    assert_nil RecordingStudioPages::CtaRenderer.call(view, { "type" => "boom" })
     assert(warnings.any? { |message| message.include?("boom") })
   ensure
     Rails.logger = previous_logger

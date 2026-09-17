@@ -9,7 +9,7 @@ module Dummy
 
       def call
         helpers.form_with url: "/start", method: :get, local: true do
-          helpers.tag.div(class: "flex flex-col gap-3 sm:flex-row sm:items-stretch") do
+          helpers.tag.div(class: "flex flex-col gap-3 sm:flex-row sm:items-center") do
             helpers.safe_join(
               [
                 helpers.render(
@@ -26,8 +26,7 @@ module Dummy
                     text: button_text,
                     style: :primary,
                     size: :md,
-                    type: "submit",
-                    class: "h-full"
+                    type: "submit"
                   )
                 )
               ]

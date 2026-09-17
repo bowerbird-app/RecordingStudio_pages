@@ -510,7 +510,7 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes social, "recording_studio_user/omniauth/continue_with_providers"
     refute_includes social, "/users/sign_in"
     refute_includes url_form, 'label: "Link"'
-    assert_includes url_form, "sm:items-stretch"
+    assert_includes url_form, "sm:items-center"
     assert_includes url_form, 'aria: { label: "Paste a link" }'
     field = File.read(File.expand_path("../app/views/recording_studio_pages/admin/sections/_field.html.erb", __dir__))
     attachment_field = File.read(
