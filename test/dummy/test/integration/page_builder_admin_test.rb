@@ -444,6 +444,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Give it a name"
     assert_includes response.body, 'name="page[title]"'
+    assert_includes response.body, "max-w-xl"
+    assert_includes response.body, "flex-wrap items-center gap-3"
 
     get RecordingStudioPages::Admin.screen_path
     assert_response :success
@@ -456,6 +458,23 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
         headers: { "Turbo-Frame" => "screen-table" }
     assert_response :success
     assert_includes response.body, titled.recordable.title
+  end
+
+  test "creating a page without ticking home still saves from the Admin root" do
+    switch_to_admin_root!
+    title = "Hub Create #{SecureRandom.hex(4)}"
+
+    post recording_studio_pages.admin_pages_path, params: { page: { title: title } }
+
+    assert_response :redirect
+    page_recording = RecordingStudio::Recording.order(:created_at).where(
+      recordable_type: "RecordingStudioPages::Page"
+    ).last
+    assert_equal title, page_recording.recordable.title
+    assert_equal false, page_recording.recordable.homepage?
+    follow_redirect!
+    assert_response :success
+    assert_includes response.body, title
   end
 
   test "pages hub widgets resolve live and draft counts instead of staying on the shimmer" do

@@ -362,6 +362,16 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes index, 'text: "Page"'
     assert_includes index, 'icon: "plus"'
     refute_includes index, "New page"
+    new_page = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/new.html.erb", __dir__))
+    assert_includes new_page, "max-w-xl"
+    assert_includes new_page, "flex-wrap items-center gap-3"
+    create_page = File.read(File.expand_path("../lib/recording_studio_pages/services/create_page.rb", __dir__))
+    assert_includes create_page, "page.homepage = homepage?"
+    controller = File.read(
+      File.expand_path("../app/controllers/recording_studio_pages/admin/pages_controller.rb", __dir__)
+    )
+    assert_includes controller, "def checked?"
+    assert_includes controller, "ActiveModel::Type::Boolean.new.cast(value) == true"
     dummy_section = File.read(
       File.expand_path("dummy/app/views/recording_studio_admin/sections/show.html.erb", __dir__)
     )

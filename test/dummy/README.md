@@ -46,7 +46,7 @@ Sign-in is email first (**Continue with email**), then password. Google and Appl
 - `/recording_studio` - redirects to `/` while the mounted Recording Studio engine stays available under that prefix for non-root routes
 - `/recording_studio_pages/admin/pages` - page builder
 - `/recording_studio_users/profile` - My Profile
-- `/admin` - RS Admin hub. Switch the current root to **Admin** first. **Page** goes to `/recording_studio_pages/admin/pages/new`. **View all** goes to `/admin/screens/pages`. The hub returns 403 while a workspace is selected. Live pages and Drafts load through Turbo frames; dummy pins Turbo and RS Admin Stimulus so those cards leave the shimmer.
+- `/admin` - RS Admin hub. Switch the current root to **Admin** first. **Page** goes to `/recording_studio_pages/admin/pages/new` (reading-width form, compact **Create page**). **View all** goes to `/admin/screens/pages`. The hub returns 403 while a workspace is selected. Live pages and Drafts load through Turbo frames; dummy pins Turbo and RS Admin Stimulus so those cards leave the shimmer.
 - `/users/sign_in` - Users email-first sign-in
 - `/docs/install`, `/docs/config`, `/docs/recordable_types`, `/docs/recordings_tree`, `/docs/gem_views`, `/docs/methods` - dummy-only starter pages
 - `/up` - Rails health check
