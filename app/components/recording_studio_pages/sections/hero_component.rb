@@ -41,12 +41,51 @@ module RecordingStudioPages
         if fullscreen_image?
           attributes[:background_image_url] = image_url
           attributes[:on] = overlay_on
-          attributes[:style] = "--hero-overlay-min-height: 100dvh"
         else
           attributes[:image_url] = image_url
           attributes[:image_alt] = title
         end
-        attributes
+        attributes[:style] = hero_style
+        attributes.compact
+      end
+
+      def hero_style
+        parts = []
+        parts << "--hero-overlay-min-height: 100dvh" if fullscreen_image?
+        parts.concat(text_colour_styles)
+        parts.join("; ").presence
+      end
+
+      def text_colour_styles
+        if fullscreen_image?
+          overlay_colour_styles
+        else
+          surface_colour_styles
+        end
+      end
+
+      def overlay_colour_styles
+        styles = []
+        styles << "--hero-overlay-text-color: #{title_color}" if title_color
+        styles << "--hero-overlay-muted-text-color: #{body_color}" if body_color
+        styles << "--hero-overlay-on-light-text-color: #{title_color}" if title_color
+        styles << "--hero-overlay-on-light-muted-text-color: #{body_color}" if body_color
+        styles
+      end
+
+      def surface_colour_styles
+        styles = []
+        styles << "--surface-content-color: #{title_color}" if title_color
+        styles << "--surface-muted-content-color: #{body_color}" if body_color
+        styles
+      end
+
+      def title_color
+        settings["title_color"].to_s.presence
+      end
+
+      def body_color
+        settings["body_color"].to_s.presence
       end
 
       def fullscreen_image?

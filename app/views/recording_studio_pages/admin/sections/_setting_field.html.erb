@@ -1,0 +1,16 @@
+<% if spec[:options].present? %>
+  <%= render FlatPack::Select::Component.new(
+    name: "section[settings][#{key}]",
+    label: spec[:label].presence || key.to_s.humanize,
+    value: value,
+    options: spec[:options]
+  ) %>
+<% else %>
+  <%= render "recording_studio_pages/admin/sections/field",
+             prefix: "section[settings]",
+             key: key,
+             spec: spec,
+             value: value,
+             preview: pages_colour_preview(key, settings_values),
+             section_recording: local_assigns[:section_recording] %>
+<% end %>

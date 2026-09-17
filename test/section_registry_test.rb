@@ -194,15 +194,26 @@ class SectionRegistryTest < Minitest::Test
     assert_equal true, hero[:fields][:title][:required]
     assert_equal "cta", hero[:fields][:cta][:type]
     assert_equal "center", hero[:settings][:alignment][:default]
+    assert_equal "style", hero[:settings][:alignment][:group]
     assert_equal(
       [%w[Center center], %w[Left left]],
       hero[:settings][:alignment][:options]
     )
     assert_equal "dark", hero[:settings][:background][:default]
+    assert_equal "Preset", hero[:settings][:background][:label]
+    assert_equal "style", hero[:settings][:background][:group]
+    assert_equal "fullscreen_image", hero[:settings][:background][:show_when]["variant"]
+    assert_equal true, hero[:settings][:background][:show_when]["image"]
     assert_equal(
-      [%w[Dark dark], %w[Light light]],
+      [["On a dark photo", "dark"], ["On a light photo", "light"]],
       hero[:settings][:background][:options]
     )
+    assert_equal "color", hero[:settings][:title_color][:type]
+    assert_equal "Headline", hero[:settings][:title_color][:label]
+    assert_equal "style", hero[:settings][:title_color][:group]
+    assert_equal "color", hero[:settings][:body_color][:type]
+    assert_equal "Quieter line", hero[:settings][:body_color][:label]
+    assert_equal "style", hero[:settings][:body_color][:group]
     assert(catalog[:templates].any? { |entry| entry[:key] == "marketing_home" })
     assert(catalog[:templates].any? { |entry| entry[:key] == "full_bleed_hero" })
     assert(catalog[:ctas].any? { |entry| entry[:key] == "button" })

@@ -4,7 +4,8 @@ require "uri"
 
 module RecordingStudioPages
   class FieldSchema
-    SIMPLE_TYPES = %i[string text rich_text url boolean integer attachment].freeze
+    SIMPLE_TYPES = %i[string text rich_text url boolean integer attachment color].freeze
+    HEX_COLOR = /\A#(?:[\da-f]{3}|[\da-f]{6})\z/i
     COMPOSITE_TYPES = %i[link list recording_ids cta].freeze
     RECORDING_ID = /\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i
 
@@ -99,9 +100,29 @@ module RecordingStudioPages
         ids.map(&:to_s).reject(&:blank?)
       when :attachment
         value.to_s.presence
+      when :color
+        coerce_color(value)
       else
         coerce_choice(spec, value.nil? ? default_for(spec) : value)
       end
+    end
+
+    def coerce_color(value)
+      text = value.to_s.strip
+      return if text.blank?
+      return unless HEX_COLOR.match?(text)
+
+      expand_hex(text)
+    end
+
+    def expand_hex(value)
+      expanded = if value.match?(/\A#[\da-f]{3}\z/i)
+                   digits = value.delete("#")
+                   "##{digits.chars.map { |digit| digit * 2 }.join}"
+                 else
+                   value
+                 end
+      expanded.downcase
     end
 
     def coerce_choice(spec, value)
@@ -170,6 +191,7 @@ module RecordingStudioPages
       return validate_list(key, spec, value) if type == :list
       return validate_recording_ids(key, value) if type == :recording_ids
       return validate_attachment(key, value) if type == :attachment
+      return validate_color(key, value) if type == :color
 
       []
     end
@@ -282,7 +304,16 @@ module RecordingStudioPages
       catalog[:label] = spec[:label] if spec[:label]
       catalog[:kind] = spec[:kind].to_s if spec[:kind]
       catalog[:options] = spec[:options] if spec[:options]
+      catalog[:group] = spec[:group].to_s if spec[:group]
+      catalog[:show_when] = stringify_keys(spec[:show_when]) if spec[:show_when]
       catalog
+    end
+
+    def validate_color(key, value)
+      return [] if value.blank?
+      return [] if HEX_COLOR.match?(value.to_s.strip)
+
+      ["#{key} must be a colour"]
     end
 
     def validate_attachment(key, value)

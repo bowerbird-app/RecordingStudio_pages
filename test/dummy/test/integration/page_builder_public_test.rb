@@ -482,4 +482,42 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "--hero-overlay-min-height: 100dvh"
     refute_includes response.body, "h-dvh w-full overflow-hidden bg-black"
   end
+
+  test "hero text colour overrides land on overlay or surface tokens" do
+    page_recording = create_page!(parent_recording: @root, title: "Painted", homepage: true, actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Plain headline", body: "Quieter." },
+      settings: { variant: "centered", title_color: "#112233", body_color: "#445566" },
+      actor: @actor
+    )
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: {
+        title: "Photo headline",
+        body: "Over the picture.",
+        image: "/images/hero-tonight.jpg"
+      },
+      settings: {
+        variant: "fullscreen_image",
+        background: "light",
+        title_color: "#ffeedd",
+        body_color: "#8899aa"
+      },
+      actor: @actor
+    )
+    publish_page!(page_recording, slug: "painted", actor: @actor)
+
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, "--surface-content-color: #112233"
+    assert_includes response.body, "--surface-muted-content-color: #445566"
+    assert_includes response.body, "--hero-overlay-text-color: #ffeedd"
+    assert_includes response.body, "--hero-overlay-muted-text-color: #8899aa"
+    assert_includes response.body, "--hero-overlay-on-light-text-color: #ffeedd"
+    assert_includes response.body, "fp-hero-overlay-on-light"
+  end
 end

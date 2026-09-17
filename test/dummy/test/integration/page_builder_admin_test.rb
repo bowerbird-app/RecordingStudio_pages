@@ -175,7 +175,15 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Title"
     assert_includes response.body, "Layout"
     assert_includes response.body, "Align"
-    assert_includes response.body, "Photo"
+    assert_includes response.body, ">Style<"
+    assert_includes response.body, "Preset"
+    assert_includes response.body, "On a dark photo"
+    assert_includes response.body, "On a light photo"
+    assert_includes response.body, "Headline"
+    assert_includes response.body, "Quieter line"
+    assert_includes response.body, "data-recording-studio-pages--style-fields-target=\"gated\""
+    assert_select "[data-show-when-variant=fullscreen_image][hidden]", count: 1
+    refute_includes response.body, ">Photo<"
     assert_includes response.body, "Call to action"
     assert_includes response.body, "Button"
     assert_includes response.body, "Social logins"
@@ -280,6 +288,48 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "Come as you are"
     assert_includes response.body, "Continue with Google"
     assert_includes response.body, ">Update<"
+  end
+
+  test "staff can save hero style colours" do
+    page_recording = create_page!(parent_recording: @root, title: "Paint", actor: @actor)
+    section = add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Warm type", image: "/images/hero-tonight.jpg" },
+      settings: { variant: "fullscreen_image", alignment: "left", background: "dark" },
+      actor: @actor
+    )
+
+    patch recording_studio_pages.admin_page_section_path(page_id: page_recording.id, id: section.id),
+          params: {
+            section: {
+              content: {
+                title: "Warm type",
+                image: "/images/hero-tonight.jpg"
+              },
+              settings: {
+                variant: "fullscreen_image",
+                alignment: "left",
+                background: "light",
+                title_color: "#f00",
+                body_color: "#334455"
+              }
+            }
+          }
+
+    assert_redirected_to recording_studio_pages.edit_admin_page_section_path(
+      page_id: page_recording.id,
+      id: section.id
+    )
+    saved = section.reload.recordable.settings
+    assert_equal "fullscreen_image", saved["variant"]
+    assert_equal "left", saved["alignment"]
+    assert_equal "light", saved["background"]
+    assert_equal "#ff0000", saved["title_color"]
+    assert_equal "#334455", saved["body_color"]
+    follow_redirect!
+    assert_includes response.body, "On a light photo"
+    assert_select "[data-show-when-variant=fullscreen_image][hidden]", count: 0
   end
 
   test "the add section library redirects to the page editor" do

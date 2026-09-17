@@ -169,6 +169,7 @@ module RecordingStudioPages
             type: :string,
             label: "Align",
             default: "center",
+            group: :style,
             options: [
               %w[Center center],
               %w[Left left]
@@ -176,12 +177,24 @@ module RecordingStudioPages
           },
           background: {
             type: :string,
-            label: "Photo",
+            label: "Preset",
             default: "dark",
+            group: :style,
+            show_when: { variant: "fullscreen_image", image: true },
             options: [
-              %w[Dark dark],
-              %w[Light light]
+              ["On a dark photo", "dark"],
+              ["On a light photo", "light"]
             ]
+          },
+          title_color: {
+            type: :color,
+            label: "Headline",
+            group: :style
+          },
+          body_color: {
+            type: :color,
+            label: "Quieter line",
+            group: :style
           }
         },
         variants: %w[centered split_image fullscreen_image]

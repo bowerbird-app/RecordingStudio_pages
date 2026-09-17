@@ -140,6 +140,24 @@ class FieldSchemaTest < Minitest::Test
     assert(schema.validate(image: "javascript:alert(1)").any? { |error| error.include?("image") })
   end
 
+  def test_color_coerces_hex_and_rejects_other_values
+    schema = RecordingStudioPages::FieldSchema.new(
+      title_color: { type: :color, label: "Headline" }
+    )
+
+    assert_nil schema.read({})["title_color"]
+    assert_nil schema.read(title_color: "")["title_color"]
+    assert_equal "#ff0000", schema.read(title_color: "#f00")["title_color"]
+    assert_equal "#aabbcc", schema.read(title_color: "#aabbcc")["title_color"]
+    assert_nil schema.read(title_color: "red")["title_color"]
+    assert_equal "color", schema.catalog[:title_color][:type]
+    assert_equal "Headline", schema.catalog[:title_color][:label]
+    assert_empty schema.validate(title_color: "#ff00aa")
+    assert_empty schema.validate(title_color: "")
+    assert(schema.validate(title_color: "red").any? { |error| error.include?("title_color") })
+    assert(schema.validate(title_color: "url(javascript:alert(1))").any? { |error| error.include?("title_color") })
+  end
+
   def test_attachment_upgrade_remap_and_resolve_urls
     schema = RecordingStudioPages::FieldSchema.new(
       image: { type: :attachment, kind: :image },

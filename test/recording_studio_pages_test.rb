@@ -377,6 +377,8 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes form, 'text: "Update"'
     assert_includes form, "form_with"
     assert_includes form, "novalidate: true"
+    assert_includes form, 'label: "Style"'
+    assert_includes form, "style-fields"
     controller = File.read(
       File.expand_path("../app/controllers/recording_studio_pages/admin/sections_controller.rb", __dir__)
     )
@@ -449,6 +451,10 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes hero, "--hero-overlay-min-height: 100dvh"
     assert_includes hero, "align:"
     assert_includes hero, "overlay_on"
+    assert_includes hero, "--hero-overlay-text-color"
+    assert_includes hero, "--surface-content-color"
+    assert_includes hero, "title_color"
+    assert_includes hero, "body_color"
     assert_includes hero, "CtaRenderer"
     assert_includes hero, "align: align"
     assert_includes hero, 'content["image"]'
@@ -518,6 +524,8 @@ class RecordingStudioPagesTest < Minitest::Test
     )
     built_ins = File.read(File.expand_path("../lib/recording_studio_pages/built_ins.rb", __dir__))
     assert_includes field, ":attachment"
+    assert_includes field, ":color"
+    assert_includes field, "ColorSwatch"
     assert_includes attachment_field, "Choose image"
     assert_includes attachment_field, "recording-studio-attachable--attachment-image-picker"
     refute_includes attachment_field, "Image url"
@@ -525,6 +533,10 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes built_ins, "key: :top_nav"
     assert_includes built_ins, "name: \"Menu\""
     assert_includes built_ins, "full_bleed: true"
+    assert_includes built_ins, 'label: "Preset"'
+    assert_includes built_ins, "On a dark photo"
+    assert_includes built_ins, "group: :style"
+    refute_includes built_ins, 'label: "Photo"'
     refute_includes built_ins, "image_url:"
     engine = File.read(File.expand_path("../lib/recording_studio_pages/engine.rb", __dir__))
     assert_includes engine, "restore_registries!"
@@ -532,6 +544,11 @@ class RecordingStudioPagesTest < Minitest::Test
     attachment_js = File.read(
       File.expand_path("../app/javascript/recording_studio_pages/controllers/attachment_field_controller.js", __dir__)
     )
+    style_js = File.read(
+      File.expand_path("../app/javascript/recording_studio_pages/controllers/style_fields_controller.js", __dir__)
+    )
     assert_includes attachment_js, "attachment.id"
+    assert_includes style_js, "gatedTargets"
+    assert_includes style_js, "fullscreen_image"
   end
 end
