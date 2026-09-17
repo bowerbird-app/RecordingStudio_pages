@@ -310,12 +310,18 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes editor, "add_template_dropdown"
     assert_includes editor, "FlatPack::Grid::Component.new(cols: 2"
     assert_includes editor, "FlatPack::Card::Component.new(padding: :md)"
+    assert_includes editor, "FlatPack::EmptyState::Component"
+    assert_includes editor, 'title: "Add your first section"'
+    assert_includes editor, 'title: "Preview"'
+    assert_includes editor, 'text: "Settings"'
+    assert_operator editor.index('text: "Settings"'), :<, editor.index("FlatPack::Grid::Component.new(cols: 2")
     refute_includes editor, "padding: :none"
-    refute_includes editor, 'title: "Preview"'
+    refute_includes editor, 'text: "Edit page"'
     refute_includes editor, "Off sections stay off"
     refute_includes editor, "editor_notice"
     refute_includes editor, "local_assigns[:notice]"
-    assert_includes editor, 'title: "Nothing live yet"'
+    refute_includes editor, "Nothing live yet"
+    refute_includes editor, "Nothing here yet"
     assert_includes template_dropdown, "Use a template"
     assert_includes template_dropdown, "turbo_stream: true"
     refute_includes template_dropdown, 'turbo_frame: "page_editor"'
@@ -324,6 +330,9 @@ class RecordingStudioPagesTest < Minitest::Test
       File.expand_path("../app/views/recording_studio_pages/admin/pages/_add_section_dropdown.html.erb", __dir__)
     )
     assert_includes add_section_dropdown, "turbo_stream: true"
+    assert_includes add_section_dropdown, 'text: "Section"'
+    assert_includes add_section_dropdown, 'icon: "plus"'
+    refute_includes add_section_dropdown, "Add section"
     refute_includes add_section_dropdown, 'turbo_frame: "page_editor"'
 
     flash_partial = File.read(File.expand_path("../app/views/recording_studio_pages/_flash.html.erb", __dir__))
@@ -429,6 +438,8 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes dummy_screen, "href: button.url"
     assert_includes dummy_screen, 'icon: (button.name.to_s == "new_page" ? "plus" : nil)'
     assert_includes edit, "Remove page"
+    assert_includes edit, 'title: "Settings"'
+    refute_includes edit, "Edit page"
 
     page_model = File.read(File.expand_path("../app/models/recording_studio_pages/page.rb", __dir__))
     assert_includes page_model, "respond_to?(:page_parent_types)"

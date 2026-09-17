@@ -93,7 +93,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     get recording_studio_pages.admin_page_path(page_recording)
 
     assert_response :success
-    assert_includes response.body, "Add section"
+    assert_includes response.body, "Section"
+    assert_includes response.body, 'data-flat-pack--icon-name-value="plus"'
     assert_includes response.body, "Hero"
     assert_includes response.body, "Menu"
     assert_includes response.body, "Call to action"
@@ -102,7 +103,13 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_select "#flash", count: 1
     assert_includes response.body, "md:grid-cols-2"
     refute_includes response.body, "Off sections stay off"
-    assert_includes response.body, "Nothing live yet"
+    assert_includes response.body, "Add your first section"
+    assert_includes response.body, "Preview"
+    assert_includes response.body, "Settings"
+    refute_includes response.body, "Add section"
+    refute_includes response.body, "Edit page"
+    refute_includes response.body, "Nothing live yet"
+    refute_includes response.body, "Nothing here yet"
     refute_includes response.body, "--card-padding-md"
     refute_includes response.body, "Sign out"
     refute_includes response.body, "/recording_studio_root_switchable/v1/root_switch"
@@ -345,6 +352,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "md:grid-cols-2"
     refute_includes response.body, "Off sections stay off"
     refute_includes response.body, "Nothing live yet"
+    refute_includes response.body, "Add your first section"
     assert_includes response.body, "Visible notes"
     assert_includes response.body, "Staff can read this."
     assert_includes response.body, "max-w-prose"
@@ -397,7 +405,9 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
 
     get recording_studio_pages.edit_admin_page_path(page_recording)
     assert_response :success
+    assert_includes response.body, "Settings"
     assert_includes response.body, "Remove page"
+    refute_includes response.body, "Edit page"
 
     delete recording_studio_pages.admin_page_path(page_recording)
     assert_redirected_to recording_studio_pages.admin_pages_path
