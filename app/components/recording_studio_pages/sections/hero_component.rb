@@ -52,43 +52,23 @@ module RecordingStudioPages
       def hero_style
         parts = []
         parts << "--hero-overlay-min-height: 100dvh" if fullscreen_image?
-        parts.concat(text_colour_styles)
+        parts.concat(headline_colour_styles)
         parts.join("; ").presence
       end
 
-      def text_colour_styles
-        if fullscreen_image?
-          overlay_colour_styles
-        else
-          surface_colour_styles
-        end
-      end
-
-      def overlay_colour_styles
-        return [] unless title_color
+      def headline_colour_styles
+        color = colour("title_color")
+        return [] unless color
+        return ["--surface-content-color: #{color}"] unless fullscreen_image?
 
         [
-          "--hero-overlay-text-color: #{title_color}",
-          "--hero-overlay-on-light-text-color: #{title_color}"
+          "--hero-overlay-text-color: #{color}",
+          "--hero-overlay-on-light-text-color: #{color}"
         ]
       end
 
-      def surface_colour_styles
-        return [] unless title_color
-
-        ["--surface-content-color: #{title_color}"]
-      end
-
-      def title_color
-        settings["title_color"].to_s.presence
-      end
-
-      def eyebrow_color
-        settings["eyebrow_color"].to_s.presence
-      end
-
-      def body_color
-        settings["body_color"].to_s.presence
+      def colour(key)
+        settings[key].to_s.presence
       end
 
       def fullscreen_image?
@@ -115,17 +95,16 @@ module RecordingStudioPages
       end
 
       def tagline
-        coloured_line(content["eyebrow"], eyebrow_color)
+        coloured_line(content["eyebrow"], colour("eyebrow_color"))
       end
 
       def description
-        coloured_line(helpers.strip_tags(content["body"].to_s), body_color)
+        coloured_line(helpers.strip_tags(content["body"].to_s), colour("body_color"))
       end
 
       def coloured_line(text, color)
         line = text.to_s.presence
-        return unless line
-        return line unless color
+        return line unless line && color
 
         helpers.content_tag(:span, line, style: "color: #{color}")
       end
