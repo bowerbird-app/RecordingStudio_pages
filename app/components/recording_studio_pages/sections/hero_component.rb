@@ -81,7 +81,7 @@ module RecordingStudioPages
       end
 
       def rendered_cta
-        RecordingStudioPages::CtaRenderer.call(self, content["cta"])
+        RecordingStudioPages::CtaRenderer.call(self, content["cta"], align: align)
       end
     end
   end

@@ -450,6 +450,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes hero, "align:"
     assert_includes hero, "overlay_on"
     assert_includes hero, "CtaRenderer"
+    assert_includes hero, "align: align"
     assert_includes hero, 'content["image"]'
     refute_includes hero, "h-dvh"
     refute_includes hero, '"h-full"'
@@ -500,11 +501,17 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes dummy_initializer, 'type: "social_logins"'
     assert_includes dummy_initializer, "fullscreen_image"
     social = File.read(File.expand_path("dummy/app/components/dummy/ctas/social_logins_component.rb", __dir__))
+    url_form = File.read(File.expand_path("dummy/app/components/dummy/ctas/url_form_component.rb", __dir__))
     assert_includes social, "recording_studio_user_omniauth_provider_names"
     assert_includes social, "recording_studio_user_omniauth_authorize_path"
     assert_includes social, "max-w-sm"
+    assert_includes social, "mr-auto"
+    assert_includes social, "mx-auto"
     refute_includes social, "recording_studio_user/omniauth/continue_with_providers"
     refute_includes social, "/users/sign_in"
+    refute_includes url_form, 'label: "Link"'
+    assert_includes url_form, "sm:items-stretch"
+    assert_includes url_form, 'aria: { label: "Paste a link" }'
     field = File.read(File.expand_path("../app/views/recording_studio_pages/admin/sections/_field.html.erb", __dir__))
     attachment_field = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/sections/_attachment_field.html.erb", __dir__)

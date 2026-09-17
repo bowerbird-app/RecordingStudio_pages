@@ -93,6 +93,31 @@ class CtaRegistryTest < Minitest::Test
     Rails.logger = previous_logger
   end
 
+  def test_cta_renderer_passes_align_only_when_the_component_accepts_it
+    received = []
+    aligned = Class.new do
+      define_method(:initialize) { |cta:, align: :center| @cta = cta; @align = align }
+    end
+    plain = Class.new do
+      define_method(:initialize) { |cta:| @cta = cta }
+    end
+    RecordingStudioPages.register_cta(key: :aligned, name: "Aligned", component: aligned)
+    RecordingStudioPages.register_cta(key: :plain, name: "Plain", component: plain)
+
+    view = Object.new
+    view.define_singleton_method(:render) do |component|
+      received << component
+      "ok"
+    end
+
+    RecordingStudioPages::CtaRenderer.call(view, { "type" => "aligned" }, align: :left)
+    RecordingStudioPages::CtaRenderer.call(view, { "type" => "plain" }, align: :left)
+
+    assert_equal :left, received.first.instance_variable_get(:@align)
+    assert_nil received.last.instance_variable_get(:@align)
+    assert_equal "plain", received.last.instance_variable_get(:@cta)["type"]
+  end
+
   def test_catalog_includes_ctas
     RecordingStudioPages::BuiltIns.register!
 

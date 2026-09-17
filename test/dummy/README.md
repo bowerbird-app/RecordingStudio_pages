@@ -38,9 +38,9 @@ Sign-in is email first (**Continue with email**), then password. Google and Appl
 - `/` - visitors see the published homepage (seeded Home starts with a Menu). Signed-in people see the host home (sidebar, root switcher, example page buttons).
 - `/site` - the live marketing homepage, even when you are signed in
 - `/pages/:uuid/about` - seeded **About** page: a full-width rich text card with display type, Hero inset, and a corner picture
-- `/pages/:uuid/join` - seeded **Join** page: one centered hero whose call to action is Users Continue-with buttons
-- `/pages/:uuid/walk-in` - seeded **Walk in** page: one fullscreen hero image (copy left on the photo) whose call to action is the same Continue-with buttons
-- `/pages/:uuid/start-from-a-url` - seeded **Start from a URL** page: one hero with a paste-a-link field
+- `/pages/:uuid/join` - seeded **Join** page: one centered hero whose call to action is Users Continue-with buttons, centered under the copy
+- `/pages/:uuid/walk-in` - seeded **Walk in** page: one fullscreen hero image (copy left on the photo) whose Continue-with buttons sit left with the copy
+- `/pages/:uuid/start-from-a-url` - seeded **Start from a URL** page: one hero with a paste-a-link field and no field name
 - `/start` - dummy catcher for that URL field
 - `/studio` - same signed-in home as `/`
 - `/recording_studio` - redirects to `/` while the mounted Recording Studio engine stays available under that prefix for non-root routes

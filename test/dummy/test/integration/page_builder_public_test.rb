@@ -317,7 +317,8 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Come as you are"
     assert_includes response.body, "Continue with Google"
     assert_includes response.body, "Continue with Apple"
-    assert_includes response.body, "max-w-sm"
+    assert_includes response.body, "mx-auto flex w-full max-w-sm flex-col gap-2"
+    refute_includes response.body, "mr-auto flex w-full max-w-sm flex-col gap-2"
     assert_includes response.body, "/users/auth/google_oauth2"
     assert_includes response.body, "/users/auth/apple"
     refute_includes response.body, 'href="/users/sign_in"'
@@ -343,7 +344,8 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "text-left"
     assert_includes response.body, "Continue with Google"
     assert_includes response.body, "Continue with Apple"
-    assert_includes response.body, "max-w-sm"
+    assert_includes response.body, "mr-auto flex w-full max-w-sm flex-col gap-2"
+    refute_includes response.body, "mx-auto flex w-full max-w-sm flex-col gap-2"
     assert_includes response.body, 'action="/users/auth/google_oauth2"'
     assert_includes response.body, 'action="/users/auth/apple"'
     refute_includes response.body, 'href="/users/sign_in"'
@@ -367,6 +369,10 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'action="/start"'
     assert_includes response.body, "Open it"
     assert_includes response.body, 'name="url"'
+    assert_includes response.body, "sm:items-stretch"
+    assert_includes response.body, 'aria-label="Paste a link"'
+    refute_includes response.body, ">Link</label>"
+    refute_includes response.body, "sm:items-end"
   end
 
   test "a saved primary_action hero still renders a button" do
