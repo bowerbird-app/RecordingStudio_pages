@@ -1,12 +1,4 @@
 <div class="flex w-full flex-col gap-6">
-  <% editor_notice = local_assigns[:notice].presence %>
-  <% if editor_notice.present? %>
-    <%= render FlatPack::Alert::Component.new(
-      style: :success,
-      title: editor_notice
-    ) %>
-  <% end %>
-
   <%= render FlatPack::PageTitle::Component.new(
     title: @page_recording.recordable.title,
     subtitle: @editor_subtitle,

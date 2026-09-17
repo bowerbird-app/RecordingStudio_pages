@@ -71,7 +71,7 @@ module RecordingStudioPages
 
         load_editor
         respond_to do |format|
-          format.turbo_stream
+          format.turbo_stream { flash.now[:notice] = "Template sections added." }
           format.html { redirect_to admin_page_path(page_recording), notice: "Template sections added." }
         end
       end

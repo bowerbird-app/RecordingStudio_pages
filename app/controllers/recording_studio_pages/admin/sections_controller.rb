@@ -23,7 +23,7 @@ module RecordingStudioPages
 
         load_editor
         respond_to do |format|
-          format.turbo_stream
+          format.turbo_stream { flash.now[:notice] = added_notice }
           format.html { redirect_to admin_page_path(id: page_recording.id), notice: added_notice }
         end
       end
@@ -132,7 +132,6 @@ module RecordingStudioPages
       def added_notice
         "Section added."
       end
-      helper_method :added_notice
 
       def reject_reorder(message)
         render json: { ok: false, error: message }, status: :unprocessable_content

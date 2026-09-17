@@ -99,6 +99,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Call to action"
     assert_includes response.body, "add-section-#{page_recording.id}-hero"
     assert_includes response.body, 'id="page_editor"'
+    assert_select "#flash", count: 1
     assert_includes response.body, "md:grid-cols-2"
     refute_includes response.body, "Off sections stay off"
     assert_includes response.body, "Nothing live yet"
@@ -112,9 +113,13 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "turbo-stream"
+    assert_includes response.body, 'action="replace"'
     assert_includes response.body, 'action="update"'
+    assert_includes response.body, 'target="flash"'
     assert_includes response.body, "page_editor"
-    assert_includes response.body, "Section added."
+    assert_select "turbo-stream[target=flash]", text: /Section added/
+    assert_select "turbo-stream[target=page_editor]"
+    refute_includes css_select("turbo-stream[target=page_editor]").text, "Section added."
     assert_includes response.body, "Hero"
     refute_includes response.body, "More"
     assert_includes response.body, "ellipsis-horizontal"
@@ -123,6 +128,30 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     sections = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
     assert_equal %w[hero], sections.map { |recording| recording.recordable.section_type }
     assert_equal "Hero", sections.first.recordable.content["title"]
+  end
+
+  test "page editor keeps one flash slot after create and add section" do
+    post recording_studio_pages.admin_pages_path, params: { page: { title: "Flash slot", homepage: "0" } }
+    follow_redirect!
+
+    assert_response :success
+    assert_select "#flash", count: 1
+    assert_includes css_select("#flash").text, "Page created."
+    refute_includes css_select("#page_editor").text, "Page created."
+
+    page_recording = RecordingStudio::Recording.order(:created_at).where(
+      recordable_type: "RecordingStudioPages::Page"
+    ).last
+
+    post recording_studio_pages.admin_page_sections_path(page_recording),
+         params: { section: { section_type: "hero" } },
+         as: :turbo_stream
+
+    assert_response :success
+    assert_select "turbo-stream[target=flash]", count: 1
+    assert_select "turbo-stream[target=flash]", text: /Section added/
+    refute_includes css_select("turbo-stream[target=page_editor]").text, "Section added."
+    refute_includes css_select("turbo-stream[target=page_editor]").text, "Page created."
   end
 
   test "staff can open a generated hero editor after adding a section" do
@@ -334,7 +363,9 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "turbo-stream"
-    assert_includes response.body, "Template sections added."
+    assert_includes response.body, 'target="flash"'
+    assert_select "turbo-stream[target=flash]", text: /Template sections added/
+    refute_includes css_select("turbo-stream[target=page_editor]").text, "Template sections added."
     types = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
                                              .map { |recording| recording.recordable.section_type }
     assert_includes types, "hero"

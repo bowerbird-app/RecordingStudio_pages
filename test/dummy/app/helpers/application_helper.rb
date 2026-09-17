@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module ApplicationHelper
+  include RecordingStudioPages::ApplicationHelper
   include RecordingStudioUser::OmniauthHelper
 
   EXAMPLE_PAGE_ORDER = [

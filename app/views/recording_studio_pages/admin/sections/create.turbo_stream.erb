@@ -1,3 +1,6 @@
+<%= turbo_stream.replace "flash" do %>
+  <%= render "recording_studio_pages/flash" %>
+<% end %>
 <%= turbo_stream.update "page_editor" do %>
-  <%= render "recording_studio_pages/admin/pages/editor", notice: added_notice %>
+  <%= render "recording_studio_pages/admin/pages/editor" %>
 <% end %>

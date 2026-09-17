@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dummy sign-in is Users email-first chrome. Password is the second screen. Google and Apple Continue-with buttons follow dummy test/development credentials under `omniauth:`.
 - Dummy `social_logins` CTA calls Users OmniAuth helpers and draws Flatpack Continue-with buttons. It does not render the sign-in `continue_with_providers` partial (that partial includes an **Or** divider). The stack is `max-w-sm`, same as the Users auth shell, so the buttons do not fill a fullscreen hero.
 - Dummy page-builder screens use Recording Studio page nav only. Root switcher and Sign out stay on dummy host screens, not in the gem screen right slot.
+- Page builder flashes use one `#flash` slot (`recording_studio_pages_flash`). Alert wins over notice. Add section and Use a template replace that slot over Turbo; they do not draw a second notice in the editor.
 - The page editor uses a two-column Flatpack Grid: section list on the left, live page on the right. The live column has no heading. The section list sits in a Card with padding (`padding: :md`, not `:none`). Each row is the section type name with a three-dot actions menu. Small screens stack the columns.
 - Edit section uses the same Grid: form on the left, that one section on the right. The preview has no heading. Turned-off sections still preview. Small screens stack the columns.
 
@@ -31,7 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Call Users OmniAuth helpers from a hero CTA component (`recording_studio_user_omniauth_configured?`, `recording_studio_user_omniauth_provider_names`, `recording_studio_user_omniauth_authorize_path`). Cap the button stack at `max-w-sm` (Users auth does the same) so `w-full` buttons stay equal without filling a wide hero. Keep `recording_studio_user/omniauth/continue_with_providers` on the sign-in screen. Continue-with buttons appear only for providers in Rails credentials under `omniauth:`. Do not put live OAuth secrets in the app.
 - Dummy test and development credentials use placeholder Google and Apple client ids so Join and Walk in can render. Replace those with real credentials in a host. Do not copy the dummy values.
 - Do not define `recording_studio_pages_page_nav` to inject a root switcher or Sign out onto Pages screens. Those screens use Recording Studio page nav. Host chrome belongs on host screens.
-- If you overrode `recording_studio_pages/admin/pages/_editor`, take the two-column Grid (edit left, live page right, no Preview heading) and the padded Card around the section list, or keep your layout on purpose.
+- If you overrode `recording_studio_pages/admin/pages/_editor`, take the two-column Grid (edit left, live page right, no Preview heading) and the padded Card around the section list, or keep your layout on purpose. Drop any in-editor notice; flashes belong in `#flash`.
+- Put `recording_studio_pages_flash` in the layout that wraps page builder screens (dummy uses Recording Studio default layout). That helper always renders `#flash`. Add section and Use a template `turbo_stream.replace` it. Without that id, those Turbo flashes do not show.
 - If you overrode `recording_studio_pages/admin/sections/edit`, take the two-column Grid (form left, that section on the right, no Preview heading), or keep your layout on purpose.
 
 ## [0.3.4] - 2026-09-15

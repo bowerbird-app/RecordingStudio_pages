@@ -8,6 +8,14 @@ module RecordingStudioPages
       app.config.assets.paths << root.join("app/javascript") if app.config.respond_to?(:assets)
     end
 
+    initializer "recording_studio_pages.helpers" do
+      ActiveSupport.on_load(:action_controller) do
+        next unless respond_to?(:helper)
+
+        helper RecordingStudioPages::ApplicationHelper
+      end
+    end
+
     initializer "recording_studio_pages.importmap", before: "importmap" do |app|
       next unless app.config.respond_to?(:importmap)
 

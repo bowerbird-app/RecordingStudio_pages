@@ -2,6 +2,10 @@
 
 module RecordingStudioPages
   module ApplicationHelper
+    def recording_studio_pages_flash
+      render "recording_studio_pages/flash"
+    end
+
     def recording_studio_pages_nav(title:, back_url: nil)
       if respond_to?(:recording_studio_pages_page_nav)
         recording_studio_pages_page_nav(title: title, back_url: back_url)

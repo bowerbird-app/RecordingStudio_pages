@@ -163,6 +163,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes layout, 'stylesheet_link_tag "flat_pack/application"'
     assert_includes layout, 'stylesheet_link_tag "tailwind"'
     assert_includes layout, "max-w-6xl"
+    assert_includes layout, "recording_studio_pages_flash"
+    refute_includes layout, "flash[:notice]"
+    refute_includes layout, "flash[:alert]"
     variables_at = layout.index('stylesheet_link_tag "flat_pack/variables"')
     tailwind_at = layout.index('stylesheet_link_tag "tailwind"')
     assert_operator variables_at, :<, tailwind_at
@@ -197,6 +200,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes readme_source, "/recording_studio"
     assert_includes readme_source, "sidebar"
     assert_includes readme_source, "/site"
+    assert_includes readme_source, "recording_studio_pages_flash"
   end
 
   def test_product_readme_is_the_page_builder_guide
@@ -205,6 +209,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes readme, "RecordingStudioPages"
     assert_includes readme, "register_section"
     assert_includes readme, "register_cta"
+    assert_includes readme, "recording_studio_pages_flash"
     assert_includes readme, "RS Publishable"
     refute_includes readme, "internal template"
     refute_includes readme, "ExampleService"
@@ -308,8 +313,42 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes editor, "padding: :none"
     refute_includes editor, 'title: "Preview"'
     refute_includes editor, "Off sections stay off"
+    refute_includes editor, "editor_notice"
+    refute_includes editor, "local_assigns[:notice]"
     assert_includes editor, 'title: "Nothing live yet"'
     assert_includes template_dropdown, "Use a template"
+    assert_includes template_dropdown, "turbo_stream: true"
+    refute_includes template_dropdown, 'turbo_frame: "page_editor"'
+
+    add_section_dropdown = File.read(
+      File.expand_path("../app/views/recording_studio_pages/admin/pages/_add_section_dropdown.html.erb", __dir__)
+    )
+    assert_includes add_section_dropdown, "turbo_stream: true"
+    refute_includes add_section_dropdown, 'turbo_frame: "page_editor"'
+
+    flash_partial = File.read(File.expand_path("../app/views/recording_studio_pages/_flash.html.erb", __dir__))
+    assert_includes flash_partial, 'id="flash"'
+    assert_includes flash_partial, "flash[:alert]"
+    assert_includes flash_partial, "flash[:notice]"
+    assert_includes flash_partial, "elsif flash[:notice]"
+
+    helper = File.read(File.expand_path("../app/helpers/recording_studio_pages/application_helper.rb", __dir__))
+    assert_includes helper, "def recording_studio_pages_flash"
+
+    dummy_helper = File.read(File.expand_path("dummy/app/helpers/application_helper.rb", __dir__))
+    assert_includes dummy_helper, "include RecordingStudioPages::ApplicationHelper"
+
+    create_stream = File.read(
+      File.expand_path("../app/views/recording_studio_pages/admin/sections/create.turbo_stream.erb", __dir__)
+    )
+    apply_stream = File.read(
+      File.expand_path("../app/views/recording_studio_pages/admin/pages/apply_template.turbo_stream.erb", __dir__)
+    )
+    [create_stream, apply_stream].each do |stream|
+      assert_includes stream, 'turbo_stream.replace "flash"'
+      assert_includes stream, 'turbo_stream.update "page_editor"'
+      refute_includes stream, "notice:"
+    end
 
     section_edit = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/sections/edit.html.erb", __dir__)
@@ -335,6 +374,13 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes controller, "edit_admin_page_section_path"
     assert_includes controller, 'notice: "Updated."'
     refute_includes controller, "Section saved."
+    assert_includes controller, "flash.now[:notice] = added_notice"
+    refute_includes controller, "helper_method :added_notice"
+
+    pages_controller = File.read(
+      File.expand_path("../app/controllers/recording_studio_pages/admin/pages_controller.rb", __dir__)
+    )
+    assert_includes pages_controller, 'flash.now[:notice] = "Template sections added."'
 
     section_row = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/pages/_section_row.html.erb", __dir__)
@@ -464,6 +510,7 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes built_ins, "image_url:"
     engine = File.read(File.expand_path("../lib/recording_studio_pages/engine.rb", __dir__))
     assert_includes engine, "restore_registries!"
+    assert_includes engine, "helper RecordingStudioPages::ApplicationHelper"
     attachment_js = File.read(
       File.expand_path("../app/javascript/recording_studio_pages/controllers/attachment_field_controller.js", __dir__)
     )

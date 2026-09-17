@@ -185,6 +185,8 @@ RS Admin gets a Pages section. The hub’s primary action is **Page** (plus icon
 
 The editor is a two-column Flatpack Grid: the section list on the left, the live page on the right. The live column has no heading. Small screens stack those columns. Enabled sections use the same components as the public page. Unpublished pages stay private on public routes. Add a section from **Add section**. Apply **Use a template** to append that template’s sections. Open **Edit page** to rename, set home, or remove the page.
 
+Flashes live in one `#flash` slot on the host layout (`recording_studio_pages_flash`). Create, save, and remove still redirect with a Rails flash. Add section and Use a template replace that slot over Turbo so the last message wins. Do not put a second notice inside the editor.
+
 Edit section puts **Update** and **Cancel** under the title, then the same Grid: the form on the left, that one section on the right. The buttons are compact, not full width. Update stays on the section and refreshes the preview. Cancel goes back to the page. The preview column has no heading. It uses the same components as the public page, including a section that is turned off. Small screens stack those columns.
 
 Gem screens call `recording_studio_pages_nav`, which uses Recording Studio page nav (back and close). That default layout stays host-agnostic. Dummy signed-in `/` uses a Flatpack sidebar and a root switcher in the top bar. Dummy `/docs` still adds a root switcher and Sign out through `dummy_page_nav`. Do not wrap that host chrome onto gem screens.

@@ -12,7 +12,7 @@ Next:
 4. Mount RecordingStudioPublishable::Engine at `/` for `/pages/:uuid/:slug`.
 5. Bundle and mount RecordingStudioDuplicatable so Copy on a section uses `duplicate_in_place!`.
 6. Register extra sections in the `:register_sections` hook and extra hero fillings in `:register_ctas`. The engine resets registries on reload.
-7. Load Flatpack CSS (`flat_pack/application`) with the host theme on `html` (`FlatPack.configuration.default_theme`). Load Flatpack Stimulus so a Menu’s **More** control works on a phone. Do not reuse a sign-in layout.
+7. Load Flatpack CSS (`flat_pack/application`) with the host theme on `html` (`FlatPack.configuration.default_theme`). Load Flatpack Stimulus so a Menu’s **More** control works on a phone. Do not reuse a sign-in layout. Put `recording_studio_pages_flash` in the layout that wraps page builder screens.
 8. Gem screens use Recording Studio page nav (back and close). Install Trashable if remove should use `trash!`.
 
 ===============================================================================
