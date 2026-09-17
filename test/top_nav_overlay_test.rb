@@ -35,6 +35,7 @@ class TopNavOverlayTest < Minitest::Test
 
     refute RecordingStudioPages::MenuOverlay.overlay?(menu, copy)
     refute RecordingStudioPages::MenuOverlay.overlay?(menu, nil)
+    assert_includes RecordingStudioPages::MenuOverlay.token_style, "--button-ghost-text-color: white"
   end
 
   private

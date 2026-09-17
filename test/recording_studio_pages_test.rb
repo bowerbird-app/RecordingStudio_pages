@@ -389,15 +389,15 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes top_nav, "FlatPack::TopNav"
     assert_includes top_nav, "CtaRenderer"
     assert_includes top_nav, "homepage_path"
-    assert_includes top_nav, "pages_menu_overlay"
-    assert_includes top_nav, "from-black/50"
+    refute_includes top_nav, "recording_studio_navigation"
     overlay = File.read(
       File.expand_path("../lib/recording_studio_pages/menu_overlay.rb", __dir__)
     )
     assert_includes overlay, "fullscreen_image"
-    refute_includes top_nav, "recording_studio_navigation"
+    assert_includes overlay, "--button-ghost-text-color"
     assert_includes section_partial, "full_bleed?"
-    assert_includes section_partial, "kwargs[:overlay]"
+    assert_includes section_partial, "pages-menu-overlay"
+    assert_includes section_partial, "from-black/50"
     assert_includes sections_partial, "MenuOverlay.overlay?"
     refute_includes section_partial, 'key == "hero"'
     assert_includes dummy_js, 'lazyLoadControllersFrom("controllers/flat_pack"'

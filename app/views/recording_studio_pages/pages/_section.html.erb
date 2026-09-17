@@ -1,12 +1,16 @@
 <% component_class = rendered.component_class %>
 <% if component_class %>
-  <% kwargs = { rendered: rendered } %>
-  <% kwargs[:overlay] = local_assigns.fetch(:overlay, false) if rendered.definition.key.to_s == "top_nav" %>
-  <% if rendered.definition.full_bleed? %>
-    <%= render component_class.new(**kwargs) %>
+  <% if local_assigns[:overlay] %>
+    <div class="sticky top-0 z-20 overflow-visible" style="height: 0" data-pages-menu-overlay="true">
+      <div class="bg-gradient-to-b from-black/50 to-transparent pb-10" style="<%= RecordingStudioPages::MenuOverlay.token_style %>">
+        <%= render component_class.new(rendered: rendered) %>
+      </div>
+    </div>
+  <% elsif rendered.definition.full_bleed? %>
+    <%= render component_class.new(rendered: rendered) %>
   <% else %>
     <div class="mx-auto w-full max-w-6xl px-6 py-8">
-      <%= render component_class.new(**kwargs) %>
+      <%= render component_class.new(rendered: rendered) %>
     </div>
   <% end %>
 <% end %>
