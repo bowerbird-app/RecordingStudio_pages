@@ -96,10 +96,15 @@ class CtaRegistryTest < Minitest::Test
   def test_cta_renderer_passes_align_only_when_the_component_accepts_it
     received = []
     aligned = Class.new do
-      define_method(:initialize) { |cta:, align: :center| @cta = cta; @align = align }
+      define_method(:initialize) do |cta:, align: :center|
+        @cta = cta
+        @align = align
+      end
     end
     plain = Class.new do
-      define_method(:initialize) { |cta:| @cta = cta }
+      define_method(:initialize) do |cta:|
+        @cta = cta
+      end
     end
     RecordingStudioPages.register_cta(key: :aligned, name: "Aligned", component: aligned)
     RecordingStudioPages.register_cta(key: :plain, name: "Plain", component: plain)

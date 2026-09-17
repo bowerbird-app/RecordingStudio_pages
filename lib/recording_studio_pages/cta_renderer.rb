@@ -40,7 +40,7 @@ module RecordingStudioPages
       parameters = component_class.instance_method(:initialize).parameters
       return @context if parameters.any? { |kind, _name| kind == :keyrest }
 
-      names = parameters.filter_map { |kind, name| name if kind == :key || kind == :keyreq }
+      names = parameters.filter_map { |kind, name| name if %i[key keyreq].include?(kind) }
       @context.slice(*names)
     end
 
