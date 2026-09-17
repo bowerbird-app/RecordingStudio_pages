@@ -15,6 +15,9 @@ Pages hub cards open the Pages list. Drafts arrives with the Draft status filter
 - The Admin Pages list has a **Status** filter: Live or Draft. The table shows that status on each row.
 - Live pages and Drafts cards on the Pages hub open the Pages list. Drafts opens it with Draft selected.
 
+### Changed
+- Dummy default layout only draws the pages flash slot when the Pages helper is on the controller, so RS Admin can share that layout.
+
 ### Upgrade notes
 - If you overrode the Admin Pages screen, take the Status filter and Status column, or keep your list on purpose.
 - If you overrode the Live pages or Drafts widgets, take `link_to` to the Pages screen (Drafts passes `status=Draft`).
