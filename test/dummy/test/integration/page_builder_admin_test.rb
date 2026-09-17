@@ -382,6 +382,9 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Nothing here yet"
     assert_includes response.body, "Add a page to get going."
+    assert_includes response.body, ">Page<"
+    assert_includes response.body, 'data-flat-pack--icon-name-value="plus"'
+    refute_includes response.body, "New page"
   end
 
   test "visitors cannot mutate pages" do
@@ -420,6 +423,39 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Pages"
+    assert_includes response.body, ">Page<"
+    assert_includes response.body, "View all"
+    refute_includes response.body, "View pages"
+    refute_includes response.body, "New page"
+
+    page_href = RecordingStudioPages::Admin.new_page_path
+    view_all_href = RecordingStudioPages::Admin.screen_path
+    assert_includes response.body, "href=\"#{page_href}\""
+    assert_includes response.body, "href=\"#{view_all_href}\""
+    assert_operator response.body.index("href=\"#{page_href}\""), :<, response.body.index("href=\"#{view_all_href}\"")
+    assert_includes response.body, 'data-flat-pack--icon-name-value="plus"'
+  end
+
+  test "Pages hub Page opens the new page form and View all opens the Admin list" do
+    titled = create_page!(parent_recording: @root, title: "Hub Listed #{SecureRandom.hex(4)}", actor: @actor)
+    switch_to_admin_root!
+
+    get RecordingStudioPages::Admin.new_page_path
+    assert_response :success
+    assert_includes response.body, "Give it a name"
+    assert_includes response.body, 'name="page[title]"'
+
+    get RecordingStudioPages::Admin.screen_path
+    assert_response :success
+    assert_includes response.body, "Pages"
+    assert_includes response.body, ">Page<"
+    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.new_page_path}\""
+    assert_includes response.body, 'data-flat-pack--icon-name-value="plus"'
+
+    get "/admin/screens/pages/table",
+        headers: { "Turbo-Frame" => "screen-table" }
+    assert_response :success
+    assert_includes response.body, titled.recordable.title
   end
 
   test "pages hub widgets resolve live and draft counts instead of staying on the shimmer" do

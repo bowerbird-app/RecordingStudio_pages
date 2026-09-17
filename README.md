@@ -181,7 +181,7 @@ List fields skip blank extra slots and items marked `_destroy`.
 
 ## Admin
 
-RS Admin gets a Pages section. The nested section canvas lives at `/recording_studio_pages/admin/pages` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a padded Flatpack Card around an ordered, orderable list. Each row is the section type name. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s three-dot menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page, then Orderable `recording_studio_orderable_append!` puts it at the end.
+RS Admin gets a Pages section. The hub’s primary action is **Page** (plus icon, then the word Page). It opens the new-page form at `/recording_studio_pages/admin/pages/new`. **View all** opens the Admin list at `/admin/screens/pages`. The nested editor still lives at `/recording_studio_pages/admin/pages/:id` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a padded Flatpack Card around an ordered, orderable list. Each row is the section type name. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s three-dot menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page, then Orderable `recording_studio_orderable_append!` puts it at the end.
 
 The editor is a two-column Flatpack Grid: the section list on the left, the live page on the right. The live column has no heading. Small screens stack those columns. Enabled sections use the same components as the public page. Unpublished pages stay private on public routes. Add a section from **Add section**. Apply **Use a template** to append that template’s sections. Open **Edit page** to rename, set home, or remove the page.
 
@@ -223,7 +223,7 @@ Sign in with `admin@admin.com` / `Password`.
 - `/start` dummy catcher for that URL field
 - `/studio` same signed-in home as `/`
 - `/recording_studio_pages/admin/pages` page builder
-- `/admin` RS Admin hub. Switch to the Admin root from the top-bar switcher first. Dummy loads Turbo and RS Admin Stimulus so Live pages and Drafts show counts instead of staying on the shimmer.
+- `/admin` RS Admin hub. Switch to the Admin root from the top-bar switcher first. **Page** opens the new-page form. **View all** opens the Admin Pages list. Dummy loads Turbo and RS Admin Stimulus so Live pages and Drafts show counts instead of staying on the shimmer.
 
 ## Upstream gaps
 
@@ -231,7 +231,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 1. **Publishable slugs cannot be `/`.** The slug regex is `[a-z0-9]+(?:-[a-z0-9]+)*`, and public path templates must include `:uuid`. Homepage routing lives in Page Builder.
 2. **Publishable slug uniqueness is not a hard unique constraint** across pages.
-3. **RS Admin is a hub of screens and widgets**, not a nested canvas for ordered sections.
+3. **RS Admin is a hub of screens and widgets**, not a nested canvas for ordered sections. Admin 2.0.2 section links pass `url:` to Flatpack Button, which only navigates on `href:`. Dummy’s Pages hub view passes `href:` so **Page** and **View all** work. Dummy’s Pages list screen adds the plus icon on **Page**; Admin’s list button already uses `href:`.
 4. **Action Text assumes mutable records.** Section copy is JSON plus `sanitize`.
 5. **Attachable is required by Publishable 0.2.1** even when you only want slug and status. Section photos also use Attachable. They are children of the section, not of the page.
 6. **Core has no `trash!`.** Page Builder calls `trash!` when Trashable is present; otherwise it logs `trashed` and sets `trashed_at`. Install Trashable for a real trash path.
@@ -239,7 +239,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.4. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
+0.3.5. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.2.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.162`.
 
 ## Upgrade
 

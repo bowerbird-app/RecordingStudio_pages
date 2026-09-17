@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.4", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.5", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -58,7 +58,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.162"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.134"'
-    refute_includes gemfile, 'tag: "0.3.4"'
+    refute_includes gemfile, 'tag: "0.3.5"'
   end
 
   def test_section_opts_into_duplicatable_and_attachable
@@ -359,6 +359,19 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes append, "recording_studio_orderable_move!"
     assert_includes index, "description:"
     refute_includes index, "message:"
+    assert_includes index, 'text: "Page"'
+    assert_includes index, 'icon: "plus"'
+    refute_includes index, "New page"
+    dummy_section = File.read(
+      File.expand_path("dummy/app/views/recording_studio_admin/sections/show.html.erb", __dir__)
+    )
+    dummy_screen = File.read(
+      File.expand_path("dummy/app/views/recording_studio_admin/screens/show.html.erb", __dir__)
+    )
+    assert_includes dummy_section, "href: preserve_anchor_url(link.url)"
+    refute_includes dummy_section, "url: preserve_anchor_url(link.url)"
+    assert_includes dummy_screen, "href: button.url"
+    assert_includes dummy_screen, 'icon: (button.name.to_s == "new_page" ? "plus" : nil)'
     assert_includes edit, "Remove page"
 
     page_model = File.read(File.expand_path("../app/models/recording_studio_pages/page.rb", __dir__))
