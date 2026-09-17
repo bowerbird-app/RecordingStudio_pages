@@ -65,6 +65,25 @@ class DummyHomeTest < ActionDispatch::IntegrationTest
     assert_includes response.body, @root.recordable.name
   end
 
+  test "signed-in home lists Home Left, Home Center, and Home Dark" do
+    left = create_page!(parent_recording: @root, title: "Home Left", actor: @actor)
+    publish_left = publish_page!(left, slug: "home-left", actor: @actor)
+    center = create_page!(parent_recording: @root, title: "Home Center", actor: @actor)
+    publish_center = publish_page!(center, slug: "home-center", actor: @actor)
+    dark = create_page!(parent_recording: @root, title: "Home Dark", homepage: true, actor: @actor)
+    publish_page!(dark, slug: "home", actor: @actor)
+
+    get "/"
+
+    assert_response :success
+    assert_includes response.body, "Home Left"
+    assert_includes response.body, "Home Center"
+    assert_includes response.body, "Home Dark"
+    assert_includes response.body, "/pages/#{publish_left.id}/home-left"
+    assert_includes response.body, "/pages/#{publish_center.id}/home-center"
+    assert_includes response.body, 'href="/site"'
+  end
+
   test "studio path matches the signed-in home" do
     get "/studio"
 

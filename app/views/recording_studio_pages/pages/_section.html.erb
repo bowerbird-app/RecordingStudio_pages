@@ -2,7 +2,7 @@
 <% if component_class %>
   <% if local_assigns[:overlay] %>
     <div class="sticky top-0 z-20 overflow-visible" style="height: 0" data-pages-menu-overlay="true">
-      <div class="bg-gradient-to-b from-black/50 to-transparent pb-10" style="<%= RecordingStudioPages::MenuOverlay.token_style %>">
+      <div class="<%= RecordingStudioPages::MenuOverlay.scrim_class(local_assigns[:following]) %>" style="<%= RecordingStudioPages::MenuOverlay.token_style(local_assigns[:following]) %>">
         <%= render component_class.new(rendered: rendered) %>
       </div>
     </div>

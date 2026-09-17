@@ -147,7 +147,11 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes tailwind_source, "RecordingStudio_users-*/app/views/**/*.erb"
     assert_includes tailwind_source, "../../../../../app/components/**/*.rb"
     assert_includes tailwind_source, "../../../../../app/components/**/*.erb"
+    assert_includes tailwind_source, "../../../../../lib/recording_studio_pages/**/*.rb"
+    assert_includes tailwind_source, "tmp/tailwind/recording_studio_pages_lib/**/*.rb"
     assert_includes tailwind_source, "../../components/**/*.rb"
+    rake = File.read(File.expand_path("dummy/lib/tasks/flat_pack_tailwind.rake", __dir__))
+    assert_includes rake, "recording_studio_pages_lib"
     refute_includes tailwind_source, "@theme"
     refute_includes tailwind_source, ":root {"
     refute_includes tailwind_source, "--color-fp-primary"
@@ -367,8 +371,10 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes page_model, 'public_layout: "recording_studio_pages/public"'
 
     hero = File.read(File.expand_path("../app/components/recording_studio_pages/sections/hero_component.rb", __dir__))
-    assert_includes hero, "h-dvh"
-    assert_includes hero, '"h-full"'
+    hero_layout = File.read(File.expand_path("../lib/recording_studio_pages/hero_layout.rb", __dir__))
+    assert_includes hero_layout, "h-dvh"
+    assert_includes hero_layout, "h-full"
+    assert_includes hero, "HeroLayout"
     assert_includes hero, "CtaRenderer"
     assert_includes hero, 'content["image"]'
     refute_includes hero, "h-screen"
@@ -395,9 +401,12 @@ class RecordingStudioPagesTest < Minitest::Test
     )
     assert_includes overlay, "fullscreen_image"
     assert_includes overlay, "--button-ghost-text-color"
+    assert_includes overlay, "from-white/70"
+    assert_includes overlay, "LIGHT_TOKENS"
     assert_includes section_partial, "full_bleed?"
     assert_includes section_partial, "pages-menu-overlay"
-    assert_includes section_partial, "from-black/50"
+    assert_includes section_partial, "MenuOverlay.scrim_class"
+    assert_includes section_partial, "MenuOverlay.token_style"
     assert_includes sections_partial, "MenuOverlay.overlay?"
     refute_includes section_partial, 'key == "hero"'
     assert_includes dummy_js, 'lazyLoadControllersFrom("controllers/flat_pack"'

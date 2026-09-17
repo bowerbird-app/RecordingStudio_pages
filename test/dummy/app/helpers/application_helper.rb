@@ -4,6 +4,9 @@ module ApplicationHelper
   include RecordingStudioUser::OmniauthHelper
 
   EXAMPLE_PAGE_ORDER = [
+    "Home Left",
+    "Home Center",
+    "Home Dark",
     "Home",
     "About",
     "Tonight",

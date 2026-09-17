@@ -36,14 +36,25 @@ class TopNavOverlayTest < Minitest::Test
     refute RecordingStudioPages::MenuOverlay.overlay?(menu, copy)
     refute RecordingStudioPages::MenuOverlay.overlay?(menu, nil)
     assert_includes RecordingStudioPages::MenuOverlay.token_style, "--button-ghost-text-color: white"
+    assert_equal RecordingStudioPages::MenuOverlay::DARK_SCRIM, RecordingStudioPages::MenuOverlay.scrim_class
+  end
+
+  def test_menu_over_a_light_fullscreen_hero_keeps_dark_type
+    menu = fake_section("top_nav")
+    hero = fake_section("hero", "fullscreen_image", "light")
+
+    assert RecordingStudioPages::MenuOverlay.overlay?(menu, hero)
+    refute_includes RecordingStudioPages::MenuOverlay.token_style(hero), "--button-ghost-text-color: white"
+    assert_includes RecordingStudioPages::MenuOverlay.token_style(hero), "--top-nav-background-color: transparent"
+    assert_equal RecordingStudioPages::MenuOverlay::LIGHT_SCRIM, RecordingStudioPages::MenuOverlay.scrim_class(hero)
   end
 
   private
 
-  def fake_section(key, variant = nil)
-    FakeSection.new(
-      RecordingStudioPages.section(key),
-      variant ? { "variant" => variant } : {}
-    )
+  def fake_section(key, variant = nil, tone = nil)
+    settings = {}
+    settings["variant"] = variant if variant
+    settings["tone"] = tone if tone
+    FakeSection.new(RecordingStudioPages.section(key), settings)
   end
 end

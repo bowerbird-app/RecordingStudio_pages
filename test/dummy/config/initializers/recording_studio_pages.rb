@@ -25,32 +25,60 @@ RecordingStudioPages.configure do |config|
   end
 
   config.hooks.on(:register_sections) do
-    RecordingStudioPages.register_template(
-      key: :home,
-      name: "Home",
-      source: "dummy",
-      sections: [
-        {
-          type: :top_nav,
-          content: {
-            name: "House",
-            links: [
-              { text: "About", url: "/" },
-              { text: "Tonight", url: "/" }
-            ],
-            cta: { type: "button", text: "Join", url: "/users/sign_in" }
-          }
-        },
-        {
-          type: :hero,
-          content: {
-            title: "The page is the front door",
-            body: "Come in if you want a seat.",
-            image: "/images/hero-tonight.jpg"
-          },
-          settings: { variant: "fullscreen_image" }
+    house_menu = lambda do
+      {
+        type: :top_nav,
+        content: {
+          name: "House",
+          links: [
+            { text: "About", url: "/" },
+            { text: "Tonight", url: "/" }
+          ],
+          cta: { type: "button", text: "Join", url: "/users/sign_in" }
         }
-      ]
+      }
+    end
+    register_home = lambda do |key:, name:, title:, body:, image:, alignment:, tone:|
+      RecordingStudioPages.register_template(
+        key: key,
+        name: name,
+        source: "dummy",
+        sections: [
+          house_menu.call,
+          {
+            type: :hero,
+            content: { title: title, body: body, image: image },
+            settings: { variant: "fullscreen_image", alignment: alignment, tone: tone }
+          }
+        ]
+      )
+    end
+    register_home.call(
+      key: :home,
+      name: "Home Dark",
+      title: "The page is the front door",
+      body: "Come in if you want a seat.",
+      image: "/images/hero-tonight.jpg",
+      alignment: "center",
+      tone: "dark"
+    )
+    register_home.call(
+      key: :home_left,
+      name: "Home Left",
+      title: "Come sit on this side",
+      body: "The light is already on.",
+      image: "/images/hero-home-left-pastel.png",
+      alignment: "left",
+      tone: "light"
+    )
+    register_home.call(
+      key: :home_center,
+      name: "Home Center",
+      title: "Meet us in the middle",
+      body: "The floor is already warm.",
+      image: "/images/hero-home-center-pastel.png",
+      alignment: "center",
+      tone: "light"
     )
     RecordingStudioPages.register_template(
       key: :join,

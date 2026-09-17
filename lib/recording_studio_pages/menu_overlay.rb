@@ -22,6 +22,13 @@ module RecordingStudioPages
       "--surface-border-color" => "rgb(255 255 255 / 0.14)"
     }.freeze
 
+    LIGHT_TOKENS = {
+      "--top-nav-background-color" => "transparent"
+    }.freeze
+
+    DARK_SCRIM = "bg-gradient-to-b from-black/50 to-transparent pb-10"
+    LIGHT_SCRIM = "bg-gradient-to-b from-white/70 to-transparent pb-10"
+
     module_function
 
     def overlay?(rendered, following)
@@ -35,8 +42,16 @@ module RecordingStudioPages
         following.settings.to_h.stringify_keys["variant"].to_s == "fullscreen_image"
     end
 
-    def token_style
-      TOKENS.map { |name, value| "#{name}: #{value}" }.join("; ")
+    def token_style(following = nil)
+      tokens_for(following).map { |name, value| "#{name}: #{value}" }.join("; ")
+    end
+
+    def scrim_class(following = nil)
+      HeroLayout.light_tone?(following&.settings) ? LIGHT_SCRIM : DARK_SCRIM
+    end
+
+    def tokens_for(following)
+      HeroLayout.light_tone?(following&.settings) ? LIGHT_TOKENS : TOKENS
     end
   end
 end

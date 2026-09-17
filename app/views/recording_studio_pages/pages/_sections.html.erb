@@ -1,5 +1,7 @@
 <% @rendered_sections.each_with_index do |rendered, index| %>
+  <% following = @rendered_sections[index + 1] %>
   <%= render "recording_studio_pages/pages/section",
              rendered: rendered,
-             overlay: RecordingStudioPages::MenuOverlay.overlay?(rendered, @rendered_sections[index + 1]) %>
+             following: following,
+             overlay: RecordingStudioPages::MenuOverlay.overlay?(rendered, following) %>
 <% end %>

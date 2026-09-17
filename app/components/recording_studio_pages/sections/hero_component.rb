@@ -23,7 +23,7 @@ module RecordingStudioPages
         # Flatpack :centered_image is min-h-[560px] and TailwindMerge applies
         # that after our classes, so a min-height on the section cannot win.
         # A 100dvh wrap plus h-full on the section fills the public viewport.
-        helpers.content_tag(:div, hero, class: "h-dvh w-full overflow-hidden bg-black")
+        helpers.content_tag(:div, hero, class: wrap_class, style: wrap_style)
       end
 
       private
@@ -38,23 +38,40 @@ module RecordingStudioPages
 
       def hero_attributes
         attributes = {
-          variant: variant,
+          variant: fullscreen_image? && light? ? :centered : variant,
           tagline: content["eyebrow"].presence,
           headline: title,
-          description: description
+          description: description,
+          class: RecordingStudioPages::HeroLayout.hero_class(
+            fullscreen: fullscreen_image?,
+            settings: settings
+          )
         }
-        if fullscreen_image?
+        if fullscreen_image? && !light?
           attributes[:background_image_url] = image_url
-          attributes[:class] = "h-full"
-        else
+        elsif !fullscreen_image?
           attributes[:image_url] = image_url
           attributes[:image_alt] = title
         end
         attributes
       end
 
+      def wrap_class
+        RecordingStudioPages::HeroLayout.wrap_class(settings: settings)
+      end
+
+      def wrap_style
+        return unless fullscreen_image? && light?
+
+        RecordingStudioPages::HeroLayout.wrap_style(image_url)
+      end
+
       def fullscreen_image?
         variant == :centered_image
+      end
+
+      def light?
+        RecordingStudioPages::HeroLayout.light_tone?(settings)
       end
 
       def variant

@@ -89,7 +89,10 @@ restore_template_sections = lambda do |page_recording, template_key, actor|
   expected_cta = expected_cta.to_h.stringify_keys if expected_cta.is_a?(Hash)
   expected_cta_type = expected_cta.is_a?(Hash) ? expected_cta["type"] : nil
   expected_image_url = expected_hero["image"] || expected_hero["image_url"]
-  expected_variant = (hero_entry&.fetch("settings") || {}).to_h.stringify_keys["variant"]
+  expected_settings = (hero_entry&.fetch("settings") || {}).to_h.stringify_keys
+  expected_variant = expected_settings["variant"]
+  expected_alignment = expected_settings["alignment"]
+  expected_tone = expected_settings["tone"]
   sections = RecordingStudioPages::Composition.section_recordings_for(page_recording)
   types = sections.map { |recording| recording.recordable.section_type }
   hero = sections.find { |recording| recording.recordable.section_type == "hero" }&.recordable
@@ -97,6 +100,8 @@ restore_template_sections = lambda do |page_recording, template_key, actor|
   hero_cta_type = hero&.content&.dig("cta", "type")
   hero_image = hero&.content&.[]("image").presence || hero&.content&.[]("image_url")
   hero_variant = hero&.settings&.[]("variant")
+  hero_alignment = hero&.settings&.[]("alignment")
+  hero_tone = hero&.settings&.[]("tone")
   legacy_cta = hero&.content&.[]("primary_action").present? && hero_cta_type.blank?
   cta_drift = if expected_cta_type.present?
     hero_cta_type != expected_cta_type
@@ -105,8 +110,10 @@ restore_template_sections = lambda do |page_recording, template_key, actor|
   end
   image_drift = expected_image_url.present? && hero_image != expected_image_url
   variant_drift = expected_variant.present? && hero_variant != expected_variant
+  alignment_drift = expected_alignment.present? && hero_alignment != expected_alignment
+  tone_drift = expected_tone.present? && hero_tone != expected_tone
   return if types == expected_types && hero_title == expected_hero_title && !legacy_cta && !cta_drift &&
-            !image_drift && !variant_drift
+            !image_drift && !variant_drift && !alignment_drift && !tone_drift
 
   sections.each do |recording|
     RecordingStudioPages::Services::RemoveSection.call(section_recording: recording, actor: actor).value!
@@ -156,19 +163,51 @@ begin
     grant_admin_access.call(recording, user)
   end
 
-  homepage_recording = find_page_recording.call("Home")
+  homepage_recording = find_page_recording.call("Home Dark") || find_page_recording.call("Home")
 
   unless homepage_recording
     homepage_recording = RecordingStudioPages::Services::CreatePage.call(
       parent_recording: root_recording,
-      title: "Home",
+      title: "Home Dark",
       homepage: true,
+      actor: user
+    ).value!
+  end
+
+  if homepage_recording.recordable.title != "Home Dark"
+    RecordingStudioPages::Services::RevisePage.call(
+      page_recording: homepage_recording,
+      title: "Home Dark",
       actor: user
     ).value!
   end
 
   restore_template_sections.call(homepage_recording, "home", user)
   publish_page.call(homepage_recording, "home", user)
+
+  home_left_recording = find_page_recording.call("Home Left")
+  unless home_left_recording
+    home_left_recording = RecordingStudioPages::Services::CreatePage.call(
+      parent_recording: root_recording,
+      title: "Home Left",
+      homepage: false,
+      actor: user
+    ).value!
+  end
+  restore_template_sections.call(home_left_recording, "home_left", user)
+  publish_page.call(home_left_recording, "home-left", user)
+
+  home_center_recording = find_page_recording.call("Home Center")
+  unless home_center_recording
+    home_center_recording = RecordingStudioPages::Services::CreatePage.call(
+      parent_recording: root_recording,
+      title: "Home Center",
+      homepage: false,
+      actor: user
+    ).value!
+  end
+  restore_template_sections.call(home_center_recording, "home_center", user)
+  publish_page.call(home_center_recording, "home-center", user)
 
   about_recording = find_page_recording.call("About")
 
@@ -278,9 +317,11 @@ begin
     { "text" => "About", "url" => public_page_path.call(about_recording) },
     { "text" => "Tonight", "url" => public_page_path.call(tonight_recording) }
   ]
-  sync_house_menu.call(homepage_recording, house_links, join_url, user)
+  [homepage_recording, home_left_recording, home_center_recording].each do |recording|
+    sync_house_menu.call(recording, house_links, join_url, user)
+  end
 
-  puts "Seeded Home, About, Tonight, Join, Walk in, and Start from a URL. Sign in as admin@admin.com / Password."
+  puts "Seeded Home Left, Home Center, Home Dark, About, Tonight, Join, Walk in, and Start from a URL. Sign in as admin@admin.com / Password."
   puts "Seeded: Workspace '#{workspace.name}' with homepage '#{homepage_recording.recordable.title}'"
   puts "Seeded: Admin root '#{admin_root.name}'"
 ensure

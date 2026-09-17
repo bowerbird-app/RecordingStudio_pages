@@ -165,7 +165,24 @@ module RecordingStudioPages
         },
         settings: {
           variant: :string,
-          alignment: :string,
+          alignment: {
+            type: :string,
+            label: "Alignment",
+            default: "center",
+            options: [
+              %w[Left left],
+              %w[Center center]
+            ]
+          },
+          tone: {
+            type: :string,
+            label: "Tone",
+            default: "dark",
+            options: [
+              %w[Light light],
+              %w[Dark dark]
+            ]
+          },
           background: :string
         },
         variants: %w[centered split_image fullscreen_image]

@@ -9,6 +9,7 @@
 @source "../../../../../app/views/**/*.erb";
 @source "../../../../../app/components/**/*.rb";
 @source "../../../../../app/components/**/*.erb";
+@source "../../../../../lib/recording_studio_pages/**/*.rb";
 
 /*
   Flatpack and Recording Studio sources. Mirror copies exist for this environment;
@@ -22,6 +23,7 @@
 @source "../../../tmp/tailwind/recording_studio_pages_views/**/*.erb";
 @source "../../../tmp/tailwind/recording_studio_pages_components/**/*.rb";
 @source "../../../tmp/tailwind/recording_studio_pages_components/**/*.erb";
+@source "../../../tmp/tailwind/recording_studio_pages_lib/**/*.rb";
 @source "../../../tmp/tailwind/recording_studio_user_views/**/*.erb";
 @source "../../../tmp/tailwind/recording_studio_attachable_views/**/*.erb";
 

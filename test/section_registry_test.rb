@@ -189,6 +189,12 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "string", hero[:fields][:title][:type]
     assert_equal true, hero[:fields][:title][:required]
     assert_equal "cta", hero[:fields][:cta][:type]
+    assert_equal "string", hero[:settings][:alignment][:type]
+    assert_equal "center", hero[:settings][:alignment][:default]
+    assert_equal [%w[Left left], %w[Center center]], hero[:settings][:alignment][:options]
+    assert_equal "string", hero[:settings][:tone][:type]
+    assert_equal "dark", hero[:settings][:tone][:default]
+    assert_equal [%w[Light light], %w[Dark dark]], hero[:settings][:tone][:options]
     assert(catalog[:templates].any? { |entry| entry[:key] == "marketing_home" })
     assert(catalog[:templates].any? { |entry| entry[:key] == "full_bleed_hero" })
     assert(catalog[:ctas].any? { |entry| entry[:key] == "button" })

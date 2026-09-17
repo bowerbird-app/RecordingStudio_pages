@@ -51,7 +51,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     homepage_recording = RecordingStudio::Recording.where(
       recordable_type: "RecordingStudioPages::Page",
       trashed_at: nil
-    ).includes(:recordable).find { |recording| recording.recordable&.title == "Home" }
+    ).includes(:recordable).find { |recording| recording.recordable&.title == "Home Dark" }
     tonight_recording = RecordingStudio::Recording.where(
       recordable_type: "RecordingStudioPages::Page",
       trashed_at: nil
@@ -88,8 +88,38 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal "The page is the front door", homepage_hero.content["title"]
     assert_equal "Come in if you want a seat.", homepage_hero.content["body"]
     assert_equal "fullscreen_image", homepage_hero.settings["variant"]
+    assert_equal "center", homepage_hero.settings["alignment"]
+    assert_equal "dark", homepage_hero.settings["tone"]
     assert_equal "/images/hero-tonight.jpg", homepage_hero.content["image"] || homepage_hero.content["image_url"]
     refute homepage_hero.content.dig("cta", "type").present?
+    home_left_recording = RecordingStudio::Recording.where(
+      recordable_type: "RecordingStudioPages::Page",
+      trashed_at: nil
+    ).includes(:recordable).find { |recording| recording.recordable&.title == "Home Left" }
+    home_center_recording = RecordingStudio::Recording.where(
+      recordable_type: "RecordingStudioPages::Page",
+      trashed_at: nil
+    ).includes(:recordable).find { |recording| recording.recordable&.title == "Home Center" }
+    assert_not_nil home_left_recording
+    assert_not_nil home_center_recording
+    refute home_left_recording.recordable.homepage?
+    refute home_center_recording.recordable.homepage?
+    home_left_hero = RecordingStudioPages::Composition.section_recordings_for(home_left_recording)
+                                                    .find { |recording| recording.recordable.section_type == "hero" }
+                                                    &.recordable
+    home_center_hero = RecordingStudioPages::Composition.section_recordings_for(home_center_recording)
+                                                       .find { |recording| recording.recordable.section_type == "hero" }
+                                                       &.recordable
+    assert_equal "Come sit on this side", home_left_hero.content["title"]
+    assert_equal "left", home_left_hero.settings["alignment"]
+    assert_equal "light", home_left_hero.settings["tone"]
+    assert_equal "/images/hero-home-left-pastel.png",
+                 home_left_hero.content["image"] || home_left_hero.content["image_url"]
+    assert_equal "Meet us in the middle", home_center_hero.content["title"]
+    assert_equal "center", home_center_hero.settings["alignment"]
+    assert_equal "light", home_center_hero.settings["tone"]
+    assert_equal "/images/hero-home-center-pastel.png",
+                 home_center_hero.content["image"] || home_center_hero.content["image_url"]
     join_recording = RecordingStudio::Recording.where(
       recordable_type: "RecordingStudioPages::Page",
       trashed_at: nil
@@ -168,15 +198,35 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal "walk_in", RecordingStudioPages.template(:walk_in).key
     assert_equal "start_from_url", RecordingStudioPages.template(:start_from_url).key
     assert_equal "home", RecordingStudioPages.template(:home).key
+    assert_equal "Home Dark", RecordingStudioPages.template(:home).name
+    assert_equal "home_left", RecordingStudioPages.template(:home_left).key
+    assert_equal "home_center", RecordingStudioPages.template(:home_center).key
     home = RecordingStudioPages.template(:home)
     home_types = home.sections.map { |entry| entry.fetch("type").to_s }
     home_hero = home.sections.find { |entry| entry.fetch("type").to_s == "hero" }
     home_hero_content = home_hero.fetch("content").to_h.stringify_keys
+    home_hero_settings = home_hero.fetch("settings").to_h.stringify_keys
     assert_equal %w[top_nav hero], home_types
-    assert_equal "fullscreen_image", home_hero.fetch("settings").to_h.stringify_keys.fetch("variant")
+    assert_equal "fullscreen_image", home_hero_settings.fetch("variant")
+    assert_equal "center", home_hero_settings.fetch("alignment")
+    assert_equal "dark", home_hero_settings.fetch("tone")
     assert_equal "The page is the front door", home_hero_content.fetch("title")
     refute home_hero_content.key?("cta")
     refute home_hero_content.key?("eyebrow")
+    left = RecordingStudioPages.template(:home_left)
+    left_hero = left.sections.find { |entry| entry.fetch("type").to_s == "hero" }
+    left_settings = left_hero.fetch("settings").to_h.stringify_keys
+    assert_equal "left", left_settings.fetch("alignment")
+    assert_equal "light", left_settings.fetch("tone")
+    assert_equal "/images/hero-home-left-pastel.png",
+                 left_hero.fetch("content").to_h.stringify_keys.fetch("image")
+    center = RecordingStudioPages.template(:home_center)
+    center_hero = center.sections.find { |entry| entry.fetch("type").to_s == "hero" }
+    center_settings = center_hero.fetch("settings").to_h.stringify_keys
+    assert_equal "center", center_settings.fetch("alignment")
+    assert_equal "light", center_settings.fetch("tone")
+    assert_equal "/images/hero-home-center-pastel.png",
+                 center_hero.fetch("content").to_h.stringify_keys.fetch("image")
     walk_in = RecordingStudioPages.template(:walk_in)
     walk_in_hero = walk_in.sections.first
     walk_in_content = walk_in_hero.fetch("content").to_h.stringify_keys

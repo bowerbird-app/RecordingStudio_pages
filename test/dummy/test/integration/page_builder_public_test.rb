@@ -165,6 +165,73 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_operator nav_at, :<, hero_at
   end
 
+  test "a light left fullscreen hero keeps dark type and left copy" do
+    page_recording = create_page!(parent_recording: @root, title: "Home Left", actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "top_nav",
+      content: {
+        name: "House",
+        links: [ { text: "About", url: "/pages/about" } ],
+        cta: { type: "button", text: "Join", url: "/users/sign_in" }
+      },
+      actor: @actor
+    )
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: {
+        title: "Come sit on this side",
+        body: "The light is already on.",
+        image: "/images/hero-home-left-pastel.png"
+      },
+      settings: { variant: "fullscreen_image", alignment: "left", tone: "light" },
+      actor: @actor
+    )
+    publishable = publish_page!(page_recording, slug: "home-left", actor: @actor)
+
+    get "/pages/#{publishable.id}/home-left"
+
+    assert_response :success
+    assert_includes response.body, "Come sit on this side"
+    assert_includes response.body, "hero-home-left-pastel.png"
+    assert_includes response.body, "background-image:"
+    assert_includes response.body, "bg-cover bg-center"
+    assert_includes response.body, "flex items-center"
+    assert_includes response.body, "text-left"
+    assert_includes response.body, "[&amp;_section]:justify-start"
+    assert_includes response.body, 'data-pages-menu-overlay="true"'
+    assert_includes response.body, "from-white/70"
+    refute_includes response.body, "--button-ghost-text-color: white"
+    refute_includes response.body, "bg-black/60"
+  end
+
+  test "a light center fullscreen hero keeps the copy in the middle" do
+    page_recording = create_page!(parent_recording: @root, title: "Home Center", actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: {
+        title: "Meet us in the middle",
+        body: "The floor is already warm.",
+        image: "/images/hero-home-center-pastel.png"
+      },
+      settings: { variant: "fullscreen_image", alignment: "center", tone: "light" },
+      actor: @actor
+    )
+    publishable = publish_page!(page_recording, slug: "home-center", actor: @actor)
+
+    get "/pages/#{publishable.id}/home-center"
+
+    assert_response :success
+    assert_includes response.body, "Meet us in the middle"
+    assert_includes response.body, "hero-home-center-pastel.png"
+    assert_includes response.body, "bg-cover bg-center"
+    refute_includes response.body, "text-left"
+    refute_includes response.body, "[&amp;_section]:justify-start"
+    refute_includes response.body, "bg-black/60"
+  end
+
   test "section variants change public markup" do
     page_recording = create_page!(parent_recording: @root, title: "Variant home", homepage: true, actor: @actor)
     add_section!(
