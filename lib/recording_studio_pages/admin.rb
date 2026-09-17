@@ -27,7 +27,8 @@ module RecordingStudioPages
     def self.append_status_query(path, status)
       return path if status.blank?
 
-      "#{path}?#{ { status: status }.to_query }"
+      query = { status: status }.to_query
+      "#{path}?#{query}"
     end
     private_class_method :append_status_query
 

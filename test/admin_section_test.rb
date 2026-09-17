@@ -51,6 +51,6 @@ class AdminSectionTest < Minitest::Test
 
     assert_includes admin, "def self.screen_path(status: nil)"
     assert_includes admin, "def self.screen_path_for(context, status: nil)"
-    assert_includes admin, "{ status: status }.to_query"
+    assert_includes admin, "query = { status: status }.to_query"
   end
 end
