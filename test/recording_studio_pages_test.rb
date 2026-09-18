@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.5", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.6", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -166,7 +166,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes layout, 'stylesheet_link_tag "flat_pack/application"'
     assert_includes layout, 'stylesheet_link_tag "tailwind"'
     assert_includes layout, "max-w-6xl"
-    assert_includes layout, "recording_studio_pages_flash"
+    assert_includes layout, "recording_studio_pages_flash if respond_to?(:recording_studio_pages_flash)"
     refute_includes layout, "flash[:notice]"
     refute_includes layout, "flash[:alert]"
     variables_at = layout.index('stylesheet_link_tag "flat_pack/variables"')

@@ -16,18 +16,64 @@ module RecordingStudioPages
       RecordingStudioAdmin.register_section(PagesSection)
     end
 
-    def self.screen_path
-      "#{admin_mount_path}/screens/#{SCREEN_KEY}"
+    def self.install_helpers!
+      return unless defined?(RecordingStudioAdmin::ApplicationController)
+      return unless RecordingStudioAdmin::ApplicationController.respond_to?(:helper)
+
+      controller = RecordingStudioAdmin::ApplicationController
+      controller.helper RecordingStudioPages::ApplicationHelper
+      if defined?(RecordingStudioPublishable::ApplicationHelper)
+        controller.helper RecordingStudioPublishable::ApplicationHelper
+      end
+      install_mounted_helpers!(controller)
     end
+
+    def self.install_mounted_helpers!(controller)
+      return unless defined?(Rails.application)
+      return unless Rails.application.respond_to?(:routes)
+
+      mounted = Rails.application.routes.mounted_helpers
+      controller.include mounted
+      controller.helper mounted
+    end
+    private_class_method :install_mounted_helpers!
+
+    def self.screen_path(status: nil, home_page: nil)
+      append_list_query("#{admin_mount_path}/screens/#{SCREEN_KEY}", status: status, home_page: home_page)
+    end
+
+    def self.screen_path_for(context, status: nil, home_page: nil)
+      append_list_query(context.admin_screen_path(SCREEN_KEY), status: status, home_page: home_page)
+    end
+
+    def self.append_list_query(path, status: nil, home_page: nil)
+      query = { status: status, home_page: home_page }.compact_blank
+      return path if query.blank?
+
+      "#{path}?#{query.to_query}"
+    end
+    private_class_method :append_list_query
 
     def self.new_page_path
       "#{ENGINE_MOUNT_PATH}/admin/pages/new"
+    end
+
+    def self.page_path(recording)
+      "#{ENGINE_MOUNT_PATH}/admin/pages/#{recording.id}"
     end
 
     def self.admin_mount_path
       return "/admin" unless defined?(RecordingStudioAdmin)
 
       RecordingStudioAdmin.configuration.default_mount_path.to_s.chomp("/")
+    end
+
+    def self.render_publishable_actions(recording, context)
+      view = context.respond_to?(:view_context) ? context.view_context : nil
+      return unless view
+      return unless view.respond_to?(:render_publishable_quick_actions)
+
+      view.render_publishable_quick_actions(recording)
     end
 
     class PagesSection < RecordingStudioAdmin::Section
@@ -52,6 +98,16 @@ module RecordingStudioPages
       button :new_page, text: "Page", url: ->(_context) { RecordingStudioPages::Admin.new_page_path },
                         style: :primary
 
+      STATUS_FILTER = lambda { |relation, value, _context|
+        RecordingStudioPages::Composition.filter_page_recordings_by_status(relation, value)
+      }
+      HOMEPAGE_FILTER = lambda { |relation, value, _context|
+        RecordingStudioPages::Composition.filter_page_recordings_by_homepage(relation, value)
+      }
+      STATUS_ACTIONS = lambda { |recording, context|
+        RecordingStudioPages::Admin.render_publishable_actions(recording, context)
+      }
+
       query do |_context|
         RecordingStudio::Recording.where(recordable_type: "RecordingStudioPages::Page", trashed_at: nil)
                                   .includes(:recordable)
@@ -60,40 +116,72 @@ module RecordingStudioPages
 
       table do
         default_sort :updated_at
+        filter :status,
+               options: RecordingStudioPages::Composition::STATUS_OPTIONS,
+               apply: STATUS_FILTER
+        filter :home_page,
+               options: RecordingStudioPages::Composition::HOMEPAGE_OPTIONS,
+               apply: HOMEPAGE_FILTER
         column :title, title: "Page", sortable: false,
                        value: ->(recording, _context) { recording.recordable&.title }
+        column :status, title: "Status", sortable: false, value: STATUS_ACTIONS
         column :homepage, title: "Home", sortable: false,
                           value: ->(recording, _context) { recording.recordable&.homepage? ? "Home" : "" }
         column :updated_at
+        admin_action SCREEN_KEY, :edit
+        admin_action SCREEN_KEY, :trash
       end
     end
 
     class PagesResource < RecordingStudioAdmin::Resource
       key SCREEN_KEY
       section SECTION_KEY
+      blast_radius :site
 
-      action :open,
-             text: "Open",
-             icon: "eye",
-             url: ->(recording, _context) { "#{ENGINE_MOUNT_PATH}/admin/pages/#{recording.id}" }
+      action :edit,
+             text: "Edit",
+             icon: "pencil-square",
+             required_role: :view,
+             blast_radius: :site,
+             url: ->(recording, _context) { RecordingStudioPages::Admin.page_path(recording) }
+      action :trash,
+             text: "Trash",
+             icon: "trash",
+             method: :delete,
+             confirm: "Trash this page?",
+             destructive: true,
+             required_role: :edit,
+             blast_radius: :site,
+             url: ->(recording, _context) { RecordingStudioPages::Admin.page_path(recording) }
     end
 
     PublishedPagesWidget = RecordingStudioAdmin::Widget.new("widgets.pages.published_pages") do
-      title "Live pages"
-      info "Pages that are live on the public site."
+      title "Published"
+      info "Pages that are on the public site."
       blast_radius :site
       value do |_context|
         RecordingStudioPages::Composition.published_pages_count
       end
+      link_to do |context|
+        RecordingStudioPages::Admin.screen_path_for(
+          context,
+          status: RecordingStudioPages::Composition::STATUS_PUBLISHED
+        )
+      end
+      link_label "Published"
     end
 
     DraftPagesWidget = RecordingStudioAdmin::Widget.new("widgets.pages.draft_pages") do
       title "Drafts"
-      info "Pages that exist but are not live yet."
+      info "Pages that are still a draft."
       blast_radius :site
       value do |_context|
         RecordingStudioPages::Composition.draft_pages_count
       end
+      link_to do |context|
+        RecordingStudioPages::Admin.screen_path_for(context, status: RecordingStudioPages::Composition::STATUS_DRAFT)
+      end
+      link_label "Drafts"
     end
   end
 end

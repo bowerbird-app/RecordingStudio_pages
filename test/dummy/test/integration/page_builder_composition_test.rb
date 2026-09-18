@@ -271,13 +271,43 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
     assert_equal false, result.value.recordable.homepage?
   end
 
-  test "published and draft page counts use live publishable children" do
-    live = create_page!(parent_recording: @root, title: "Live count", actor: @actor)
-    create_page!(parent_recording: @root, title: "Draft count", actor: @actor)
-    publish_page!(live, slug: "live-count-#{SecureRandom.hex(4)}", actor: @actor)
+  test "published, scheduled, and draft page counts use publishable children" do
+    published = create_page!(parent_recording: @root, title: "Published count", actor: @actor)
+    scheduled = create_page!(parent_recording: @root, title: "Scheduled count", actor: @actor)
+    draft = create_page!(parent_recording: @root, title: "Draft count", actor: @actor)
+    home = create_page!(parent_recording: @root, title: "Home count", homepage: true, actor: @actor)
+    publish_page!(published, slug: "published-count-#{SecureRandom.hex(4)}", actor: @actor)
+    RecordingStudioPublishable::Services::Publishables::Update.call(
+      parent_recording: scheduled,
+      attributes: { slug: "scheduled-count-#{SecureRandom.hex(4)}", status: "published", publish_at: 1.day.from_now },
+      actor: @actor
+    ).value!
 
     assert RecordingStudioPages::Composition.published_pages_count >= 1
     assert RecordingStudioPages::Composition.draft_pages_count >= 1
+    assert_equal "Published", RecordingStudioPages::Composition.page_status(published.reload)
+    assert_equal "Scheduled", RecordingStudioPages::Composition.page_status(scheduled.reload)
+    assert_equal "Draft", RecordingStudioPages::Composition.page_status(draft)
+
+    pages = RecordingStudioPages::Composition.page_recordings
+    draft_pages = RecordingStudioPages::Composition.filter_page_recordings_by_status(pages, "Draft")
+    scheduled_pages = RecordingStudioPages::Composition.filter_page_recordings_by_status(pages, "Scheduled")
+    published_pages = RecordingStudioPages::Composition.filter_page_recordings_by_status(pages, "Published")
+    home_pages = RecordingStudioPages::Composition.filter_page_recordings_by_homepage(pages, "Home")
+    other_pages = RecordingStudioPages::Composition.filter_page_recordings_by_homepage(pages, "Other pages")
+
+    assert_includes published_pages.map(&:id), published.id
+    refute_includes draft_pages.map(&:id), published.id
+    refute_includes scheduled_pages.map(&:id), published.id
+    assert_includes scheduled_pages.map(&:id), scheduled.id
+    refute_includes published_pages.map(&:id), scheduled.id
+    refute_includes draft_pages.map(&:id), scheduled.id
+    assert_includes draft_pages.map(&:id), draft.id
+    refute_includes published_pages.map(&:id), draft.id
+    assert_includes home_pages.map(&:id), home.id
+    refute_includes other_pages.map(&:id), home.id
+    assert_includes other_pages.map(&:id), draft.id
+    assert_equal pages.count, published_pages.count + scheduled_pages.count + draft_pages.count
   end
 
   test "duplicating a section requires edit access" do

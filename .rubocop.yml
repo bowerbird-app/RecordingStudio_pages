@@ -33,6 +33,7 @@ Metrics/ModuleLength:
   Exclude:
     - "lib/recording_studio_pages/built_ins.rb"
     - "lib/recording_studio_pages/admin.rb"
+    - "lib/recording_studio_pages/composition.rb"
 
 Metrics/MethodLength:
   Exclude:
