@@ -9,18 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.6] - 2026-09-17
 
-Pages hub cards open the Pages list. Drafts arrives with the Draft status filter on.
+Pages hub cards open the Pages list. The list uses Publishable status, a Home filter, and a row menu.
 
 ### Added
-- The Admin Pages list has a **Status** filter: Live or Draft. The table shows that status on each row.
-- Live pages and Drafts cards on the Pages hub open the Pages list. Drafts opens it with Draft selected.
+- The Admin Pages list has a **Status** filter (Draft, Scheduled, Published) and a **Home page** filter (Home or Other pages). Status on each row is Publishable’s `render_publishable_quick_actions` control.
+- Each row has an actions menu with **Edit** (the page editor) and **Trash**.
+- Published and Drafts cards on the Pages hub open the Pages list. Drafts opens it with Draft selected. Published opens it with Published selected.
 
 ### Changed
 - Dummy default layout only draws the pages flash slot when the Pages helper is on the controller, so RS Admin can share that layout.
 
 ### Upgrade notes
-- If you overrode the Admin Pages screen, take the Status filter and Status column, or keep your list on purpose.
-- If you overrode the Live pages or Drafts widgets, take `link_to` to the Pages screen (Drafts passes `status=Draft`).
+- If you overrode the Admin Pages screen, take the Status filter (Draft / Scheduled / Published), Home page filter, Publishable status control, and the Edit / Trash row menu, or keep your list on purpose.
+- If you overrode the Published (was Live pages) or Drafts widgets, take `link_to` to the Pages screen. Published passes `status=Published`. Drafts passes `status=Draft`.
 
 ## [0.3.5] - 2026-09-17
 

@@ -578,34 +578,91 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Status"
   end
 
-  test "the Pages list can filter live and draft pages" do
-    live = create_page!(parent_recording: @root, title: "Live Listed #{SecureRandom.hex(4)}", actor: @actor)
+  test "the Pages list can filter publishable status and home" do
+    published = create_page!(parent_recording: @root, title: "Published Listed #{SecureRandom.hex(4)}", actor: @actor)
+    scheduled = create_page!(parent_recording: @root, title: "Scheduled Listed #{SecureRandom.hex(4)}", actor: @actor)
     draft = create_page!(parent_recording: @root, title: "Draft Listed #{SecureRandom.hex(4)}", actor: @actor)
-    publish_page!(live, slug: "live-listed-#{SecureRandom.hex(4)}", actor: @actor)
+    home = create_page!(
+      parent_recording: @root,
+      title: "Home Listed #{SecureRandom.hex(4)}",
+      homepage: true,
+      actor: @actor
+    )
+    publish_page!(published, slug: "published-listed-#{SecureRandom.hex(4)}", actor: @actor)
+    RecordingStudioPublishable::Services::Publishables::Update.call(
+      parent_recording: scheduled,
+      attributes: {
+        slug: "scheduled-listed-#{SecureRandom.hex(4)}",
+        status: "published",
+        publish_at: 1.day.from_now
+      },
+      actor: @actor
+    ).value!
 
     switch_to_admin_root!
 
     get RecordingStudioPages::Admin.screen_path
     assert_response :success
     assert_includes response.body, "Status"
-    assert_includes response.body, "Live"
     assert_includes response.body, "Draft"
+    assert_includes response.body, "Scheduled"
+    assert_includes response.body, "Published"
+    assert_includes response.body, "Home page"
+    refute_includes response.body, ">Live<"
 
     get "/admin/screens/pages/table",
         params: { status: RecordingStudioPages::Composition::STATUS_DRAFT },
         headers: { "Turbo-Frame" => "screen-table" }
     assert_response :success
     assert_includes response.body, draft.recordable.title
-    refute_includes response.body, live.recordable.title
+    refute_includes response.body, published.recordable.title
+    refute_includes response.body, scheduled.recordable.title
     assert_includes response.body, "Draft"
+    assert_includes response.body, "publishable_quick_actions_#{draft.id}"
 
     get "/admin/screens/pages/table",
-        params: { status: RecordingStudioPages::Composition::STATUS_LIVE },
+        params: { status: RecordingStudioPages::Composition::STATUS_PUBLISHED },
         headers: { "Turbo-Frame" => "screen-table" }
     assert_response :success
-    assert_includes response.body, live.recordable.title
+    assert_includes response.body, published.recordable.title
     refute_includes response.body, draft.recordable.title
-    assert_includes response.body, "Live"
+    refute_includes response.body, scheduled.recordable.title
+    assert_includes response.body, "Published"
+
+    get "/admin/screens/pages/table",
+        params: { status: RecordingStudioPages::Composition::STATUS_SCHEDULED },
+        headers: { "Turbo-Frame" => "screen-table" }
+    assert_response :success
+    assert_includes response.body, scheduled.recordable.title
+    refute_includes response.body, published.recordable.title
+    refute_includes response.body, draft.recordable.title
+
+    get "/admin/screens/pages/table",
+        params: { homepage: RecordingStudioPages::Composition::HOMEPAGE_HOME },
+        headers: { "Turbo-Frame" => "screen-table" }
+    assert_response :success
+    assert_includes response.body, home.recordable.title
+    refute_includes response.body, draft.recordable.title
+  end
+
+  test "the Pages list row menu can edit and trash a page" do
+    page_recording = create_page!(parent_recording: @root, title: "Row Menu #{SecureRandom.hex(4)}", actor: @actor)
+    switch_to_admin_root!
+
+    get "/admin/screens/pages/table",
+        headers: { "Turbo-Frame" => "screen-table" }
+
+    assert_response :success
+    assert_includes response.body, "Edit"
+    assert_includes response.body, "Trash"
+    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.page_path(page_recording)}\""
+    assert_includes response.body, "data-turbo-method=\"delete\""
+    assert_includes response.body, "Trash this page?"
+    assert_includes response.body, "Actions"
+
+    delete recording_studio_pages.admin_page_path(page_recording)
+    assert_response :redirect
+    assert_nil RecordingStudio::Recording.find_by(id: page_recording.id, trashed_at: nil)
   end
 
   test "creating a page without ticking home still saves from the Admin root" do
@@ -651,9 +708,11 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     refute_includes response.body, "aria-busy"
-    assert_includes response.body, "Live pages"
+    assert_includes response.body, "Published"
+    refute_includes response.body, "Live pages"
     assert_includes response.body, ">#{published_count}<"
-    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.screen_path}\""
+    assert_includes response.body,
+                    "href=\"#{RecordingStudioPages::Admin.screen_path(status: RecordingStudioPages::Composition::STATUS_PUBLISHED)}\""
 
     get "/admin/sections/pages/widgets/widgets.pages.draft_pages",
         params: { widget_view_variant: :compact },

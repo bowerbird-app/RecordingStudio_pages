@@ -4,9 +4,14 @@ module RecordingStudioPages
   module Composition
     module_function
 
-    STATUS_LIVE = "Live"
     STATUS_DRAFT = "Draft"
-    STATUS_OPTIONS = [STATUS_LIVE, STATUS_DRAFT].freeze
+    STATUS_SCHEDULED = "Scheduled"
+    STATUS_PUBLISHED = "Published"
+    STATUS_OPTIONS = [STATUS_DRAFT, STATUS_SCHEDULED, STATUS_PUBLISHED].freeze
+
+    HOMEPAGE_HOME = "Home"
+    HOMEPAGE_OTHER = "Other pages"
+    HOMEPAGE_OPTIONS = [HOMEPAGE_HOME, HOMEPAGE_OTHER].freeze
 
     def section_recordings_for(page_recording)
       scope = ordered_children(page_recording)
@@ -48,48 +53,79 @@ module RecordingStudioPages
     end
 
     def draft_pages_count
-      [page_recordings.count - published_pages_count, 0].max
+      filter_page_recordings_by_status(page_recordings, STATUS_DRAFT).count
     end
 
     def live_page_recording_ids
-      live_ids = currently_live_publishable_ids
-      return RecordingStudio::Recording.none.select(:parent_recording_id) if live_ids.blank?
+      page_recording_ids_for_publishables(currently_live_publishable_ids)
+    end
 
-      RecordingStudio::Recording.where(
-        recordable_type: "RecordingStudioPublishable::Publishable",
-        recordable_id: live_ids,
-        trashed_at: nil,
-        parent_recording_id: page_recordings.select(:id)
-      ).distinct.select(:parent_recording_id)
+    def scheduled_page_recording_ids
+      page_recording_ids_for_publishables(currently_scheduled_publishable_ids)
     end
 
     def filter_page_recordings_by_status(relation, value)
       case value.to_s
-      when STATUS_LIVE
+      when STATUS_PUBLISHED
         relation.where(id: live_page_recording_ids)
+      when STATUS_SCHEDULED
+        relation.where(id: scheduled_page_recording_ids)
       when STATUS_DRAFT
-        relation.where.not(id: live_page_recording_ids)
+        relation.where.not(id: live_page_recording_ids).where.not(id: scheduled_page_recording_ids)
+      else
+        relation
+      end
+    end
+
+    def filter_page_recordings_by_homepage(relation, value)
+      homepage_ids = RecordingStudioPages::Page.where(homepage: true).select(:id)
+
+      case value.to_s
+      when HOMEPAGE_HOME
+        relation.where(recordable_id: homepage_ids)
+      when HOMEPAGE_OTHER
+        relation.where.not(recordable_id: homepage_ids)
       else
         relation
       end
     end
 
     def page_status(recording)
-      live_page?(recording) ? STATUS_LIVE : STATUS_DRAFT
-    end
+      return STATUS_PUBLISHED if live_page?(recording)
+      return STATUS_SCHEDULED if scheduled_page?(recording)
 
-    def page_status_badge_style(status)
-      status.to_s == STATUS_LIVE ? :success : :info
+      STATUS_DRAFT
     end
 
     def live_page?(recording)
       recording.respond_to?(:currently_published?) && recording.currently_published?
     end
 
+    def scheduled_page?(recording)
+      recording.respond_to?(:scheduled_for_future?) && recording.scheduled_for_future?
+    end
+
     def currently_live_publishable_ids
       return [] unless defined?(RecordingStudioPublishable::Publishable)
 
       RecordingStudioPublishable::Publishable.currently_published.select(:id)
+    end
+
+    def currently_scheduled_publishable_ids
+      return [] unless defined?(RecordingStudioPublishable::Publishable)
+
+      RecordingStudioPublishable::Publishable.scheduled.select(:id)
+    end
+
+    def page_recording_ids_for_publishables(publishable_ids)
+      return RecordingStudio::Recording.none.select(:parent_recording_id) if publishable_ids.blank?
+
+      RecordingStudio::Recording.where(
+        recordable_type: "RecordingStudioPublishable::Publishable",
+        recordable_id: publishable_ids,
+        trashed_at: nil,
+        parent_recording_id: page_recordings.select(:id)
+      ).distinct.select(:parent_recording_id)
     end
 
     def ordered_children(page_recording)

@@ -40,7 +40,10 @@ module RecordingStudioPages
 
     config.to_prepare do
       RecordingStudioPages.restore_registries!
-      RecordingStudioPages::Admin.register! if defined?(RecordingStudioPages::Admin) && defined?(RecordingStudioAdmin)
+      if defined?(RecordingStudioPages::Admin) && defined?(RecordingStudioAdmin)
+        RecordingStudioPages::Admin.register!
+        RecordingStudioPages::Admin.install_helpers!
+      end
     end
 
     class << self
