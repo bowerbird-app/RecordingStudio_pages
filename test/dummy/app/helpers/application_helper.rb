@@ -41,6 +41,10 @@ module ApplicationHelper
     "/pages/#{publishable_recording.id}/#{publishable.slug}"
   end
 
+  def dummy_href_from_root(path)
+    RecordingStudioPages::Admin.merge_anchor_url(path, main_app.root_path)
+  end
+
   def dummy_page_nav(title:, back_url: nil, back_label: "Home")
     recording_studio_page_nav(
       title: title,

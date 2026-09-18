@@ -43,7 +43,8 @@ module RecordingStudioPages
     end
 
     def self.screen_path_for(context, status: nil, home_page: nil)
-      append_list_query(context.admin_screen_path(SCREEN_KEY), status: status, home_page: home_page)
+      path = append_list_query(context.admin_screen_path(SCREEN_KEY), status: status, home_page: home_page)
+      merge_anchor_url(path, incoming_anchor_url(context))
     end
 
     def self.append_list_query(path, status: nil, home_page: nil)
@@ -60,6 +61,14 @@ module RecordingStudioPages
 
     def self.page_path(recording, anchor_url: nil)
       merge_anchor_url("#{ENGINE_MOUNT_PATH}/admin/pages/#{recording.id}", anchor_url)
+    end
+
+    def self.incoming_anchor_url(context)
+      return if context.blank?
+      return unless context.respond_to?(:params)
+
+      params = context.params || {}
+      safe_anchor_url(params[:anchor_url] || params["anchor_url"])
     end
 
     def self.safe_anchor_url(value)
@@ -127,9 +136,9 @@ module RecordingStudioPages
       subtitle "Compose public pages from registered sections"
       blast_radius :site
       link :new_page, text: "Page",
-                      url: ->(_context) { RecordingStudioPages::Admin.new_page_path(anchor_url: RecordingStudioPages::Admin.admin_mount_path) },
+                      url: ->(context) { RecordingStudioPages::Admin.new_page_path(anchor_url: RecordingStudioPages::Admin.incoming_anchor_url(context)) },
                       style: :primary
-      link :pages, text: "View all", url: ->(context) { context.admin_screen_path(SCREEN_KEY) },
+      link :pages, text: "View all", url: ->(context) { RecordingStudioPages::Admin.screen_path_for(context) },
                    style: :secondary
       widget "widgets.pages.published_pages", view_variant: :compact
       widget "widgets.pages.draft_pages", view_variant: :compact
@@ -141,7 +150,7 @@ module RecordingStudioPages
       subtitle "Compose public pages from sections."
       blast_radius :site
       button :new_page, text: "Page",
-                        url: ->(context) { RecordingStudioPages::Admin.new_page_path(anchor_url: context.admin_screen_path(SCREEN_KEY)) },
+                        url: ->(context) { RecordingStudioPages::Admin.new_page_path(anchor_url: RecordingStudioPages::Admin.incoming_anchor_url(context)) },
                         style: :primary
 
       STATUS_FILTER = lambda { |relation, value, _context|
@@ -191,7 +200,7 @@ module RecordingStudioPages
              icon: "pencil-square",
              required_role: :view,
              blast_radius: :site,
-             url: ->(recording, context) { RecordingStudioPages::Admin.page_path(recording, anchor_url: context.admin_screen_path(SCREEN_KEY)) }
+             url: ->(recording, context) { RecordingStudioPages::Admin.page_path(recording, anchor_url: RecordingStudioPages::Admin.incoming_anchor_url(context)) }
       action :trash,
              text: "Trash",
              icon: "trash",

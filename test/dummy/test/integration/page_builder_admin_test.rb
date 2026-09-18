@@ -545,7 +545,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "View pages"
     refute_includes response.body, "New page"
 
-    page_href = RecordingStudioPages::Admin.new_page_path(anchor_url: "/admin")
+    page_href = RecordingStudioPages::Admin.new_page_path
     view_all_href = RecordingStudioPages::Admin.screen_path
     assert_includes response.body, "href=\"#{page_href}\""
     assert_includes response.body, "href=\"#{view_all_href}\""
@@ -564,11 +564,10 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "max-w-xl"
     assert_includes response.body, "flex-wrap items-center gap-3"
     assert_includes response.body, 'aria-label="Close"'
-    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.screen_path}\""
+    assert_match(%r{href="/admin"(?:[\s>/])}, response.body)
+    refute_includes response.body, "href=\"#{RecordingStudioPages::Admin.screen_path}\""
 
-    list_new_page_href = RecordingStudioPages::Admin.new_page_path(
-      anchor_url: RecordingStudioPages::Admin.screen_path
-    )
+    list_new_page_href = RecordingStudioPages::Admin.new_page_path
     get RecordingStudioPages::Admin.screen_path
     assert_response :success
     assert_includes response.body, "Pages"
@@ -707,10 +706,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Edit"
     assert_includes response.body, "Trash"
-    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.page_path(
-      page_recording,
-      anchor_url: RecordingStudioPages::Admin.screen_path
-    )}\""
+    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.page_path(page_recording)}\""
     assert_includes response.body, "data-turbo-method=\"delete\""
     assert_includes response.body, "Trash this page?"
     assert_includes response.body, "Actions"
@@ -721,18 +717,20 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
   end
 
   test "page builder screens close to the original trigger" do
-    origin = "/admin"
+    origin = "/"
     get recording_studio_pages.new_admin_page_path, params: { anchor_url: origin }
 
     assert_response :success
     assert_includes response.body, 'aria-label="Close"'
-    assert_match(%r{href="/admin"(?:[\s>/])}, response.body)
+    assert_match(%r{href="/"(?:[\s>])}, response.body)
+    refute_includes response.body, "href=\"#{RecordingStudioPages::Admin.screen_path}\""
 
     get recording_studio_pages.new_admin_page_path, params: { anchor_url: "javascript:alert(1)" }
 
     assert_response :success
-    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.screen_path}\""
+    assert_match(%r{href="/admin"(?:[\s>/])}, response.body)
     refute_includes response.body, "javascript:alert"
+    refute_includes response.body, "href=\"#{RecordingStudioPages::Admin.screen_path}\""
 
     title = "Anchor Create #{SecureRandom.hex(4)}"
     post recording_studio_pages.admin_pages_path(anchor_url: origin), params: { page: { title: title } }
@@ -746,12 +744,38 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, title
     assert_includes response.body, 'aria-label="Close"'
-    assert_match(%r{href="/admin"(?:[\s>/])}, response.body)
+    assert_match(%r{href="/"(?:[\s>])}, response.body)
 
     get recording_studio_pages.edit_admin_page_path(page_recording, anchor_url: origin)
     assert_response :success
     assert_includes response.body, "Settings"
-    assert_match(%r{href="/admin"(?:[\s>/])}, response.body)
+    assert_match(%r{href="/"(?:[\s>])}, response.body)
+
+    switch_to_admin_root!
+    root_new_page = RecordingStudioPages::Admin.new_page_path(anchor_url: origin)
+    get "/admin", params: { anchor_url: origin }
+    assert_response :success
+    assert_includes response.body, "href=\"#{root_new_page}\""
+    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.merge_anchor_url(
+      RecordingStudioPages::Admin.screen_path,
+      origin
+    )}\""
+
+    get "/admin/screens/pages", params: { anchor_url: origin }
+    assert_response :success
+    assert_includes response.body, "href=\"#{root_new_page}\""
+    refute_includes response.body, RecordingStudioPages::Admin.new_page_path(
+      anchor_url: RecordingStudioPages::Admin.screen_path
+    )
+
+    get "/admin/screens/pages/table",
+        params: { anchor_url: origin },
+        headers: { "Turbo-Frame" => "screen-table" }
+    assert_response :success
+    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.page_path(
+      page_recording,
+      anchor_url: origin
+    )}\""
   end
 
   test "creating a page without ticking home still saves from the Admin root" do

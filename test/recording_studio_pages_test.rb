@@ -101,6 +101,7 @@ class RecordingStudioPagesTest < Minitest::Test
 
     refute_includes dummy_helper, "recording_studio_pages_page_nav"
     assert_includes dummy_helper, "dummy_page_nav"
+    assert_includes dummy_helper, "dummy_href_from_root"
     assert_includes dummy_helper, "recording_studio_root_switch_dropdown"
     assert_includes dummy_helper, "Sign out"
     assert_includes gem_helper, "recording_studio_page_nav"
@@ -435,7 +436,7 @@ class RecordingStudioPagesTest < Minitest::Test
     new_page = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/new.html.erb", __dir__))
     assert_includes new_page, "max-w-xl"
     assert_includes new_page, "flex-wrap items-center gap-3"
-    assert_includes new_page, "anchor_url: RecordingStudioPages::Admin.screen_path"
+    assert_includes new_page, "anchor_url: RecordingStudioPages::Admin.admin_mount_path"
     create_page = File.read(File.expand_path("../lib/recording_studio_pages/services/create_page.rb", __dir__))
     assert_includes create_page, "page.homepage = homepage?"
     controller = File.read(

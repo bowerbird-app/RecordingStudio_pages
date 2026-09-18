@@ -22,9 +22,12 @@ class AdminSectionTest < Minitest::Test
 
     assert_includes admin, "context.admin_screen_path(SCREEN_KEY)"
     assert_includes admin, "RecordingStudioPages::Admin.new_page_path"
-    assert_includes admin, "anchor_url: RecordingStudioPages::Admin.admin_mount_path"
-    assert_includes admin, "anchor_url: context.admin_screen_path(SCREEN_KEY)"
+    assert_includes admin, "RecordingStudioPages::Admin.screen_path_for(context)"
+    assert_includes admin, "incoming_anchor_url(context)"
+    assert_includes admin, "def self.incoming_anchor_url(context)"
     assert_includes admin, "def self.safe_anchor_url(value)"
+    refute_includes admin, "anchor_url: context.admin_screen_path(SCREEN_KEY)"
+    refute_includes admin, "anchor_url: RecordingStudioPages::Admin.admin_mount_path"
     assert_includes admin, "ENGINE_MOUNT_PATH = \"/recording_studio_pages\""
     assert_includes admin, "sortable: false"
     assert_includes admin, "default_sort :updated_at"
@@ -109,5 +112,29 @@ class AdminSectionTest < Minitest::Test
     assert_includes admin, "def self.screen_path(status: nil, home_page: nil)"
     assert_includes admin, "def self.screen_path_for(context, status: nil, home_page: nil)"
     assert_includes admin, "query.to_query"
+  end
+
+  def test_incoming_anchor_url_keeps_the_original_trigger
+    context = Struct.new(:params).new({ anchor_url: "/" })
+
+    assert_equal "/", RecordingStudioPages::Admin.incoming_anchor_url(context)
+    assert_nil RecordingStudioPages::Admin.incoming_anchor_url(Struct.new(:params).new({}))
+    assert_nil RecordingStudioPages::Admin.incoming_anchor_url(Struct.new(:params).new({ anchor_url: "javascript:alert(1)" }))
+    assert_equal "/recording_studio_pages/admin/pages/new?anchor_url=%2F",
+                 RecordingStudioPages::Admin.new_page_path(anchor_url: "/")
+    refute_includes RecordingStudioPages::Admin.new_page_path(anchor_url: "/"),
+                    RecordingStudioPages::Admin.screen_path
+
+    screen_context = Object.new
+    def screen_context.params
+      { anchor_url: "/" }
+    end
+
+    def screen_context.admin_screen_path(_key)
+      "/admin/screens/pages"
+    end
+
+    assert_equal "/admin/screens/pages?anchor_url=%2F",
+                 RecordingStudioPages::Admin.screen_path_for(screen_context)
   end
 end
