@@ -718,6 +718,27 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
 
   test "page builder screens close to the original trigger" do
     origin = "/"
+    context = Struct.new(:params).new({ anchor_url: origin })
+    unsafe = Struct.new(:params).new({ anchor_url: "javascript:alert(1)" })
+    screen_context = Object.new
+    def screen_context.params
+      { anchor_url: "/" }
+    end
+
+    def screen_context.admin_screen_path(_key)
+      "/admin/screens/pages"
+    end
+
+    assert_equal origin, RecordingStudioPages::Admin.incoming_anchor_url(context)
+    assert_nil RecordingStudioPages::Admin.incoming_anchor_url(Struct.new(:params).new({}))
+    assert_nil RecordingStudioPages::Admin.incoming_anchor_url(unsafe)
+    assert_equal "/recording_studio_pages/admin/pages/new?anchor_url=%2F",
+                 RecordingStudioPages::Admin.new_page_path(anchor_url: origin)
+    refute_includes RecordingStudioPages::Admin.new_page_path(anchor_url: origin),
+                    RecordingStudioPages::Admin.screen_path
+    assert_equal "/admin/screens/pages?anchor_url=%2F",
+                 RecordingStudioPages::Admin.screen_path_for(screen_context)
+
     get recording_studio_pages.new_admin_page_path, params: { anchor_url: origin }
 
     assert_response :success
