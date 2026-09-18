@@ -608,6 +608,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Scheduled"
     assert_includes response.body, "Published"
     assert_includes response.body, "Home page"
+    assert_includes response.body, "Other pages"
     refute_includes response.body, ">Live<"
 
     get "/admin/screens/pages/table",
@@ -638,7 +639,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     refute_includes response.body, draft.recordable.title
 
     get "/admin/screens/pages/table",
-        params: { homepage: RecordingStudioPages::Composition::HOMEPAGE_HOME },
+        params: { home_page: RecordingStudioPages::Composition::HOMEPAGE_HOME },
         headers: { "Turbo-Frame" => "screen-table" }
     assert_response :success
     assert_includes response.body, home.recordable.title

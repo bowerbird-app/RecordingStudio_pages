@@ -38,16 +38,16 @@ module RecordingStudioPages
     end
     private_class_method :install_mounted_helpers!
 
-    def self.screen_path(status: nil, homepage: nil)
-      append_list_query("#{admin_mount_path}/screens/#{SCREEN_KEY}", status: status, homepage: homepage)
+    def self.screen_path(status: nil, home_page: nil)
+      append_list_query("#{admin_mount_path}/screens/#{SCREEN_KEY}", status: status, home_page: home_page)
     end
 
-    def self.screen_path_for(context, status: nil, homepage: nil)
-      append_list_query(context.admin_screen_path(SCREEN_KEY), status: status, homepage: homepage)
+    def self.screen_path_for(context, status: nil, home_page: nil)
+      append_list_query(context.admin_screen_path(SCREEN_KEY), status: status, home_page: home_page)
     end
 
-    def self.append_list_query(path, status: nil, homepage: nil)
-      query = { status: status, homepage: homepage }.compact_blank
+    def self.append_list_query(path, status: nil, home_page: nil)
+      query = { status: status, home_page: home_page }.compact_blank
       return path if query.blank?
 
       "#{path}?#{query.to_query}"
@@ -118,11 +118,9 @@ module RecordingStudioPages
         default_sort :updated_at
         filter :status,
                options: RecordingStudioPages::Composition::STATUS_OPTIONS,
-               placeholder: "Status",
                apply: STATUS_FILTER
-        filter :homepage,
+        filter :home_page,
                options: RecordingStudioPages::Composition::HOMEPAGE_OPTIONS,
-               placeholder: "Home page",
                apply: HOMEPAGE_FILTER
         column :title, title: "Page", sortable: false,
                        value: ->(recording, _context) { recording.recordable&.title }
@@ -138,6 +136,7 @@ module RecordingStudioPages
     class PagesResource < RecordingStudioAdmin::Resource
       key SCREEN_KEY
       section SECTION_KEY
+      blast_radius :site
 
       action :edit,
              text: "Edit",
