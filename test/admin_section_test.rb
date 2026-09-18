@@ -22,6 +22,9 @@ class AdminSectionTest < Minitest::Test
 
     assert_includes admin, "context.admin_screen_path(SCREEN_KEY)"
     assert_includes admin, "RecordingStudioPages::Admin.new_page_path"
+    assert_includes admin, "anchor_url: RecordingStudioPages::Admin.admin_mount_path"
+    assert_includes admin, "anchor_url: context.admin_screen_path(SCREEN_KEY)"
+    assert_includes admin, "def self.safe_anchor_url(value)"
     assert_includes admin, "ENGINE_MOUNT_PATH = \"/recording_studio_pages\""
     assert_includes admin, "sortable: false"
     assert_includes admin, "default_sort :updated_at"
@@ -70,8 +73,12 @@ class AdminSectionTest < Minitest::Test
     assert_includes admin, "def self.public_page_path(recording)"
     assert_includes admin, "def self.render_page_title(recording, context)"
     assert_includes admin, "value: TITLE_CELL"
-    assert_includes admin, "FlatPack::Link::Component.new(href: href)"
-    assert_includes admin, "Composition.live_page?(recording)"
+    assert_includes admin, "def self.public_page_link(href)"
+    assert_includes admin, "RecordingStudioPublishable::PageLink.for"
+    assert_includes admin, "link.text != \"View\""
+    assert_includes admin, "target: \"_blank\""
+    assert_includes admin, "data: { turbo: false }"
+    refute_includes admin, "Composition.live_page?(recording)"
   end
 
   def test_row_actions_edit_and_trash_the_page

@@ -54,12 +54,33 @@ module RecordingStudioPages
     end
     private_class_method :append_list_query
 
-    def self.new_page_path
-      "#{ENGINE_MOUNT_PATH}/admin/pages/new"
+    def self.new_page_path(anchor_url: nil)
+      merge_anchor_url("#{ENGINE_MOUNT_PATH}/admin/pages/new", anchor_url)
     end
 
-    def self.page_path(recording)
-      "#{ENGINE_MOUNT_PATH}/admin/pages/#{recording.id}"
+    def self.page_path(recording, anchor_url: nil)
+      merge_anchor_url("#{ENGINE_MOUNT_PATH}/admin/pages/#{recording.id}", anchor_url)
+    end
+
+    def self.safe_anchor_url(value)
+      href = value.to_s.strip
+      return if href.empty?
+      return href if href.start_with?("/") && !href.start_with?("//")
+
+      nil
+    end
+
+    def self.merge_anchor_url(path, anchor_url)
+      href = safe_anchor_url(anchor_url)
+      return path if href.blank?
+
+      uri = URI.parse(path)
+      query = Rack::Utils.parse_nested_query(uri.query)
+      query["anchor_url"] ||= href
+      uri.query = query.to_query.presence
+      uri.to_s
+    rescue URI::InvalidURIError
+      path
     end
 
     def self.admin_mount_path
@@ -77,17 +98,12 @@ module RecordingStudioPages
     end
 
     def self.public_page_path(recording)
-      return unless Composition.live_page?(recording)
-      return unless defined?(RecordingStudioPublishable::Routing)
-      return unless recording.respond_to?(:publishable_child_recording)
+      return unless defined?(RecordingStudioPublishable::PageLink)
 
-      child = recording.publishable_child_recording
-      return if child.blank?
+      link = RecordingStudioPublishable::PageLink.for(recording: recording, preview_href: "")
+      return if link.blank? || link.text != "View"
 
-      RecordingStudioPublishable::Routing.path_for(
-        publishable_recording: child,
-        parent_recordable_type: recording.recordable_type
-      )
+      link.href.presence
     end
 
     def self.render_page_title(recording, context)
@@ -96,8 +112,13 @@ module RecordingStudioPages
       view = context.respond_to?(:view_context) ? context.view_context : nil
       return title unless href.present? && view.respond_to?(:render)
 
-      view.render(FlatPack::Link::Component.new(href: href)) { title }
+      view.render(public_page_link(href)) { title }
     end
+
+    def self.public_page_link(href)
+      FlatPack::Link::Component.new(href: href, target: "_blank", data: { turbo: false })
+    end
+    private_class_method :public_page_link
 
     class PagesSection < RecordingStudioAdmin::Section
       key SECTION_KEY
@@ -105,7 +126,8 @@ module RecordingStudioPages
       title "Pages"
       subtitle "Compose public pages from registered sections"
       blast_radius :site
-      link :new_page, text: "Page", url: ->(_context) { RecordingStudioPages::Admin.new_page_path },
+      link :new_page, text: "Page",
+                      url: ->(_context) { RecordingStudioPages::Admin.new_page_path(anchor_url: RecordingStudioPages::Admin.admin_mount_path) },
                       style: :primary
       link :pages, text: "View all", url: ->(context) { context.admin_screen_path(SCREEN_KEY) },
                    style: :secondary
@@ -118,7 +140,8 @@ module RecordingStudioPages
       title "Pages"
       subtitle "Compose public pages from sections."
       blast_radius :site
-      button :new_page, text: "Page", url: ->(_context) { RecordingStudioPages::Admin.new_page_path },
+      button :new_page, text: "Page",
+                        url: ->(context) { RecordingStudioPages::Admin.new_page_path(anchor_url: context.admin_screen_path(SCREEN_KEY)) },
                         style: :primary
 
       STATUS_FILTER = lambda { |relation, value, _context|
@@ -168,7 +191,7 @@ module RecordingStudioPages
              icon: "pencil-square",
              required_role: :view,
              blast_radius: :site,
-             url: ->(recording, _context) { RecordingStudioPages::Admin.page_path(recording) }
+             url: ->(recording, context) { RecordingStudioPages::Admin.page_path(recording, anchor_url: context.admin_screen_path(SCREEN_KEY)) }
       action :trash,
              text: "Trash",
              icon: "trash",

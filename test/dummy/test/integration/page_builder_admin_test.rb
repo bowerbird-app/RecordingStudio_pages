@@ -545,7 +545,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "View pages"
     refute_includes response.body, "New page"
 
-    page_href = RecordingStudioPages::Admin.new_page_path
+    page_href = RecordingStudioPages::Admin.new_page_path(anchor_url: "/admin")
     view_all_href = RecordingStudioPages::Admin.screen_path
     assert_includes response.body, "href=\"#{page_href}\""
     assert_includes response.body, "href=\"#{view_all_href}\""
@@ -563,16 +563,21 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'name="page[title]"'
     assert_includes response.body, "max-w-xl"
     assert_includes response.body, "flex-wrap items-center gap-3"
+    assert_includes response.body, 'aria-label="Close"'
+    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.screen_path}\""
 
+    list_new_page_href = RecordingStudioPages::Admin.new_page_path(
+      anchor_url: RecordingStudioPages::Admin.screen_path
+    )
     get RecordingStudioPages::Admin.screen_path
     assert_response :success
     assert_includes response.body, "Pages"
     assert_includes response.body, ">Page<"
-    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.new_page_path}\""
+    assert_includes response.body, "href=\"#{list_new_page_href}\""
     assert_includes response.body, 'data-flat-pack--icon-name-value="plus"'
     assert_includes response.body, "page-title-actions"
     subtitle_at = response.body.index("Compose public pages from sections.")
-    page_button_at = response.body.index("href=\"#{RecordingStudioPages::Admin.new_page_path}\"")
+    page_button_at = response.body.index("href=\"#{list_new_page_href}\"")
     assert_operator subtitle_at, :<, page_button_at
 
     get "/admin/screens/pages/table",
@@ -666,8 +671,11 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     slug = "live-linked-#{SecureRandom.hex(4)}"
     publishable = publish_page!(live, slug: slug, actor: @actor)
     live.reload
+    page_link = RecordingStudioPublishable::PageLink.for(recording: live, preview_href: "")
     public_path = RecordingStudioPages::Admin.public_page_path(live)
 
+    assert_equal "View", page_link.text
+    assert_equal page_link.href, public_path
     assert_equal "/pages/#{publishable.id}/#{slug}", public_path
     assert_nil RecordingStudioPages::Admin.public_page_path(draft)
 
@@ -679,10 +687,10 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, live.recordable.title
     assert_includes response.body, draft.recordable.title
-    assert_match(
-      /href="#{Regexp.escape(public_path)}"[^>]*>\s*#{Regexp.escape(live.recordable.title)}/,
-      response.body
-    )
+    title_link = response.body[/<a[^>]*href="#{Regexp.escape(public_path)}"[^>]*>\s*#{Regexp.escape(live.recordable.title)}/]
+    assert title_link.present?
+    assert_includes title_link, 'target="_blank"'
+    assert_includes title_link, 'data-turbo="false"'
     refute_match(
       %r{href="/pages/[^"]+"[^>]*>\s*#{Regexp.escape(draft.recordable.title)}},
       response.body
@@ -699,7 +707,10 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Edit"
     assert_includes response.body, "Trash"
-    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.page_path(page_recording)}\""
+    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.page_path(
+      page_recording,
+      anchor_url: RecordingStudioPages::Admin.screen_path
+    )}\""
     assert_includes response.body, "data-turbo-method=\"delete\""
     assert_includes response.body, "Trash this page?"
     assert_includes response.body, "Actions"
@@ -707,6 +718,40 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     delete recording_studio_pages.admin_page_path(page_recording)
     assert_response :redirect
     assert_nil RecordingStudio::Recording.find_by(id: page_recording.id, trashed_at: nil)
+  end
+
+  test "page builder screens close to the original trigger" do
+    origin = "/admin"
+    get recording_studio_pages.new_admin_page_path, params: { anchor_url: origin }
+
+    assert_response :success
+    assert_includes response.body, 'aria-label="Close"'
+    assert_match(%r{href="/admin"(?:[\s>/])}, response.body)
+
+    get recording_studio_pages.new_admin_page_path, params: { anchor_url: "javascript:alert(1)" }
+
+    assert_response :success
+    assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.screen_path}\""
+    refute_includes response.body, "javascript:alert"
+
+    title = "Anchor Create #{SecureRandom.hex(4)}"
+    post recording_studio_pages.admin_pages_path(anchor_url: origin), params: { page: { title: title } }
+
+    page_recording = RecordingStudio::Recording.order(:created_at).where(
+      recordable_type: "RecordingStudioPages::Page"
+    ).last
+    assert_redirected_to recording_studio_pages.admin_page_path(page_recording, anchor_url: origin)
+
+    follow_redirect!
+    assert_response :success
+    assert_includes response.body, title
+    assert_includes response.body, 'aria-label="Close"'
+    assert_match(%r{href="/admin"(?:[\s>/])}, response.body)
+
+    get recording_studio_pages.edit_admin_page_path(page_recording, anchor_url: origin)
+    assert_response :success
+    assert_includes response.body, "Settings"
+    assert_match(%r{href="/admin"(?:[\s>/])}, response.body)
   end
 
   test "creating a page without ticking home still saves from the Admin root" do

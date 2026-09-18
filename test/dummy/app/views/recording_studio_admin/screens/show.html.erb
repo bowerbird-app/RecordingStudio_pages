@@ -12,7 +12,7 @@
       <% @screen.buttons.each do |button| %>
         <%= render FlatPack::Button::Component.new(
           text: button.text,
-          href: button.url,
+          href: preserve_anchor_url(button.url),
           style: button.style,
           icon: (button.name.to_s == "new_page" ? "plus" : nil)
         ) %>
