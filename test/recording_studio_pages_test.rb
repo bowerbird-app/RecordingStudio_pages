@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.6", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.7", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -447,6 +447,8 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes dummy_section, "url: preserve_anchor_url(link.url)"
     assert_includes dummy_screen, "href: button.url"
     assert_includes dummy_screen, 'icon: (button.name.to_s == "new_page" ? "plus" : nil)'
+    assert_includes dummy_screen, "page_title.slot"
+    refute_includes dummy_screen, "recording_studio_page_nav_right"
     assert_includes edit, "Remove page"
     assert_includes edit, 'title: "Settings"'
     refute_includes edit, "Edit page"

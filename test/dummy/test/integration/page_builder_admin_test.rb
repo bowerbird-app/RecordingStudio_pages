@@ -570,12 +570,26 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">Page<"
     assert_includes response.body, "href=\"#{RecordingStudioPages::Admin.new_page_path}\""
     assert_includes response.body, 'data-flat-pack--icon-name-value="plus"'
+    assert_includes response.body, "page-title-actions"
+    subtitle_at = response.body.index("Compose public pages from sections.")
+    page_button_at = response.body.index("href=\"#{RecordingStudioPages::Admin.new_page_path}\"")
+    assert_operator subtitle_at, :<, page_button_at
 
     get "/admin/screens/pages/table",
         headers: { "Turbo-Frame" => "screen-table" }
     assert_response :success
     assert_includes response.body, titled.recordable.title
     assert_includes response.body, "Status"
+
+    page_header = response.body.index("Page")
+    home_header = response.body.index("Home")
+    updated_header = response.body.index("Updated at")
+    status_header = response.body.index("Status")
+    actions_header = response.body.index("Actions")
+    assert_operator page_header, :<, home_header
+    assert_operator home_header, :<, updated_header
+    assert_operator updated_header, :<, status_header
+    assert_operator status_header, :<, actions_header
   end
 
   test "the Pages list can filter publishable status and home" do
@@ -644,6 +658,35 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, home.recordable.title
     refute_includes response.body, draft.recordable.title
+  end
+
+  test "the Pages list links a live page name to the published url" do
+    live = create_page!(parent_recording: @root, title: "Live Linked #{SecureRandom.hex(4)}", actor: @actor)
+    draft = create_page!(parent_recording: @root, title: "Draft Plain #{SecureRandom.hex(4)}", actor: @actor)
+    slug = "live-linked-#{SecureRandom.hex(4)}"
+    publishable = publish_page!(live, slug: slug, actor: @actor)
+    live.reload
+    public_path = RecordingStudioPages::Admin.public_page_path(live)
+
+    assert_equal "/pages/#{publishable.id}/#{slug}", public_path
+    assert_nil RecordingStudioPages::Admin.public_page_path(draft)
+
+    switch_to_admin_root!
+
+    get "/admin/screens/pages/table",
+        headers: { "Turbo-Frame" => "screen-table" }
+
+    assert_response :success
+    assert_includes response.body, live.recordable.title
+    assert_includes response.body, draft.recordable.title
+    assert_match(
+      /href="#{Regexp.escape(public_path)}"[^>]*>\s*#{Regexp.escape(live.recordable.title)}/,
+      response.body
+    )
+    refute_match(
+      %r{href="/pages/[^"]+"[^>]*>\s*#{Regexp.escape(draft.recordable.title)}},
+      response.body
+    )
   end
 
   test "the Pages list row menu can edit and trash a page" do

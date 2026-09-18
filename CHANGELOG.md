@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.7] - 2026-09-18
+
+The Admin Pages list keeps Status next to the row menu and links live names out.
+
+### Changed
+- Pages list columns are Page, Home, Updated at, Status, then the Edit / Trash menu. Status sits immediately left of Actions.
+- Dummy’s Pages list puts **Page** under the title, not in the page-nav right slot.
+- A live page name in the first column links to the published URL. Draft and scheduled names stay plain text.
+
+### Upgrade notes
+- If you overrode the Admin Pages screen or dummy `recording_studio_admin/screens/show`, take **Page** under the title, the column order, and live name links, or keep your list on purpose.
+
 ## [0.3.6] - 2026-09-17
 
 Pages hub cards open the Pages list. The list uses Publishable status, a Home filter, and a row menu.
@@ -249,7 +261,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.6...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.7...HEAD
+[0.3.7]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.6...v0.3.7
 [0.3.6]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.5...v0.3.6
 [0.3.5]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.4...v0.3.5
 [0.3.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.2.1...v0.3.0

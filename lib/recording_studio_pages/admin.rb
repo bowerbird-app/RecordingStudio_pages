@@ -76,6 +76,29 @@ module RecordingStudioPages
       view.render_publishable_quick_actions(recording)
     end
 
+    def self.public_page_path(recording)
+      return unless Composition.live_page?(recording)
+      return unless defined?(RecordingStudioPublishable::Routing)
+      return unless recording.respond_to?(:publishable_child_recording)
+
+      child = recording.publishable_child_recording
+      return if child.blank?
+
+      RecordingStudioPublishable::Routing.path_for(
+        publishable_recording: child,
+        parent_recordable_type: recording.recordable_type
+      )
+    end
+
+    def self.render_page_title(recording, context)
+      title = recording.recordable&.title
+      href = public_page_path(recording)
+      view = context.respond_to?(:view_context) ? context.view_context : nil
+      return title unless href.present? && view.respond_to?(:render)
+
+      view.render(FlatPack::Link::Component.new(href: href)) { title }
+    end
+
     class PagesSection < RecordingStudioAdmin::Section
       key SECTION_KEY
       icon :document_text
@@ -107,6 +130,9 @@ module RecordingStudioPages
       STATUS_ACTIONS = lambda { |recording, context|
         RecordingStudioPages::Admin.render_publishable_actions(recording, context)
       }
+      TITLE_CELL = lambda { |recording, context|
+        RecordingStudioPages::Admin.render_page_title(recording, context)
+      }
 
       query do |_context|
         RecordingStudio::Recording.where(recordable_type: "RecordingStudioPages::Page", trashed_at: nil)
@@ -122,12 +148,11 @@ module RecordingStudioPages
         filter :home_page,
                options: RecordingStudioPages::Composition::HOMEPAGE_OPTIONS,
                apply: HOMEPAGE_FILTER
-        column :title, title: "Page", sortable: false,
-                       value: ->(recording, _context) { recording.recordable&.title }
-        column :status, title: "Status", sortable: false, value: STATUS_ACTIONS
+        column :title, title: "Page", sortable: false, value: TITLE_CELL
         column :homepage, title: "Home", sortable: false,
                           value: ->(recording, _context) { recording.recordable&.homepage? ? "Home" : "" }
         column :updated_at
+        column :status, title: "Status", sortable: false, value: STATUS_ACTIONS
         admin_action SCREEN_KEY, :edit
         admin_action SCREEN_KEY, :trash
       end

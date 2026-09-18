@@ -51,6 +51,27 @@ class AdminSectionTest < Minitest::Test
     assert_includes admin, "filter_page_recordings_by_homepage"
     assert_includes admin, "admin_action SCREEN_KEY, :edit"
     assert_includes admin, "admin_action SCREEN_KEY, :trash"
+
+    title = admin.index("column :title")
+    homepage = admin.index("column :homepage")
+    updated = admin.index("column :updated_at")
+    status = admin.index("column :status, title: \"Status\"")
+    actions = admin.index("admin_action SCREEN_KEY, :edit")
+
+    assert_operator title, :<, homepage
+    assert_operator homepage, :<, updated
+    assert_operator updated, :<, status
+    assert_operator status, :<, actions
+  end
+
+  def test_pages_list_links_live_page_names
+    admin = File.read(File.expand_path("../lib/recording_studio_pages/admin.rb", __dir__))
+
+    assert_includes admin, "def self.public_page_path(recording)"
+    assert_includes admin, "def self.render_page_title(recording, context)"
+    assert_includes admin, "value: TITLE_CELL"
+    assert_includes admin, "FlatPack::Link::Component.new(href: href)"
+    assert_includes admin, "Composition.live_page?(recording)"
   end
 
   def test_row_actions_edit_and_trash_the_page
