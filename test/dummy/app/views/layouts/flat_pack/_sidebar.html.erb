@@ -17,14 +17,14 @@
 
       <%= render FlatPack::Sidebar::Item::Component.new(
         text: "Pages",
-        href: recording_studio_pages.admin_pages_path,
+        href: dummy_href_from_root(recording_studio_pages.admin_pages_path),
         icon: :document_text,
         active: request.path.start_with?("/recording_studio_pages/admin")
       ) %>
 
       <%= render FlatPack::Sidebar::Item::Component.new(
         text: "Admin",
-        href: "/admin",
+        href: dummy_href_from_root("/admin"),
         icon: :cog_6_tooth,
         active: request.path == "/admin" || request.path.start_with?("/admin/")
       ) %>

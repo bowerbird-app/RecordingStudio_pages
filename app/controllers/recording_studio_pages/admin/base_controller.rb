@@ -11,6 +11,14 @@ module RecordingStudioPages
       helper_method :page_recording, :section_recordings, :page_builder_page_path, :section_definitions,
                     :add_section_form_id, :section_action_form_id
 
+      def default_url_options
+        options = super || {}
+        anchor = RecordingStudioPages::Admin.safe_anchor_url(params[:anchor_url])
+        return options if anchor.blank?
+
+        options.merge(anchor_url: anchor)
+      end
+
       private
 
       def page_builder_page_path(recording = nil)

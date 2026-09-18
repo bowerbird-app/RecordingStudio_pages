@@ -1,4 +1,8 @@
-<% recording_studio_pages_nav(title: "Edit section", back_url: page_builder_page_path) %>
+<% recording_studio_pages_nav(
+     title: "Edit section",
+     back_url: page_builder_page_path,
+     anchor_url: RecordingStudioPages::Admin.admin_mount_path
+   ) %>
 <% section_form_id = "section-editor" %>
 
 <div class="flex w-full flex-col gap-6">

@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.6", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.7", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -101,9 +101,12 @@ class RecordingStudioPagesTest < Minitest::Test
 
     refute_includes dummy_helper, "recording_studio_pages_page_nav"
     assert_includes dummy_helper, "dummy_page_nav"
+    assert_includes dummy_helper, "dummy_href_from_root"
     assert_includes dummy_helper, "recording_studio_root_switch_dropdown"
     assert_includes dummy_helper, "Sign out"
     assert_includes gem_helper, "recording_studio_page_nav"
+    assert_includes gem_helper, "page_nav_anchor_url"
+    assert_includes gem_helper, "pages_nav_anchor_url"
   end
 
   def test_dummy_login_layout_keeps_flatpack_assets_without_tight_main_offset
@@ -167,6 +170,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes layout, 'stylesheet_link_tag "tailwind"'
     assert_includes layout, "max-w-6xl"
     assert_includes layout, "recording_studio_pages_flash if respond_to?(:recording_studio_pages_flash)"
+    assert_includes layout, "page_nav_options[:anchor_href] = anchor_url"
+    refute_includes layout, "page_nav_options[:anchor_url] = anchor_url"
+    refute_includes layout, "page_nav_options[:back_url] = back_url"
     refute_includes layout, "flash[:notice]"
     refute_includes layout, "flash[:alert]"
     variables_at = layout.index('stylesheet_link_tag "flat_pack/variables"')
@@ -430,6 +436,7 @@ class RecordingStudioPagesTest < Minitest::Test
     new_page = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/new.html.erb", __dir__))
     assert_includes new_page, "max-w-xl"
     assert_includes new_page, "flex-wrap items-center gap-3"
+    assert_includes new_page, "anchor_url: RecordingStudioPages::Admin.admin_mount_path"
     create_page = File.read(File.expand_path("../lib/recording_studio_pages/services/create_page.rb", __dir__))
     assert_includes create_page, "page.homepage = homepage?"
     controller = File.read(
@@ -437,6 +444,11 @@ class RecordingStudioPagesTest < Minitest::Test
     )
     assert_includes controller, "def checked?"
     assert_includes controller, "ActiveModel::Type::Boolean.new.cast(value) == true"
+    base_controller = File.read(
+      File.expand_path("../app/controllers/recording_studio_pages/admin/base_controller.rb", __dir__)
+    )
+    assert_includes base_controller, "def default_url_options"
+    assert_includes base_controller, "safe_anchor_url(params[:anchor_url])"
     dummy_section = File.read(
       File.expand_path("dummy/app/views/recording_studio_admin/sections/show.html.erb", __dir__)
     )
@@ -445,8 +457,11 @@ class RecordingStudioPagesTest < Minitest::Test
     )
     assert_includes dummy_section, "href: preserve_anchor_url(link.url)"
     refute_includes dummy_section, "url: preserve_anchor_url(link.url)"
-    assert_includes dummy_screen, "href: button.url"
+    assert_includes dummy_screen, "href: preserve_anchor_url(button.url)"
+    refute_includes dummy_screen, "href: button.url"
     assert_includes dummy_screen, 'icon: (button.name.to_s == "new_page" ? "plus" : nil)'
+    assert_includes dummy_screen, "page_title.slot"
+    refute_includes dummy_screen, "recording_studio_page_nav_right"
     assert_includes edit, "Remove page"
     assert_includes edit, 'title: "Settings"'
     refute_includes edit, "Edit page"

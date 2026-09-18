@@ -1,4 +1,8 @@
-<% recording_studio_pages_nav(title: "New page", back_url: admin_pages_path) %>
+<% recording_studio_pages_nav(
+     title: "New page",
+     back_url: admin_pages_path,
+     anchor_url: RecordingStudioPages::Admin.admin_mount_path
+   ) %>
 
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(

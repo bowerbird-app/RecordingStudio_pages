@@ -6,12 +6,22 @@ module RecordingStudioPages
       render "recording_studio_pages/flash"
     end
 
-    def recording_studio_pages_nav(title:, back_url: nil)
+    def recording_studio_pages_nav(title:, back_url: nil, anchor_url: nil)
+      resolved_anchor = pages_nav_anchor_url(default: anchor_url)
       if respond_to?(:recording_studio_pages_page_nav)
-        recording_studio_pages_page_nav(title: title, back_url: back_url)
+        recording_studio_pages_page_nav(title: title, back_url: back_url, anchor_url: resolved_anchor)
       elsif respond_to?(:recording_studio_page_nav)
-        recording_studio_page_nav(title: title, page_nav_back_url: back_url)
+        recording_studio_page_nav(
+          title: title,
+          page_nav_back_url: back_url,
+          page_nav_anchor_url: resolved_anchor
+        )
       end
+    end
+
+    def pages_nav_anchor_url(default: nil)
+      RecordingStudioPages::Admin.safe_anchor_url(params[:anchor_url]) ||
+        RecordingStudioPages::Admin.safe_anchor_url(default)
     end
 
     def pages_attachable_routes

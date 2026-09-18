@@ -43,7 +43,8 @@ module RecordingStudioPages
     end
 
     def self.screen_path_for(context, status: nil, home_page: nil)
-      append_list_query(context.admin_screen_path(SCREEN_KEY), status: status, home_page: home_page)
+      path = append_list_query(context.admin_screen_path(SCREEN_KEY), status: status, home_page: home_page)
+      merge_anchor_url(path, incoming_anchor_url(context))
     end
 
     def self.append_list_query(path, status: nil, home_page: nil)
@@ -54,12 +55,41 @@ module RecordingStudioPages
     end
     private_class_method :append_list_query
 
-    def self.new_page_path
-      "#{ENGINE_MOUNT_PATH}/admin/pages/new"
+    def self.new_page_path(anchor_url: nil)
+      merge_anchor_url("#{ENGINE_MOUNT_PATH}/admin/pages/new", anchor_url)
     end
 
-    def self.page_path(recording)
-      "#{ENGINE_MOUNT_PATH}/admin/pages/#{recording.id}"
+    def self.page_path(recording, anchor_url: nil)
+      merge_anchor_url("#{ENGINE_MOUNT_PATH}/admin/pages/#{recording.id}", anchor_url)
+    end
+
+    def self.incoming_anchor_url(context)
+      return if context.blank?
+      return unless context.respond_to?(:params)
+
+      params = context.params || {}
+      safe_anchor_url(params[:anchor_url] || params["anchor_url"])
+    end
+
+    def self.safe_anchor_url(value)
+      href = value.to_s.strip
+      return if href.empty?
+      return href if href.start_with?("/") && !href.start_with?("//")
+
+      nil
+    end
+
+    def self.merge_anchor_url(path, anchor_url)
+      href = safe_anchor_url(anchor_url)
+      return path if href.blank?
+
+      uri = URI.parse(path)
+      query = Rack::Utils.parse_nested_query(uri.query)
+      query["anchor_url"] ||= href
+      uri.query = query.to_query.presence
+      uri.to_s
+    rescue URI::InvalidURIError
+      path
     end
 
     def self.admin_mount_path
@@ -76,15 +106,39 @@ module RecordingStudioPages
       view.render_publishable_quick_actions(recording)
     end
 
+    def self.public_page_path(recording)
+      return unless defined?(RecordingStudioPublishable::PageLink)
+
+      link = RecordingStudioPublishable::PageLink.for(recording: recording, preview_href: "")
+      return if link.blank? || link.text != "View"
+
+      link.href.presence
+    end
+
+    def self.render_page_title(recording, context)
+      title = recording.recordable&.title
+      href = public_page_path(recording)
+      view = context.respond_to?(:view_context) ? context.view_context : nil
+      return title unless href.present? && view.respond_to?(:render)
+
+      view.render(public_page_link(href)) { title }
+    end
+
+    def self.public_page_link(href)
+      FlatPack::Link::Component.new(href: href, target: "_blank", data: { turbo: false })
+    end
+    private_class_method :public_page_link
+
     class PagesSection < RecordingStudioAdmin::Section
       key SECTION_KEY
       icon :document_text
       title "Pages"
       subtitle "Compose public pages from registered sections"
       blast_radius :site
-      link :new_page, text: "Page", url: ->(_context) { RecordingStudioPages::Admin.new_page_path },
+      link :new_page, text: "Page",
+                      url: ->(context) { RecordingStudioPages::Admin.new_page_path(anchor_url: RecordingStudioPages::Admin.incoming_anchor_url(context)) },
                       style: :primary
-      link :pages, text: "View all", url: ->(context) { context.admin_screen_path(SCREEN_KEY) },
+      link :pages, text: "View all", url: ->(context) { RecordingStudioPages::Admin.screen_path_for(context) },
                    style: :secondary
       widget "widgets.pages.published_pages", view_variant: :compact
       widget "widgets.pages.draft_pages", view_variant: :compact
@@ -95,7 +149,8 @@ module RecordingStudioPages
       title "Pages"
       subtitle "Compose public pages from sections."
       blast_radius :site
-      button :new_page, text: "Page", url: ->(_context) { RecordingStudioPages::Admin.new_page_path },
+      button :new_page, text: "Page",
+                        url: ->(context) { RecordingStudioPages::Admin.new_page_path(anchor_url: RecordingStudioPages::Admin.incoming_anchor_url(context)) },
                         style: :primary
 
       STATUS_FILTER = lambda { |relation, value, _context|
@@ -106,6 +161,9 @@ module RecordingStudioPages
       }
       STATUS_ACTIONS = lambda { |recording, context|
         RecordingStudioPages::Admin.render_publishable_actions(recording, context)
+      }
+      TITLE_CELL = lambda { |recording, context|
+        RecordingStudioPages::Admin.render_page_title(recording, context)
       }
 
       query do |_context|
@@ -122,12 +180,11 @@ module RecordingStudioPages
         filter :home_page,
                options: RecordingStudioPages::Composition::HOMEPAGE_OPTIONS,
                apply: HOMEPAGE_FILTER
-        column :title, title: "Page", sortable: false,
-                       value: ->(recording, _context) { recording.recordable&.title }
-        column :status, title: "Status", sortable: false, value: STATUS_ACTIONS
+        column :title, title: "Page", sortable: false, value: TITLE_CELL
         column :homepage, title: "Home", sortable: false,
                           value: ->(recording, _context) { recording.recordable&.homepage? ? "Home" : "" }
         column :updated_at
+        column :status, title: "Status", sortable: false, value: STATUS_ACTIONS
         admin_action SCREEN_KEY, :edit
         admin_action SCREEN_KEY, :trash
       end
@@ -143,7 +200,7 @@ module RecordingStudioPages
              icon: "pencil-square",
              required_role: :view,
              blast_radius: :site,
-             url: ->(recording, _context) { RecordingStudioPages::Admin.page_path(recording) }
+             url: ->(recording, context) { RecordingStudioPages::Admin.page_path(recording, anchor_url: RecordingStudioPages::Admin.incoming_anchor_url(context)) }
       action :trash,
              text: "Trash",
              icon: "trash",

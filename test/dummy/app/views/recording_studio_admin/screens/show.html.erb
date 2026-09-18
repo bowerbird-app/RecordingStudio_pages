@@ -1,25 +1,25 @@
-<%# Admin 2.0.2 already passes href: here. Dummy adds the plus icon on Page. %>
+<%# Admin 2.0.2 already passes href: here. Dummy adds the plus icon on Page and
+    puts screen buttons under the title, not in the page-nav right slot. %>
 <% recording_studio_page_nav(
      title: @screen.title,
      page_nav_anchor_url: page_nav_anchor_url(default: RecordingStudioAdmin.configuration.default_mount_path)
    ) %>
-<% if @screen.buttons.any? %>
-  <% recording_studio_page_nav_right do %>
-    <%= render FlatPack::ButtonGroup::Component.new do |group| %>
+<%= render "recording_studio_admin/shared/page_nav" unless recording_studio_admin_default_layout? %>
+
+<%= render FlatPack::PageTitle::Component.new(title: @screen.title, subtitle: @screen.subtitle) do |page_title| %>
+  <% if @screen.buttons.any? %>
+    <% page_title.slot do %>
       <% @screen.buttons.each do |button| %>
-        <% group.button(render(FlatPack::Button::Component.new(
+        <%= render FlatPack::Button::Component.new(
           text: button.text,
-          href: button.url,
+          href: preserve_anchor_url(button.url),
           style: button.style,
           icon: (button.name.to_s == "new_page" ? "plus" : nil)
-        ))) %>
+        ) %>
       <% end %>
     <% end %>
   <% end %>
 <% end %>
-<%= render "recording_studio_admin/shared/page_nav" unless recording_studio_admin_default_layout? %>
-
-<%= render FlatPack::PageTitle::Component.new(title: @screen.title, subtitle: @screen.subtitle) %>
 
 <% if @screen.widgets.any? %>
   <% if RecordingStudioAdmin.configuration.async_widgets.enabled %>
