@@ -57,7 +57,7 @@ Point `/` at the homepage controller. Public pages use `recording_studio_pages/p
 
 ```
 Workspace (root recording)
-  └── Page recording (title, homepage, template_key)
+  └── Page recording (title, homepage)
         ├── Section recording (section_type: hero, content, settings)
         │     └── Attachment children (photos for that section)
         ├── Section recording (section_type: feature_grid, ...)
@@ -114,11 +114,11 @@ Duplicate keys raise `RecordingStudioPages::DuplicateRegistration`. Unknown type
 
 `full_bleed: true` draws the section edge to edge. Hero and Menu do this. Leave it off for reading-width sections.
 
-`RecordingStudioPages.catalog` lists every registered section, template, and call to action, including field types, required flags, settings, and variants. That catalog is the machine-readable surface for future API and MCP tooling.
+`RecordingStudioPages.catalog` lists every registered section and call to action, including field types, required flags, settings, and variants. That catalog is the machine-readable surface for future API and MCP tooling.
 
 ## Register a call to action
 
-A hero has one slot under the copy. Pages fills it from a **CTA registry**, not by forking the hero. The built-in filling is a button (`text` + `url`). Hosts and other gems register more fillings — social logins, a URL field, a waitlist form — and pick them on the hero, or bake them into a template.
+A hero has one slot under the copy. Pages fills it from a **CTA registry**, not by forking the hero. The built-in filling is a button (`text` + `url`). Hosts and other gems register more fillings — social logins, a URL field, a waitlist form — and pick them on the hero.
 
 ```ruby
 RecordingStudioPages.configure do |config|
@@ -147,25 +147,9 @@ The component receives `cta:` — the saved hash, including `type`. A hero also 
 
 Hero content looks like `cta: { type: "button", text: "Come in", url: "/users/sign_in" }`. Saved rows that still have `primary_action` upgrade on read; the next save writes `cta`. Image-and-text and call-to-action sections still use `primary_action` as a single link.
 
-New page still starts from a **template**. The template names the CTA. Editing the hero is where you change Button / Social logins / URL field. **Section** does not list CTAs.
+New pages start empty. Editing the hero is where you change Button / Social logins / URL field. **Section** does not list CTAs.
 
-Dummy registers `social_logins` and `url_form`, plus **Join**, **Walk in**, and **Start from a URL** templates, so a one-section landing can be a button, sign-in buttons, or a paste-a-link field. Dummy `social_logins` calls Recording Studio Users OmniAuth helpers (`recording_studio_user_omniauth_provider_names`, `recording_studio_user_omniauth_authorize_path`, and the provider label/logo helpers) and draws stacked Flatpack Continue-with buttons. The stack is `max-w-sm` (same cap as the Users auth shell) so `w-full` buttons stay equal without stretching across a fullscreen hero. A left hero docks that stack (`mr-auto`); a centered hero keeps `mx-auto`. That wrap is dummy’s, not Recording Studio Users — Users’ sign-in partial is a vertical stack with no side margin. Dummy `url_form` is a paste-a-link field with no visible field name; the button sits beside it. Native Flatpack UrlInput and Button `:md` heights still differ. It does not render `recording_studio_user/omniauth/continue_with_providers` — that partial is for the sign-in screen and includes an **Or** divider. Dummy test and development credentials enable Google and Apple so Join and Walk in can show those buttons. Hosts leave `omniauth_providers` empty and put real secrets in credentials; do not copy dummy client ids.
-
-## Register a template
-
-```ruby
-RecordingStudioPages.register_template(
-  key: :launch,
-  name: "Launch",
-  source: "host",
-  sections: [
-    { type: :hero, content: { title: "We shipped" } },
-    { type: :call_to_action, content: { title: "See the changelog" } }
-  ]
-)
-```
-
-`ApplyTemplate` creates new section recordings. Two pages that use the same template do not share rows.
+Dummy registers `social_logins` and `url_form`, so a one-section landing can be a button, sign-in buttons, or a paste-a-link field. Dummy `social_logins` calls Recording Studio Users OmniAuth helpers (`recording_studio_user_omniauth_provider_names`, `recording_studio_user_omniauth_authorize_path`, and the provider label/logo helpers) and draws stacked Flatpack Continue-with buttons. The stack is `max-w-sm` (same cap as the Users auth shell) so `w-full` buttons stay equal without stretching across a fullscreen hero. A left hero docks that stack (`mr-auto`); a centered hero keeps `mx-auto`. That wrap is dummy’s, not Recording Studio Users — Users’ sign-in partial is a vertical stack with no side margin. Dummy `url_form` is a paste-a-link field with no visible field name; the button sits beside it. Native Flatpack UrlInput and Button `:md` heights still differ. It does not render `recording_studio_user/omniauth/continue_with_providers` — that partial is for the sign-in screen and includes an **Or** divider. Dummy test and development credentials enable Google and Apple so Join and Walk in can show those buttons. Hosts leave `omniauth_providers` empty and put real secrets in credentials; do not copy dummy client ids.
 
 ## Built-in sections
 
@@ -175,7 +159,7 @@ A **Menu** is a sticky top bar (`FlatPack::TopNav`). Name and an optional mark s
 
 Rich text is a full-width card with a display headline, muted body, and Hero inset (`px-16 py-24`). Copy stays `max-w-xl` so a wide card does not turn into a newspaper column. Background is Default, Muted, or Inverted. An optional corner image uses the same Attachable `image` field as hero; skip it and the card is words only. When the image is present, the card keeps extra space under the words so the mark stays in the corner. Narrow keeps a reading-width card. Copy is JSON plus `sanitize`. Action Text expects a mutable record, so this gem does not use `has_rich_text`. Hero, image-and-text, logo-cloud, menu, and rich-text photos are Attachable children of the section. The JSON stores the attachment id; public render turns it into an Active Storage path.
 
-- Built-in templates: `marketing_home` (menu, left-aligned hero, logos, features, CTA) and `full_bleed_hero` (one fullscreen hero, copy left on the photo). Dummy also registers `join` (centered hero with social logins), `walk_in` (fullscreen hero image with social logins), and `start_from_url` (hero with a URL field). Dummy seeds published **Tonight**, **Join**, **Walk in**, and **Start from a URL** pages. Open Tonight at `/pages/:uuid/tonight`, Join at `/pages/:uuid/join`, Walk in at `/pages/:uuid/walk-in`, and the URL landing at `/pages/:uuid/start-from-a-url`. Those public URLs are the page, not the editor preview. A fullscreen hero fills the first viewport with `--hero-overlay-min-height: 100dvh`. Dummy Home is the `marketing_home` sample; seed restores that template if the sections drift (a second hero from **Use a template**, old copy, and so on), then points the Home menu at the seeded About, Tonight, and Join pages.
+Dummy seeds published **Tonight**, **Join**, **Walk in**, and **Start from a URL** pages. Open Tonight at `/pages/:uuid/tonight`, Join at `/pages/:uuid/join`, Walk in at `/pages/:uuid/walk-in`, and the URL landing at `/pages/:uuid/start-from-a-url`. Those public URLs are the page, not the editor preview. A fullscreen hero fills the first viewport with `--hero-overlay-min-height: 100dvh`. Dummy Home starts with a menu, a left-aligned hero, logos, features, and a CTA. Seed restores those sections if they drift, then points the Home menu at the seeded About, Tonight, and Join pages.
 
 List fields skip blank extra slots and items marked `_destroy`.
 
@@ -183,9 +167,9 @@ List fields skip blank extra slots and items marked `_destroy`.
 
 RS Admin gets a Pages section. The hub’s primary action is **Page** (plus icon, then the word Page). It opens the new-page form at `/recording_studio_pages/admin/pages/new`. That form is a reading-width column (`max-w-xl`). **Create page** is compact, not full width. Unticked “Use as the public home page” stores false (an unchecked box does not submit). **View all** opens the Admin list at `/admin/screens/pages`. The nested editor still lives at `/recording_studio_pages/admin/pages/:id` because RS Admin is a hub of screens and widgets, not a nested recording editor. The editor lists sections in a padded Flatpack Card around an ordered, orderable list. Each row is the section type name. Drag a row to change order. Copy, edit, turn off, and remove live in the row’s three-dot menu. Copy uses Recording Studio Duplicatable (`duplicate_in_place!`) so the new row is another generic section recording under the same page, then Orderable `recording_studio_orderable_append!` puts it at the end.
 
-The editor is a two-column Flatpack Grid below the action row: the section list on the left, the live page on the right. The live column has no heading. Small screens stack those columns. Enabled sections use the same components as the public page. Unpublished pages stay private on public routes. Add a section from **Section** (plus icon). Apply **Use a template** to append that template’s sections. Open **Settings** to rename, set home, or remove the page. The Draft / Published control is Publishable’s `render_publishable_quick_actions` dropdown (scheduled pages show the date). An empty list uses Empty State **Add your first section**. An empty live column uses Empty State **Preview**.
+The editor is a two-column Flatpack Grid below the action row: the section list on the left, the live page on the right. The live column has no heading. Small screens stack those columns. Enabled sections use the same components as the public page. Unpublished pages stay private on public routes. Add a section from **Section** (plus icon). Open **Settings** to rename, set home, or remove the page. The Draft / Published control is Publishable’s `render_publishable_quick_actions` dropdown (scheduled pages show the date). An empty list uses Empty State **Add your first section**. An empty live column uses Empty State **Preview**.
 
-Flashes live in one `#flash` slot on the layout that wraps page builder screens (`recording_studio_pages_flash`). Create, save, and remove still redirect with a Rails flash. **Section** and Use a template replace that slot over Turbo so the last message wins. Do not put a second notice inside the editor. Skip the helper on layouts that also wrap RS Admin — isolated Admin controllers do not include it.
+Flashes live in one `#flash` slot on the layout that wraps page builder screens (`recording_studio_pages_flash`). Create, save, and remove still redirect with a Rails flash. **Section** replaces that slot over Turbo so the last message wins. Do not put a second notice inside the editor. Skip the helper on layouts that also wrap RS Admin — isolated Admin controllers do not include it.
 
 Edit section puts **Update** and **Cancel** under the title, then the same Grid: the form on the left, that one section on the right. Copy fields sit first, then a **Call to action** divider if the section has a CTA, then Layout. Hero also has a **Style** group: Align, Eyebrow, Headline and Subtitle colour swatches, and **Preset** only when Layout is a fullscreen photo with a picture. The buttons are compact, not full width. Update stays on the section and refreshes the preview. Cancel goes back to the page. The preview column has no heading. It uses the same components as the public page, including a section that is turned off. Small screens stack those columns.
 
@@ -243,7 +227,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.7. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.3.0`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.186`.
+0.3.8. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.3.0`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.186`.
 
 ## Upgrade
 
@@ -258,7 +242,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and call the Users OmniAuth helpers from a CTA component. Dummy Join and Walk in do that. The `continue_with_providers` partial is for the sign-in screen. Continue-with buttons follow Rails credentials under `omniauth:`.
 10. Built-in `image` fields are `{ type: :attachment, kind: :image }`. Old `image_url` rows still render. The next save writes `image` when someone picks a file. Mount Attachable, register `RecordingStudioAttachable::Attachment`, start Active Storage, and eager-load its Stimulus controllers. Public pages resolve ids to `rails_blob_path`. Copying a section copies that section's photos and rewrites the ids.
 11. If you overrode the rich text component, take the extra bottom inset when a corner image is present (`pb-56`), or keep your layout on purpose.
-12. Built-in **Menu** (`top_nav`) is a full-bleed Flatpack TopNav section. Add it from **Section**, or apply **Marketing home**. Old pages stay as they are until you add one. If you overrode `_section.html.erb`, take `full_bleed?` (Hero and Menu set `full_bleed: true`). Public layout should use `viewport-fit=cover`. Load Flatpack Stimulus (`controllers/flat_pack`) so **More** on a phone opens and so the bar frosts after scroll.
+12. Built-in **Menu** (`top_nav`) is a full-bleed Flatpack TopNav section. Add it from **Section**. Old pages stay as they are until you add one. If you overrode `_section.html.erb`, take `full_bleed?` (Hero and Menu set `full_bleed: true`). Public layout should use `viewport-fit=cover`. Load Flatpack Stimulus (`controllers/flat_pack`) so **More** on a phone opens and so the bar frosts after scroll.
 13. RS Admin hub widgets need Turbo on the admin layout. Dummy imports `@hotwired/turbo-rails` and pins `controllers/recording_studio_admin`. Run `recording_studio_admin:install` in a host for that Stimulus pin. Without Turbo, Published and Drafts stay on the shimmer. Those cards open `/admin/screens/pages`. Drafts adds `status=Draft`. Published adds `status=Published`. If you overrode the Pages screen, take **Page** under the title (not in the top-right slot), columns Page / Home / Updated at / Status / Actions, live page names linked to the published URL, the Status filter (Draft / Scheduled / Published), Home page filter, Publishable status control, and the Edit / Trash row menu.
 14. A fullscreen image hero fills the viewport with `--hero-overlay-min-height: 100dvh` on the Flatpack section. Do not wrap the hero, and do not pass a competing `min-h-*` class. Overlay copy sits high, left or center. Hero **Preset** (On a dark photo / On a light photo) maps to `on: :dark` or `:light` and only shows when Layout is fullscreen and there is a picture. Optional `title_color` sets `--hero-overlay-text-color` or `--surface-content-color`. `eyebrow_color` and `body_color` wrap the eyebrow and subtitle so they do not share Flatpack’s muted token. If you overrode the hero component or the section form, take the **Call to action** divider, Style, the gated preset, and those colour paths, or keep your layout on purpose.
 15. Pin Publishable `v0.3.0` (or later). Include `RecordingStudioPublishable::ApplicationHelper` on Pages controllers. The editor uses `render_publishable_quick_actions` instead of a **Publish** button. Public `recording_studio_pages/public` should call `publishable_document_title`, `publishable_head_tags`, and `publishable_preview_badge`. Import Turbo so the Draft/Published control can publish without leaving the editor.

@@ -161,20 +161,14 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Section)
   end
 
-  test "dummy host registers extra hero CTAs and templates" do
+  test "dummy host registers extra hero CTAs and no templates" do
     assert RecordingStudioPages.cta?(:button)
     assert RecordingStudioPages.cta?(:social_logins)
     assert RecordingStudioPages.cta?(:url_form)
-    assert_equal "join", RecordingStudioPages.template(:join).key
-    assert_equal "walk_in", RecordingStudioPages.template(:walk_in).key
-    assert_equal "start_from_url", RecordingStudioPages.template(:start_from_url).key
-    walk_in = RecordingStudioPages.template(:walk_in)
-    walk_in_hero = walk_in.sections.first
-    walk_in_content = walk_in_hero.fetch("content").to_h.stringify_keys
-    assert_equal "hero", walk_in_hero.fetch("type").to_s
-    assert_equal "fullscreen_image", walk_in_hero.fetch("settings").to_h.stringify_keys.fetch("variant")
-    assert_equal "left", walk_in_hero.fetch("settings").to_h.stringify_keys.fetch("alignment")
-    assert_equal "social_logins", walk_in_content.fetch("cta").to_h.stringify_keys.fetch("type")
+    refute RecordingStudioPages.respond_to?(:register_template)
+    refute RecordingStudioPages.respond_to?(:template)
+    refute RecordingStudioPages.respond_to?(:templates)
+    refute RecordingStudioPages.catalog.key?(:templates)
     routes = File.read(Rails.root.join("config/routes.rb"))
 
     assert_includes routes, 'get "/start"'

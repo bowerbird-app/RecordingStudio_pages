@@ -138,28 +138,6 @@ class PageBuilderCompositionTest < ActiveSupport::TestCase
     assert_equal "Keep me", leftover.content["title"]
   end
 
-  test "templates create independent section recordings" do
-    first = create_page!(parent_recording: @root, title: "First", actor: @actor)
-    second = create_page!(parent_recording: @root, title: "Second", actor: @actor)
-    RecordingStudioPages::Services::ApplyTemplate.call(
-      page_recording: first,
-      template_key: "marketing_home",
-      actor: @actor
-    ).value!
-    RecordingStudioPages::Services::ApplyTemplate.call(
-      page_recording: second,
-      template_key: "marketing_home",
-      actor: @actor
-    ).value!
-
-    first_ids = RecordingStudioPages::Composition.section_recordings_for(first.reload).map(&:id)
-    second_ids = RecordingStudioPages::Composition.section_recordings_for(second.reload).map(&:id)
-
-    refute_empty first_ids
-    refute_empty second_ids
-    assert_empty first_ids & second_ids
-  end
-
   test "setting a second homepage clears the first" do
     first = create_page!(parent_recording: @root, title: "Home A", homepage: true, actor: @actor)
     second = create_page!(parent_recording: @root, title: "Home B", homepage: true, actor: @actor)

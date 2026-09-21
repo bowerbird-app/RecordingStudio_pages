@@ -21,11 +21,19 @@ class DummyUsersInstallTest < ActionDispatch::IntegrationTest
     root = create_workspace_root!("Join CTA #{SecureRandom.hex(4)}")
     grant_admin!(root, actor)
     page_recording = create_page!(parent_recording: root, title: "Walk in", actor: actor)
-    RecordingStudioPages::Services::ApplyTemplate.call(
+    add_section!(
       page_recording: page_recording,
-      template_key: "walk_in",
+      section_type: "hero",
+      content: {
+        eyebrow: "Members",
+        title: "The lights are already on",
+        body: "Use the door you already have.",
+        image_url: "/images/hero-tonight.jpg",
+        cta: { type: "social_logins" }
+      },
+      settings: { variant: "fullscreen_image", alignment: "left" },
       actor: actor
-    ).value!
+    )
     publishable = publish_page!(page_recording, slug: "walk-in-cta", actor: actor)
 
     get "/pages/#{publishable.id}/walk-in-cta"

@@ -79,15 +79,14 @@ sync_house_menu = lambda do |page_recording, links, join_url, actor|
   ).value!
 end
 
-restore_template_sections = lambda do |page_recording, template_key, actor|
-  template = RecordingStudioPages.template(template_key)
-  expected_types = template.sections.map { |entry| entry.fetch("type").to_s }
-  hero_entry = template.sections.find { |entry| entry.fetch("type").to_s == "hero" }
-  expected_hero = (hero_entry&.fetch("content") || {}).to_h.stringify_keys
+ensure_sections = lambda do |page_recording, entries, actor|
+  expected_types = entries.map { |entry| entry.fetch(:type).to_s }
+  hero_entry = entries.find { |entry| entry.fetch(:type).to_s == "hero" }
+  expected_hero = (hero_entry&.fetch(:content) || {}).to_h.stringify_keys
   expected_hero_title = expected_hero["title"]
   expected_cta_type = expected_hero.dig("cta", "type")
   expected_image_url = expected_hero["image"] || expected_hero["image_url"]
-  expected_settings = (hero_entry&.fetch("settings") || {}).to_h.stringify_keys
+  expected_settings = (hero_entry&.fetch(:settings) || {}).to_h.stringify_keys
   sections = RecordingStudioPages::Composition.section_recordings_for(page_recording)
   types = sections.map { |recording| recording.recordable.section_type }
   hero = sections.find { |recording| recording.recordable.section_type == "hero" }&.recordable
@@ -105,12 +104,129 @@ restore_template_sections = lambda do |page_recording, template_key, actor|
   sections.each do |recording|
     RecordingStudioPages::Services::RemoveSection.call(section_recording: recording, actor: actor).value!
   end
-  RecordingStudioPages::Services::ApplyTemplate.call(
-    page_recording: page_recording,
-    template_key: template_key,
-    actor: actor
-  ).value!
+  entries.each do |entry|
+    RecordingStudioPages::Services::AddSection.call(
+      page_recording: page_recording.reload,
+      section_type: entry.fetch(:type),
+      content: entry.fetch(:content),
+      settings: entry.fetch(:settings, {}),
+      enabled: entry.fetch(:enabled, true),
+      actor: actor
+    ).value!
+  end
 end
+
+home_sections = [
+  {
+    type: :top_nav,
+    content: {
+      name: "House",
+      links: [
+        { text: "About", url: "/" },
+        { text: "Tonight", url: "/" }
+      ],
+      cta: { type: "button", text: "Join", url: "/users/sign_in" }
+    }
+  },
+  {
+    type: :hero,
+    content: {
+      eyebrow: "Open tonight",
+      title: "The page is the front door",
+      body: "Stack a few pieces. Move them around. Put it live when it feels like a site.",
+      cta: { type: "button", text: "Come in", url: "/users/sign_in" }
+    },
+    settings: { variant: "centered", alignment: "left" }
+  },
+  {
+    type: :logo_cloud,
+    content: {
+      title: "Names on the door",
+      items: [
+        { name: "House lights" },
+        { name: "Late show" },
+        { name: "Stage door" }
+      ]
+    }
+  },
+  {
+    type: :feature_grid,
+    content: {
+      title: "What you get",
+      items: [
+        { title: "Pages", body: "A page is a stack you can reorder." },
+        { title: "Pieces", body: "Each piece has a job. Change the layout without starting over." },
+        { title: "Reuse", body: "Add a type once, then drop it on any page." }
+      ]
+    },
+    settings: { variant: "three_column" }
+  },
+  {
+    type: :call_to_action,
+    content: {
+      title: "Ready when you are",
+      body: "Keep it private until it looks right. Then put it on the street.",
+      primary_action: { text: "Have a look", url: "/users/sign_in" }
+    }
+  }
+]
+
+tonight_sections = [
+  {
+    type: :hero,
+    content: {
+      eyebrow: "Doors at eight",
+      title: "The floor is already warm",
+      body: "One picture. One line. Come in if you want a seat.",
+      cta: { type: "button", text: "Take a seat", url: "/users/sign_in" }
+    },
+    settings: { variant: "fullscreen_image", alignment: "left" }
+  }
+]
+
+join_sections = [
+  {
+    type: :hero,
+    content: {
+      eyebrow: "Members",
+      title: "Come as you are",
+      body: "Use the door you already have.",
+      cta: { type: "social_logins" }
+    },
+    settings: { variant: "centered" }
+  }
+]
+
+walk_in_sections = [
+  {
+    type: :hero,
+    content: {
+      eyebrow: "Members",
+      title: "The lights are already on",
+      body: "Use the door you already have.",
+      image_url: "/images/hero-tonight.jpg",
+      cta: { type: "social_logins" }
+    },
+    settings: { variant: "fullscreen_image", alignment: "left" }
+  }
+]
+
+start_from_url_sections = [
+  {
+    type: :hero,
+    content: {
+      eyebrow: "Quick start",
+      title: "Got a link?",
+      body: "Paste it. We'll take it from there.",
+      cta: {
+        type: "url_form",
+        placeholder: "https://",
+        button_text: "Open it"
+      }
+    },
+    settings: { variant: "centered" }
+  }
+]
 
 user = User.find_or_initialize_by(email: "admin@admin.com")
 if user.new_record?
@@ -161,7 +277,7 @@ begin
     ).value!
   end
 
-  restore_template_sections.call(homepage_recording, "marketing_home", user)
+  ensure_sections.call(homepage_recording, home_sections, user)
   publish_page.call(homepage_recording, "home", user)
 
   about_recording = find_page_recording.call("About")
@@ -214,7 +330,7 @@ begin
     ).value!
   end
 
-  restore_template_sections.call(tonight_recording, "full_bleed_hero", user)
+  ensure_sections.call(tonight_recording, tonight_sections, user)
 
   hero_recording = RecordingStudioPages::Composition.section_recordings_for(tonight_recording).find do |recording|
     recording.recordable.section_type == "hero"
@@ -240,7 +356,7 @@ begin
       actor: user
     ).value!
   end
-  restore_template_sections.call(join_recording, "join", user)
+  ensure_sections.call(join_recording, join_sections, user)
   publish_page.call(join_recording, "join", user)
 
   walk_in_recording = find_page_recording.call("Walk in")
@@ -252,7 +368,7 @@ begin
       actor: user
     ).value!
   end
-  restore_template_sections.call(walk_in_recording, "walk_in", user)
+  ensure_sections.call(walk_in_recording, walk_in_sections, user)
   publish_page.call(walk_in_recording, "walk-in", user)
 
   start_recording = find_page_recording.call("Start from a URL")
@@ -264,7 +380,7 @@ begin
       actor: user
     ).value!
   end
-  restore_template_sections.call(start_recording, "start_from_url", user)
+  ensure_sections.call(start_recording, start_from_url_sections, user)
   publish_page.call(start_recording, "start-from-a-url", user)
 
   join_url = public_page_path.call(join_recording) || "/users/sign_in"

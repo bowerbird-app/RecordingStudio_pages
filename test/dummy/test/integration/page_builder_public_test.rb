@@ -293,11 +293,18 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
 
   test "a published page can be only a fullscreen hero" do
     page_recording = create_page!(parent_recording: @root, title: "Tonight", actor: @actor)
-    RecordingStudioPages::Services::ApplyTemplate.call(
+    add_section!(
       page_recording: page_recording,
-      template_key: "full_bleed_hero",
+      section_type: "hero",
+      content: {
+        eyebrow: "Doors at eight",
+        title: "The floor is already warm",
+        body: "One picture. One line. Come in if you want a seat.",
+        cta: { type: "button", text: "Take a seat", url: "/users/sign_in" }
+      },
+      settings: { variant: "fullscreen_image", alignment: "left" },
       actor: @actor
-    ).value!
+    )
     heroes = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
     assert_equal 1, heroes.size
     hero = heroes.first
@@ -351,11 +358,18 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
 
   test "a hero can render a host social login CTA" do
     page_recording = create_page!(parent_recording: @root, title: "Join", actor: @actor)
-    RecordingStudioPages::Services::ApplyTemplate.call(
+    add_section!(
       page_recording: page_recording,
-      template_key: "join",
+      section_type: "hero",
+      content: {
+        eyebrow: "Members",
+        title: "Come as you are",
+        body: "Use the door you already have.",
+        cta: { type: "social_logins" }
+      },
+      settings: { variant: "centered" },
       actor: @actor
-    ).value!
+    )
     publishable = publish_page!(page_recording, slug: "join-us", actor: @actor)
 
     get "/pages/#{publishable.id}/join-us"
@@ -374,11 +388,19 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
 
   test "a fullscreen hero can render social continue-with buttons" do
     page_recording = create_page!(parent_recording: @root, title: "Walk in", actor: @actor)
-    RecordingStudioPages::Services::ApplyTemplate.call(
+    add_section!(
       page_recording: page_recording,
-      template_key: "walk_in",
+      section_type: "hero",
+      content: {
+        eyebrow: "Members",
+        title: "The lights are already on",
+        body: "Use the door you already have.",
+        image_url: "/images/hero-tonight.jpg",
+        cta: { type: "social_logins" }
+      },
+      settings: { variant: "fullscreen_image", alignment: "left" },
       actor: @actor
-    ).value!
+    )
     publishable = publish_page!(page_recording, slug: "walk-in", actor: @actor)
 
     get "/pages/#{publishable.id}/walk-in"
@@ -402,11 +424,22 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
 
   test "a hero can render a host URL field CTA" do
     page_recording = create_page!(parent_recording: @root, title: "Start", actor: @actor)
-    RecordingStudioPages::Services::ApplyTemplate.call(
+    add_section!(
       page_recording: page_recording,
-      template_key: "start_from_url",
+      section_type: "hero",
+      content: {
+        eyebrow: "Quick start",
+        title: "Got a link?",
+        body: "Paste it. We'll take it from there.",
+        cta: {
+          type: "url_form",
+          placeholder: "https://",
+          button_text: "Open it"
+        }
+      },
+      settings: { variant: "centered" },
       actor: @actor
-    ).value!
+    )
     publishable = publish_page!(page_recording, slug: "start-here", actor: @actor)
 
     get "/pages/#{publishable.id}/start-here"

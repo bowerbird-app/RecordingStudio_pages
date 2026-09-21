@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.7", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.8", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -221,6 +221,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes readme, "recording_studio_pages_flash"
     assert_includes readme, "RS Publishable"
     refute_includes readme, "internal template"
+    refute_includes readme, "register_template"
+    refute_includes readme, "ApplyTemplate"
+    refute_includes readme, "Use a template"
     refute_includes readme, "ExampleService"
     refute_includes readme, "v3 declarations"
   end
@@ -311,12 +314,22 @@ class RecordingStudioPagesTest < Minitest::Test
     editor = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/_editor.html.erb", __dir__))
     index = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/index.html.erb", __dir__))
     edit = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/edit.html.erb", __dir__))
-    template_dropdown = File.read(
-      File.expand_path("../app/views/recording_studio_pages/admin/pages/_add_template_dropdown.html.erb", __dir__)
-    )
+    new_page = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/new.html.erb", __dir__))
+    routes = File.read(File.expand_path("../config/routes.rb", __dir__))
+    lib = File.read(File.expand_path("../lib/recording_studio_pages.rb", __dir__))
 
     assert_includes editor, "orderable_url:"
-    assert_includes editor, "add_template_dropdown"
+    refute_includes editor, "add_template_dropdown"
+    refute_includes editor, "Use a template"
+    refute_includes new_page, "template_key"
+    refute_includes new_page, "Start from a template"
+    refute_includes routes, "apply_template"
+    refute_includes lib, "register_template"
+    refute File.exist?(File.expand_path("../app/views/recording_studio_pages/admin/pages/_add_template_dropdown.html.erb", __dir__))
+    refute File.exist?(File.expand_path("../app/views/recording_studio_pages/admin/pages/apply_template.turbo_stream.erb", __dir__))
+    refute File.exist?(File.expand_path("../lib/recording_studio_pages/template_registry.rb", __dir__))
+    refute File.exist?(File.expand_path("../lib/recording_studio_pages/page_template.rb", __dir__))
+    refute File.exist?(File.expand_path("../lib/recording_studio_pages/services/apply_template.rb", __dir__))
     assert_includes editor, "FlatPack::Grid::Component.new(cols: 2"
     assert_includes editor, "FlatPack::Card::Component.new(padding: :md)"
     assert_includes editor, "FlatPack::EmptyState::Component"
@@ -334,10 +347,6 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes editor, "local_assigns[:notice]"
     refute_includes editor, "Nothing live yet"
     refute_includes editor, "Nothing here yet"
-    assert_includes template_dropdown, "Use a template"
-    assert_includes template_dropdown, "turbo_stream: true"
-    refute_includes template_dropdown, 'turbo_frame: "page_editor"'
-
     add_section_dropdown = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/pages/_add_section_dropdown.html.erb", __dir__)
     )
@@ -362,14 +371,9 @@ class RecordingStudioPagesTest < Minitest::Test
     create_stream = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/sections/create.turbo_stream.erb", __dir__)
     )
-    apply_stream = File.read(
-      File.expand_path("../app/views/recording_studio_pages/admin/pages/apply_template.turbo_stream.erb", __dir__)
-    )
-    [create_stream, apply_stream].each do |stream|
-      assert_includes stream, 'turbo_stream.replace "flash"'
-      assert_includes stream, 'turbo_stream.update "page_editor"'
-      refute_includes stream, "notice:"
-    end
+    assert_includes create_stream, 'turbo_stream.replace "flash"'
+    assert_includes create_stream, 'turbo_stream.update "page_editor"'
+    refute_includes create_stream, "notice:"
 
     section_edit = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/sections/edit.html.erb", __dir__)
@@ -405,7 +409,9 @@ class RecordingStudioPagesTest < Minitest::Test
     pages_controller = File.read(
       File.expand_path("../app/controllers/recording_studio_pages/admin/pages_controller.rb", __dir__)
     )
-    assert_includes pages_controller, 'flash.now[:notice] = "Template sections added."'
+    refute_includes pages_controller, "Template sections added."
+    refute_includes pages_controller, "apply_template"
+    refute_includes pages_controller, "template_key"
 
     section_row = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/pages/_section_row.html.erb", __dir__)
@@ -527,12 +533,16 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes cta_js, "panelTargets"
     assert_includes cta_js, "field.disabled"
     dummy_initializer = File.read(File.expand_path("dummy/config/initializers/recording_studio_pages.rb", __dir__))
+    dummy_seeds = File.read(File.expand_path("dummy/db/seeds.rb", __dir__))
     assert_includes dummy_initializer, "register_cta"
     assert_includes dummy_initializer, ":social_logins"
     assert_includes dummy_initializer, ":url_form"
-    assert_includes dummy_initializer, "key: :walk_in"
-    assert_includes dummy_initializer, 'type: "social_logins"'
-    assert_includes dummy_initializer, "fullscreen_image"
+    refute_includes dummy_initializer, "register_template"
+    refute_includes dummy_initializer, "key: :walk_in"
+    assert_includes dummy_seeds, 'type: "social_logins"'
+    assert_includes dummy_seeds, "fullscreen_image"
+    refute_includes dummy_seeds, "ApplyTemplate"
+    refute_includes dummy_seeds, "restore_template_sections"
     social = File.read(File.expand_path("dummy/app/components/dummy/ctas/social_logins_component.rb", __dir__))
     url_form = File.read(File.expand_path("dummy/app/components/dummy/ctas/url_form_component.rb", __dir__))
     assert_includes social, "recording_studio_user_omniauth_provider_names"

@@ -403,7 +403,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_equal false, response.parsed_body["ok"]
   end
 
-  test "the editor previews sections and can apply a template" do
+  test "the editor previews sections without a template action" do
     page_recording = create_page!(parent_recording: @root, title: "Preview me", actor: @actor)
     add_section!(
       page_recording: page_recording,
@@ -430,29 +430,11 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Visible notes"
     assert_includes response.body, "Staff can read this."
     assert_includes response.body, "max-w-prose"
-    assert_includes response.body, "Use a template"
-    assert_includes response.body, "apply-template-#{page_recording.id}-marketing_home"
-    assert_includes response.body, "apply-template-#{page_recording.id}-full_bleed_hero"
-    assert_includes response.body, "apply-template-#{page_recording.id}-join"
-    assert_includes response.body, "apply-template-#{page_recording.id}-walk_in"
-    assert_includes response.body, "apply-template-#{page_recording.id}-start_from_url"
+    refute_includes response.body, "Use a template"
+    refute_includes response.body, "apply-template-"
+    refute_includes response.body, "Start from a template"
     assert_includes response.body, "orderable-url-value"
     refute_includes response.body, "Staff preview"
-
-    post recording_studio_pages.apply_template_admin_page_path(page_recording),
-         params: { template_key: "marketing_home" },
-         as: :turbo_stream
-
-    assert_response :success
-    assert_includes response.body, "turbo-stream"
-    assert_includes response.body, 'target="flash"'
-    assert_select "turbo-stream[target=flash]", text: /Template sections added/
-    refute_includes css_select("turbo-stream[target=page_editor]").text, "Template sections added."
-    types = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
-                                             .map { |recording| recording.recordable.section_type }
-    assert_includes types, "hero"
-    assert_includes types, "top_nav"
-    assert_includes types, "call_to_action"
   end
 
   test "copied sections stay last in the orderable list" do
@@ -560,6 +542,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     get RecordingStudioPages::Admin.new_page_path
     assert_response :success
     assert_includes response.body, "Give it a name"
+    refute_includes response.body, "Start from a template"
+    refute_includes response.body, "template_key"
     assert_includes response.body, 'name="page[title]"'
     assert_includes response.body, "max-w-xl"
     assert_includes response.body, "flex-wrap items-center gap-3"

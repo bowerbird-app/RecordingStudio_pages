@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.8] - 2026-09-21
+
+Pages are a blank stack. Templates are gone.
+
+### Removed
+- `register_template`, `templates`, `template`, `ApplyTemplate`, and the in-memory template registry.
+- Built-in `marketing_home` and `full_bleed_hero` recipes.
+- Editor **Use a template**. New page **Start from a template**.
+- Dummy `join`, `walk_in`, and `start_from_url` template registrations.
+
+### Changed
+- Dummy seed still creates Home, Tonight, Join, Walk in, and Start from a URL with `AddSection`.
+- `RecordingStudioPages.catalog` is `{ sections:, ctas: }`.
+- Create and revise no longer write `template_key`. The column stays.
+
+### Upgrade notes
+- Delete `register_template` calls and any `ApplyTemplate` usage. Add sections with `AddSection` or **Section**.
+- If you overrode `_editor` or `new`, drop **Use a template** and **Start from a template**.
+- Dummy hosts that registered Join / Walk in / Start from a URL templates should seed those pages with `AddSection` instead.
+- Do not drop the `template_key` column in this release. New pages leave it blank.
+
 ## [0.3.7] - 2026-09-18
 
 The Admin Pages list keeps Status next to the row menu and links live names out. Page builder screens close to the original trigger.
@@ -263,7 +284,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.7...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.8...HEAD
+[0.3.8]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.7...v0.3.8
 [0.3.7]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.6...v0.3.7
 [0.3.6]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.5...v0.3.6
 [0.3.5]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.4...v0.3.5

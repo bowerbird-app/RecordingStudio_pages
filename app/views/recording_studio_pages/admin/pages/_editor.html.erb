@@ -7,7 +7,6 @@
 
   <div class="flex flex-wrap items-center gap-3">
     <%= render "recording_studio_pages/admin/pages/add_section_dropdown" %>
-    <%= render "recording_studio_pages/admin/pages/add_template_dropdown" %>
     <%= render FlatPack::Button::Component.new(
       text: "Settings",
       href: edit_admin_page_path(id: page_recording.id),

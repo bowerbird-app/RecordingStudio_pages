@@ -3,14 +3,13 @@
 module RecordingStudioPages
   module Admin
     class PagesController < BaseController
-      before_action :require_admin_write_access!, only: %i[create update destroy apply_template]
+      before_action :require_admin_write_access!, only: %i[create update destroy]
 
       def index
         @page_recordings = page_scope
       end
 
       def new
-        @templates = RecordingStudioPages.templates
       end
 
       def create
@@ -18,18 +17,9 @@ module RecordingStudioPages
           parent_recording: create_parent_recording,
           title: page_params[:title],
           homepage: checked?(page_params[:homepage]),
-          template_key: page_params[:template_key].presence,
           actor: current_admin_actor
         )
         return render_failure(result, :new) if result.failure?
-
-        if page_params[:template_key].present?
-          Services::ApplyTemplate.call(
-            page_recording: result.value,
-            template_key: page_params[:template_key],
-            actor: current_admin_actor
-          ).value!
-        end
 
         redirect_to admin_page_path(result.value), notice: "Page created."
       end
@@ -61,21 +51,6 @@ module RecordingStudioPages
         redirect_to admin_pages_path, notice: "Page removed."
       end
 
-      def apply_template
-        result = Services::ApplyTemplate.call(
-          page_recording: page_recording,
-          template_key: params.require(:template_key),
-          actor: current_admin_actor
-        )
-        return redirect_to(admin_page_path(page_recording), alert: result.error) if result.failure?
-
-        load_editor
-        respond_to do |format|
-          format.turbo_stream { flash.now[:notice] = "Template sections added." }
-          format.html { redirect_to admin_page_path(page_recording), notice: "Template sections added." }
-        end
-      end
-
       private
 
       def page_scope
@@ -85,7 +60,7 @@ module RecordingStudioPages
       end
 
       def page_params
-        params.fetch(:page, {}).permit(:title, :homepage, :template_key)
+        params.fetch(:page, {}).permit(:title, :homepage)
       end
 
       def checked?(value)
