@@ -134,9 +134,31 @@ class SectionRegistryTest < Minitest::Test
   def test_built_in_sections_are_registered
     RecordingStudioPages::BuiltIns.register!
 
-    %w[top_nav hero rich_text image_text logo_cloud feature_grid call_to_action].each do |key|
+    %w[top_nav hero rich_text image_text logo_cloud feature_grid call_to_action feature logo].each do |key|
       assert RecordingStudioPages.section?(key), "expected #{key} to be registered"
     end
+  end
+
+  def test_feature_and_logo_are_child_sections
+    RecordingStudioPages::BuiltIns.register!
+
+    grid = RecordingStudioPages.section(:feature_grid)
+    cloud = RecordingStudioPages.section(:logo_cloud)
+
+    assert_equal ["feature"], grid.child_types
+    assert_equal ["logo"], cloud.child_types
+    assert_empty RecordingStudioPages.section(:feature).child_types
+    assert_empty RecordingStudioPages.section(:logo).child_types
+    refute grid.fields.fields.key?(:items)
+    refute cloud.fields.fields.key?(:items)
+    refute RecordingStudioPages.page_section?(:feature)
+    refute RecordingStudioPages.page_section?(:logo)
+    assert RecordingStudioPages.page_section?(:hero)
+    page_keys = RecordingStudioPages.page_sections.map(&:key)
+    refute_includes page_keys, "feature"
+    refute_includes page_keys, "logo"
+    assert_includes page_keys, "feature_grid"
+    assert_equal ["feature"], grid.catalog[:child_types]
   end
 
   def test_catalog_exposes_sections_for_agents

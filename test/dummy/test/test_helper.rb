@@ -56,9 +56,11 @@ module PageBuilderTestHelper
     ).value!
   end
 
-  def add_section!(page_recording:, section_type:, content: {}, settings: {}, enabled: true, actor:)
+  def add_section!(section_type:, page_recording: nil, parent_recording: nil, content: {}, settings: {},
+                   enabled: true, actor:)
     RecordingStudioPages::Services::AddSection.call(
       page_recording: page_recording,
+      parent_recording: parent_recording,
       section_type: section_type,
       content: content,
       settings: settings,

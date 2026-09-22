@@ -105,7 +105,7 @@ ensure_sections = lambda do |page_recording, entries, actor|
     RecordingStudioPages::Services::RemoveSection.call(section_recording: recording, actor: actor).value!
   end
   entries.each do |entry|
-    RecordingStudioPages::Services::AddSection.call(
+    parent = RecordingStudioPages::Services::AddSection.call(
       page_recording: page_recording.reload,
       section_type: entry.fetch(:type),
       content: entry.fetch(:content),
@@ -113,6 +113,16 @@ ensure_sections = lambda do |page_recording, entries, actor|
       enabled: entry.fetch(:enabled, true),
       actor: actor
     ).value!
+    Array(entry[:children]).each do |child|
+      RecordingStudioPages::Services::AddSection.call(
+        parent_recording: parent,
+        section_type: child.fetch(:type),
+        content: child.fetch(:content),
+        settings: child.fetch(:settings, {}),
+        enabled: child.fetch(:enabled, true),
+        actor: actor
+      ).value!
+    end
   end
 end
 
@@ -140,26 +150,22 @@ home_sections = [
   },
   {
     type: :logo_cloud,
-    content: {
-      title: "Names on the door",
-      items: [
-        { name: "House lights" },
-        { name: "Late show" },
-        { name: "Stage door" }
-      ]
-    }
+    content: { title: "Names on the door" },
+    children: [
+      { type: :logo, content: { name: "House lights" } },
+      { type: :logo, content: { name: "Late show" } },
+      { type: :logo, content: { name: "Stage door" } }
+    ]
   },
   {
     type: :feature_grid,
-    content: {
-      title: "What you get",
-      items: [
-        { title: "Pages", body: "A page is a stack you can reorder." },
-        { title: "Pieces", body: "Each piece has a job. Change the layout without starting over." },
-        { title: "Reuse", body: "Add a type once, then drop it on any page." }
-      ]
-    },
-    settings: { variant: "three_column" }
+    content: { title: "What you get" },
+    settings: { variant: "three_column" },
+    children: [
+      { type: :feature, content: { title: "Pages", body: "A page is a stack you can reorder." } },
+      { type: :feature, content: { title: "Pieces", body: "Each piece has a job. Change the layout without starting over." } },
+      { type: :feature, content: { title: "Reuse", body: "Add a type once, then drop it on any page." } }
+    ]
   },
   {
     type: :call_to_action,
@@ -389,6 +395,7 @@ begin
     { "text" => "Tonight", "url" => public_page_path.call(tonight_recording) }
   ]
   sync_house_menu.call(homepage_recording, house_links, join_url, user)
+  RecordingStudioPages::Services::UpgradeNestedSections.call(actor: user).value!
 
   puts "Seeded Home, About, Tonight, Join, Walk in, and Start from a URL. Sign in as admin@admin.com / Password."
   puts "Seeded: Workspace '#{workspace.name}' with homepage '#{homepage_recording.recordable.title}'"

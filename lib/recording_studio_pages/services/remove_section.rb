@@ -9,6 +9,7 @@ module RecordingStudioPages
       end
 
       def perform
+        trash_descendants(@section_recording)
         TrashRecording.call(recording: @section_recording, actor: actor)
       end
 
@@ -16,6 +17,13 @@ module RecordingStudioPages
 
       def actor
         @actor || current_actor
+      end
+
+      def trash_descendants(recording)
+        Composition.child_section_recordings_for(recording).each do |child|
+          trash_descendants(child)
+          TrashRecording.call(recording: child, actor: actor).value!
+        end
       end
     end
   end

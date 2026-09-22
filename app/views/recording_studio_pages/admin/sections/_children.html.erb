@@ -1,0 +1,37 @@
+<% children = RecordingStudioPages::Composition.child_section_recordings_for(section_recording) %>
+<% child_definitions = definition.child_definitions %>
+
+<div class="flex flex-col gap-4">
+  <%= render "recording_studio_pages/admin/sections/add_child",
+             section_recording: section_recording,
+             child_definitions: child_definitions %>
+
+  <% if children.any? %>
+    <%= render FlatPack::Card::Component.new(padding: :md) do %>
+      <div data-controller="recording-studio-pages--section-list">
+        <%= render FlatPack::List::Component.new(
+          ordered: false,
+          orderable: true,
+          orderable_url: reorder_admin_page_sections_path(page_id: page_recording.id),
+          orderable_method: :patch,
+          param_uuid_name: "moving_recording_id",
+          param_target_position_name: "target_position",
+          divider: true
+        ) do %>
+          <% children.each do |recording| %>
+            <% content = recording.recordable.content || {} %>
+            <% row_label = content["title"].presence || content["name"].presence %>
+            <%= render "recording_studio_pages/admin/pages/section_row",
+                       recording: recording,
+                       label: row_label %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  <% else %>
+    <%= render FlatPack::EmptyState::Component.new(
+      title: "Add a #{child_definitions.first&.name&.downcase || "piece"}",
+      description: "They show up on the page."
+    ) %>
+  <% end %>
+</div>

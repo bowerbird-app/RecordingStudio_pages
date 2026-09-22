@@ -1,5 +1,15 @@
 # Migration Notes
 
+## 0.3.8 child sections
+
+Feature grids and logo clouds no longer store an `items` list. Each row is a child section (`feature` or `logo`). After you deploy this version, run once:
+
+```ruby
+RecordingStudioPages::Services::UpgradeNestedSections.call
+```
+
+That records one child per saved row, copies an item image onto that child, and clears `items`. Run it again and it leaves the tree alone. New saves do not write `items`.
+
 ## Current Requirements
 
 - Ruby 3.3 or newer

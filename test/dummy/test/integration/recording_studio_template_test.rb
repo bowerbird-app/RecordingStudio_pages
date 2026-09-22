@@ -78,6 +78,16 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
                                                      .find { |recording| recording.recordable.section_type == "hero" }
                                                      &.recordable
     assert_equal %w[top_nav hero logo_cloud feature_grid call_to_action], homepage_types
+    logo_cloud = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
+                                                  .find { |recording| recording.recordable.section_type == "logo_cloud" }
+    feature_grid = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
+                                                    .find { |recording| recording.recordable.section_type == "feature_grid" }
+    logo_names = RecordingStudioPages::Composition.child_section_recordings_for(logo_cloud)
+                                                  .map { |recording| recording.recordable.content["name"] }
+    feature_titles = RecordingStudioPages::Composition.child_section_recordings_for(feature_grid)
+                                                      .map { |recording| recording.recordable.content["title"] }
+    assert_equal ["House lights", "Late show", "Stage door"], logo_names
+    assert_equal ["Pages", "Pieces", "Reuse"], feature_titles
     homepage_menu = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
                                                     .find { |recording| recording.recordable.section_type == "top_nav" }
                                                     &.recordable
@@ -151,6 +161,8 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     refute RecordingStudio.capability_enabled?(:accessible, for: RecordingStudioPages::Page)
     assert RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Section)
     refute RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Page)
+    assert RecordingStudio.capability_enabled?(:orderable, for: RecordingStudioPages::Section)
+    assert RecordingStudio.capability_enabled?(:orderable, for: RecordingStudioPages::Page)
     assert RecordingStudio.capability_enabled?(:trashable, for: RecordingStudioPages::Page)
     refute RecordingStudio.capability_enabled?(:trashable, for: RecordingStudioPages::Section)
     assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout

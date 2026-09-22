@@ -12,19 +12,24 @@ module RecordingStudioPages
 
       def create
         payload = section_payload
+        parent = parent_for_new_section(payload[:parent_section_id])
         result = Services::AddSection.call(
-          page_recording: page_recording,
+          parent_recording: parent,
           section_type: payload[:section_type],
           content: starter_content_for(payload[:section_type]).merge(payload[:content]),
           settings: payload[:settings],
           actor: current_admin_actor
         )
-        return redirect_to(admin_page_path(id: page_recording.id), alert: result.error) if result.failure?
+        return redirect_to(section_home_path(parent), alert: result.error) if result.failure?
 
-        load_editor
-        respond_to do |format|
-          format.turbo_stream { flash.now[:notice] = added_notice }
-          format.html { redirect_to admin_page_path(id: page_recording.id), notice: added_notice }
+        if parent.recordable_type == "RecordingStudioPages::Section"
+          redirect_to section_home_path(parent), notice: added_notice_for(payload[:section_type])
+        else
+          load_editor
+          respond_to do |format|
+            format.turbo_stream { flash.now[:notice] = added_notice }
+            format.html { redirect_to admin_page_path(id: page_recording.id), notice: added_notice }
+          end
         end
       end
 
@@ -54,17 +59,20 @@ module RecordingStudioPages
       end
 
       def destroy
-        Services::RemoveSection.call(section_recording: section_recording, actor: current_admin_actor).value!
-        redirect_to admin_page_path(id: page_recording.id), notice: "Section removed."
+        recording = section_recording
+        parent = recording.parent_recording
+        Services::RemoveSection.call(section_recording: recording, actor: current_admin_actor).value!
+        redirect_to section_home_path(parent), notice: "Section removed."
       end
 
       def reorder
         position = params[:target_position].to_i
         return reject_reorder("Choose a place in the list.") if position < 1
 
+        moving = moving_section_recording
         result = Services::MoveSection.call(
-          page_recording: page_recording,
-          section_recording: moving_section_recording,
+          page_recording: moving.parent_recording,
+          section_recording: moving,
           to_index: position - 1,
           actor: current_admin_actor
         )
@@ -74,22 +82,26 @@ module RecordingStudioPages
       end
 
       def toggle
+        recording = section_recording
+        parent = recording.parent_recording
         Services::ToggleSection.call(
-          section_recording: section_recording,
-          enabled: !section_recording.recordable.enabled?,
+          section_recording: recording,
+          enabled: !recording.recordable.enabled?,
           actor: current_admin_actor
         ).value!
-        redirect_to admin_page_path(id: page_recording.id)
+        redirect_to section_home_path(parent)
       end
 
       def duplicate
+        recording = section_recording
+        parent = recording.parent_recording
         result = Services::DuplicateSection.call(
-          section_recording: section_recording,
+          section_recording: recording,
           actor: current_admin_actor
         )
-        return redirect_to(admin_page_path(id: page_recording.id), alert: result.error) if result.failure?
+        return redirect_to(section_home_path(parent), alert: result.error) if result.failure?
 
-        redirect_to admin_page_path(id: page_recording.id), notice: "Section copied."
+        redirect_to section_home_path(parent), notice: "Section copied."
       end
 
       private
@@ -103,16 +115,47 @@ module RecordingStudioPages
       end
 
       def find_section_recording(recording_id)
-        page_recording.child_recordings.find_by!(
+        recording = RecordingStudio::Recording.find_by!(
           id: recording_id,
-          recordable_type: "RecordingStudioPages::Section"
+          recordable_type: "RecordingStudioPages::Section",
+          trashed_at: nil
         )
+        raise ActiveRecord::RecordNotFound unless belongs_to_page?(recording)
+
+        recording
+      end
+
+      def belongs_to_page?(recording)
+        current = recording
+        seen = {}
+        while current && !seen[current.id]
+          return true if current.id == page_recording.id || current.parent_recording_id == page_recording.id
+
+          seen[current.id] = true
+          current = current.parent_recording
+        end
+        false
+      end
+
+      def parent_for_new_section(parent_section_id)
+        return page_recording if parent_section_id.blank?
+
+        find_section_recording(parent_section_id)
+      end
+
+      def section_home_path(parent)
+        if parent&.recordable_type == "RecordingStudioPages::Section"
+          edit_admin_page_section_path(page_id: page_recording.id, id: parent.id)
+        else
+          admin_page_path(id: page_recording.id)
+        end
       end
 
       def section_payload
         raw = params.fetch(:section, {}).to_unsafe_h
         {
           section_type: raw["section_type"],
+          parent_section_id: raw["parent_section_id"],
           content: stringify_payload(raw["content"]),
           settings: stringify_payload(raw["settings"])
         }
@@ -131,6 +174,11 @@ module RecordingStudioPages
 
       def added_notice
         "Section added."
+      end
+
+      def added_notice_for(section_type)
+        name = RecordingStudioPages.find_section(section_type)&.name
+        name.present? ? "#{name} added." : added_notice
       end
 
       def reject_reorder(message)

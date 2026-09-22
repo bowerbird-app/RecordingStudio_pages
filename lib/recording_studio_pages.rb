@@ -29,6 +29,7 @@ require "recording_studio_pages/services/duplicate_section"
 require "recording_studio_pages/services/trash_recording"
 require "recording_studio_pages/services/remove_section"
 require "recording_studio_pages/services/remove_page"
+require "recording_studio_pages/services/upgrade_nested_sections"
 require "recording_studio_pages/engine"
 
 module RecordingStudioPages
@@ -72,6 +73,19 @@ module RecordingStudioPages
 
     def sections
       section_registry.all
+    end
+
+    def page_sections
+      nested = child_section_keys
+      sections.reject { |definition| nested.include?(definition.key) }
+    end
+
+    def page_section?(key)
+      section?(key) && !child_section_keys.include?(key.to_s)
+    end
+
+    def child_section_keys
+      sections.flat_map(&:child_types).uniq
     end
 
     def cta(key)

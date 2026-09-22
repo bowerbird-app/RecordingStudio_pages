@@ -1,0 +1,46 @@
+<% if child_definitions.one? %>
+  <% child = child_definitions.first %>
+  <% form_id = "add-child-#{section_recording.id}-#{child.key}" %>
+  <%= form_with url: admin_page_sections_path(page_id: page_recording.id),
+                method: :post,
+                html: { id: form_id, class: "hidden" },
+                data: { turbo: false } do %>
+    <%= hidden_field_tag "section[section_type]", child.key %>
+    <%= hidden_field_tag "section[parent_section_id]", section_recording.id %>
+  <% end %>
+  <%= render FlatPack::Button::Component.new(
+    text: child.name,
+    icon: "plus",
+    style: :primary,
+    size: :md,
+    type: :submit,
+    form: form_id
+  ) %>
+<% else %>
+  <% child_definitions.each do |child| %>
+    <% form_id = "add-child-#{section_recording.id}-#{child.key}" %>
+    <%= form_with url: admin_page_sections_path(page_id: page_recording.id),
+                  method: :post,
+                  html: { id: form_id, class: "hidden" },
+                  data: { turbo: false } do %>
+      <%= hidden_field_tag "section[section_type]", child.key %>
+      <%= hidden_field_tag "section[parent_section_id]", section_recording.id %>
+    <% end %>
+  <% end %>
+  <%= render FlatPack::Button::Dropdown::Component.new(
+    text: "Add",
+    icon: "plus",
+    style: :primary,
+    size: :md,
+    placement: :bottom_left
+  ) do |dropdown| %>
+    <% child_definitions.each do |child| %>
+      <% dropdown.menu_item(
+        text: child.name,
+        icon: child.menu_icon,
+        form: "add-child-#{section_recording.id}-#{child.key}",
+        type: "submit"
+      ) %>
+    <% end %>
+  <% end %>
+<% end %>

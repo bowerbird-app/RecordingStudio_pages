@@ -18,7 +18,9 @@ module RecordingStudioPages
       register_hero!
       register_rich_text!
       register_image_text!
+      register_logo!
       register_logo_cloud!
+      register_feature!
       register_feature_grid!
       register_call_to_action!
     end
@@ -171,6 +173,22 @@ module RecordingStudioPages
       )
     end
 
+    def register_logo!
+      RecordingStudioPages.register_section(
+        key: :logo,
+        name: "Logo",
+        category: "marketing",
+        source: "recording_studio_pages",
+        component: "RecordingStudioPages::Sections::LogoComponent",
+        icon: "photo",
+        fields: {
+          name: { type: :string, required: true, label: "Name" },
+          url: { type: :url, label: "URL" },
+          image: { type: :attachment, kind: :image, label: "Image" }
+        }
+      )
+    end
+
     def register_logo_cloud!
       RecordingStudioPages.register_section(
         key: :logo_cloud,
@@ -179,21 +197,30 @@ module RecordingStudioPages
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::LogoCloudComponent",
         icon: "building-office",
+        child_types: [:logo],
         fields: {
-          title: :string,
-          items: {
-            type: :list,
-            item: {
-              name: :string,
-              url: :url,
-              image: { type: :attachment, kind: :image, label: "Image" }
-            }
-          }
+          title: :string
         },
         settings: {
           variant: :string
         },
         variants: %w[simple compact]
+      )
+    end
+
+    def register_feature!
+      RecordingStudioPages.register_section(
+        key: :feature,
+        name: "Feature",
+        category: "marketing",
+        source: "recording_studio_pages",
+        component: "RecordingStudioPages::Sections::FeatureComponent",
+        icon: "sparkles",
+        fields: {
+          title: { type: :string, required: true },
+          body: :text,
+          image: { type: :attachment, kind: :image, label: "Image" }
+        }
       )
     end
 
@@ -205,13 +232,10 @@ module RecordingStudioPages
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::FeatureGridComponent",
         icon: "squares-2x2",
+        child_types: [:feature],
         fields: {
           title: { type: :string, required: true },
-          body: :text,
-          items: {
-            type: :list,
-            item: { title: :string, body: :text }
-          }
+          body: :text
         },
         settings: {
           variant: :string

@@ -335,29 +335,21 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     section = add_section!(
       page_recording: page_recording,
       section_type: "feature_grid",
-      content: {
-        title: "What you get",
-        items: [
-          { title: "Pages", body: "A stack." },
-          { title: "Pieces", body: "Each has a job." }
-        ]
-      },
+      content: { title: "What you get" },
       settings: { variant: "three_column" },
+      actor: @actor
+    )
+    add_section!(
+      parent_recording: section,
+      section_type: "feature",
+      content: { title: "Pages", body: "A stack." },
       actor: @actor
     )
 
     patch recording_studio_pages.admin_page_section_path(page_id: page_recording.id, id: section.id),
           params: {
             section: {
-              content: {
-                title: "What changed",
-                body: "Still a grid.",
-                items: {
-                  "0" => { title: "Pages", body: "A stack you can reorder." },
-                  "1" => { title: "Pieces", body: "Each piece has a job." },
-                  "2" => { title: "", body: "" }
-                }
-              },
+              content: { title: "What changed", body: "Still a grid." },
               settings: { variant: "icon_grid" }
             }
           }
@@ -369,14 +361,14 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     saved = section.reload.recordable
     assert_equal "What changed", saved.content["title"]
     assert_equal "Still a grid.", saved.content["body"]
-    assert_equal [
-      { "title" => "Pages", "body" => "A stack you can reorder." },
-      { "title" => "Pieces", "body" => "Each piece has a job." }
-    ], saved.content["items"]
+    refute saved.content.key?("items")
     assert_equal "icon_grid", saved.settings["variant"]
     follow_redirect!
     assert_includes response.body, "Updated."
     assert_includes response.body, "What changed"
+    assert_includes response.body, "Pages"
+    assert_select "input[name='section[section_type]'][value='feature']"
+    assert_select "button", text: "Feature"
   end
 
   test "staff can save hero style colours" do

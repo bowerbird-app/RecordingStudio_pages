@@ -19,6 +19,14 @@ module RecordingStudioPages
       scope.select { |recording| recording.recordable_type == "RecordingStudioPages::Section" }
     end
 
+    def child_section_recordings_for(section_recording)
+      section_recordings_for(section_recording)
+    end
+
+    def renderable_child_section_recordings_for(section_recording)
+      renderable_section_recordings_for(section_recording)
+    end
+
     def renderable_section_recordings_for(page_recording)
       section_recordings_for(page_recording).select do |recording|
         recordable = recording.recordable

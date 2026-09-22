@@ -29,6 +29,10 @@ Pages are a blank stack. Templates are gone.
 - Dummy `/admin` switches the current root to Admin when the signed-in actor has Accessible `:view` on that root. A workspace selection no longer blanks the hub. People without that grant still get 403.
 - Dummy pins Flatpack `v0.1.193`. The signed-in sidebar header passes `show_version: false`.
 - Feature grid, logo cloud, and menu lists accept the editor’s indexed rows (`items[0]`, `items[1]`). Saving one no longer raises.
+- A feature grid holds `feature` sections. A logo cloud holds `logo` sections. `register_section` takes `child_types:`. The page **Section** menu lists types that are not anyone else's child. Add, drag, turn off, copy, and remove those children on the parent section. Section opts into Orderable for that list. Copying a parent copies the children and their pictures. Removing a parent removes the children.
+- `AddSection` takes `parent_recording:` for a child section. `page_recording:` still adds a section on a page.
+- `Composition.child_section_recordings_for` returns a section's children in order. Public feature grids and logo clouds render the enabled ones.
+- `UpgradeNestedSections` turns a saved `items` list into those child sections, copies each item image onto the child, then clears `items`.
 
 ### Upgrade notes
 - Delete `register_template` calls and any `ApplyTemplate` usage. Add sections with `AddSection` or **Section**.
@@ -43,7 +47,12 @@ Pages are a blank stack. Templates are gone.
 - Install Trashable and keep Page’s `Capabilities::Trashable.to` so **Trash** calls `recording_studio_trashable_trash!`.
 - Dummy hosts that linked `/admin` from a workspace can drop the manual root switch. Keep Accessible grants on the Admin root. People without that grant still get 403.
 - Pin Flatpack `v0.1.193`. Pass `show_version: false` on a product `FlatPack::Sidebar::Header` so the kit version badge stays off the title.
-- List fields on a section accept either an array or the editor’s indexed hash. Blank and removed rows are dropped.
+- List fields on a section accept either an array or the editor’s indexed hash. Blank and removed rows are dropped. Menu links still use a list.
+- Run `RecordingStudioPages::Services::UpgradeNestedSections.call` once. Existing feature grids and logo clouds become child sections. New saves do not write `items`.
+- Add a feature or logo on its parent section. The page **Section** menu does not offer them.
+- A section may sit under a page or a section. `AddSection` is what decides which type is allowed. Pass `parent_recording:` for a child. Keep `page_recording:` for a page section.
+- If you overrode the feature grid or logo cloud component, render child sections. `content["items"]` is gone.
+- If you overrode the section edit screen, show the child list when `child_types` is present. One child type is a single button. The row label is the feature title or the logo name.
 
 ## [0.3.7] - 2026-09-18
 

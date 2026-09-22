@@ -27,7 +27,7 @@ module RecordingStudioPages
       end
 
       def section_definitions
-        RecordingStudioPages.sections
+        RecordingStudioPages.page_sections
       end
 
       def add_section_form_id(definition)

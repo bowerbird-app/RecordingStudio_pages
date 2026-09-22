@@ -8,6 +8,10 @@ begin
   require "recording_studio_attachable"
 rescue LoadError
 end
+begin
+  require "recording_studio_orderable"
+rescue LoadError
+end
 
 module RecordingStudioPages
   class Section < ApplicationRecord
@@ -18,7 +22,7 @@ module RecordingStudioPages
     recording_studio_recordable label: "Section",
                                 plural_label: "Sections",
                                 root: false,
-                                allowed_parent_types: ["RecordingStudioPages::Page"]
+                                allowed_parent_types: ["RecordingStudioPages::Page", "RecordingStudioPages::Section"]
 
     if defined?(RecordingStudio::Capabilities::Duplicatable)
       include RecordingStudio::Capabilities::Duplicatable.to(
@@ -32,6 +36,10 @@ module RecordingStudioPages
         allowed_content_types: ["image/*"],
         enabled_attachment_kinds: %i[image]
       )
+    end
+
+    if defined?(RecordingStudio::Capabilities::Orderable)
+      include RecordingStudio::Capabilities::Orderable.to(allows: ["RecordingStudioPages::Section"])
     end
 
     def enabled?

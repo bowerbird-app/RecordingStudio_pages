@@ -71,7 +71,8 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes section_source, "image/*"
     assert_includes service_source, "duplicate_in_place!"
     assert_includes service_source, "record_attachment_upload"
-    refute_includes service_source, "AddSection.call"
+    assert_includes service_source, "copy_child_sections"
+    assert_includes section_source, "Capabilities::Orderable.to"
   end
 
   def test_page_opts_into_trashable

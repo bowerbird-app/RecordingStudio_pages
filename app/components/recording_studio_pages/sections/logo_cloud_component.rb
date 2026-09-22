@@ -22,7 +22,9 @@ module RecordingStudioPages
       private
 
       def items
-        Array(@rendered.content["items"])
+        RecordingStudioPages::Composition.renderable_child_section_recordings_for(@rendered.recording).filter_map do |recording|
+          RecordingStudioPages::Renderer.section(recording, context: helpers)&.content
+        end
       end
 
       def compact?
