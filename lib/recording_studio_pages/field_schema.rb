@@ -19,6 +19,29 @@ module RecordingStudioPages
       fields.keys
     end
 
+    def self.list_entries(value)
+      return [] if value.nil?
+      return value if value.is_a?(Array)
+
+      hash = list_hash(value)
+      return [] unless hash
+      return hash.sort_by { |key, _item| key.to_i }.map(&:last) if indexed_list?(hash)
+
+      [hash]
+    end
+
+    def self.list_hash(value)
+      return value if value.is_a?(Hash)
+      return value.to_unsafe_h if value.respond_to?(:to_unsafe_h)
+
+      nil
+    end
+
+    def self.indexed_list?(hash)
+      hash.keys.all? { |key| key.to_s.match?(/\A\d+\z/) }
+    end
+    private_class_method :list_hash, :indexed_list?
+
     def read(raw)
       source = stringify_keys(raw)
       fields.each_with_object({}) do |(key, spec), result|
@@ -77,6 +100,10 @@ module RecordingStudioPages
       raise ArgumentError, "Unsupported field spec #{spec.inspect}"
     end
 
+    def list_entries(value)
+      self.class.list_entries(value)
+    end
+
     def stringify_keys(raw)
       return {} if raw.nil?
 
@@ -94,7 +121,7 @@ module RecordingStudioPages
       when :cta
         coerce_cta(value)
       when :list
-        Array(value).filter_map { |item| read_list_item(spec, item) }
+        list_entries(value).filter_map { |item| read_list_item(spec, item) }
       when :recording_ids
         ids = value.is_a?(String) ? value.split(/[\s,]+/) : Array(value)
         ids.map(&:to_s).reject(&:blank?)
@@ -217,7 +244,9 @@ module RecordingStudioPages
       case spec[:type].to_sym
       when :boolean
         false
-      when :list, :recording_ids
+      when :list
+        list_entries(value).empty?
+      when :recording_ids
         Array(value).empty?
       when :link
         link = coerce_link(value)
@@ -273,9 +302,9 @@ module RecordingStudioPages
     end
 
     def validate_list(key, spec, value)
-      return ["#{key} must be a list"] unless value.nil? || value.is_a?(Array)
+      return ["#{key} must be a list"] unless value.nil? || value.is_a?(Array) || value.is_a?(Hash)
 
-      Array(value).flat_map.with_index do |item, index|
+      list_entries(value).flat_map.with_index do |item, index|
         hash = stringify_keys(item)
         next [] if destroyed_item?(hash)
 
@@ -335,7 +364,7 @@ module RecordingStudioPages
           result[key_s] = result[key_s].presence || result["#{key_s}_url"]
         elsif type == :list
           nested = self.class.new(spec[:item] || {}).fields
-          result[key_s] = Array(result[key_s]).map do |item|
+          result[key_s] = list_entries(result[key_s]).map do |item|
             upgrade_attachment_hash(stringify_keys(item), nested)
           end
         end
@@ -354,7 +383,7 @@ module RecordingStudioPages
         type = spec[:type].to_sym
         result[key_s] = if type == :list
                           nested = self.class.new(spec[:item] || {}).fields
-                          Array(result[key_s]).map do |item|
+                          list_entries(result[key_s]).map do |item|
                             transform_hash(stringify_keys(item), nested, &)
                           end
                         else

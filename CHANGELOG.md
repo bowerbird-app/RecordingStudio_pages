@@ -28,6 +28,7 @@ Pages are a blank stack. Templates are gone.
 - Dummy installs Recording Studio Trashable. Page opts into `Capabilities::Trashable`. `TrashRecording` calls `recording_studio_trashable_trash!` when that capability is on.
 - Dummy `/admin` switches the current root to Admin when the signed-in actor has Accessible `:view` on that root. A workspace selection no longer blanks the hub. People without that grant still get 403.
 - Dummy pins Flatpack `v0.1.193`. The signed-in sidebar header passes `show_version: false`.
+- Feature grid, logo cloud, and menu lists accept the editor’s indexed rows (`items[0]`, `items[1]`). Saving one no longer raises.
 
 ### Upgrade notes
 - Delete `register_template` calls and any `ApplyTemplate` usage. Add sections with `AddSection` or **Section**.
@@ -42,6 +43,7 @@ Pages are a blank stack. Templates are gone.
 - Install Trashable and keep Page’s `Capabilities::Trashable.to` so **Trash** calls `recording_studio_trashable_trash!`.
 - Dummy hosts that linked `/admin` from a workspace can drop the manual root switch. Keep Accessible grants on the Admin root. People without that grant still get 403.
 - Pin Flatpack `v0.1.193`. Pass `show_version: false` on a product `FlatPack::Sidebar::Header` so the kit version badge stays off the title.
+- List fields on a section accept either an array or the editor’s indexed hash. Blank and removed rows are dropped.
 
 ## [0.3.7] - 2026-09-18
 

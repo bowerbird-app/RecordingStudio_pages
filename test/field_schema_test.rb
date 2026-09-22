@@ -73,6 +73,24 @@ class FieldSchemaTest < Minitest::Test
     assert_equal [{ "name" => "Keep", "url" => "https://example.com" }], result["items"]
   end
 
+  def test_list_read_accepts_the_editor_index_hash
+    schema = RecordingStudioPages::FieldSchema.new(
+      items: { type: :list, item: { title: :string, body: :text } }
+    )
+
+    result = schema.read(
+      items: {
+        "2" => { "title" => "Third", "body" => "Last" },
+        "0" => { "title" => "First", "body" => "Kept" },
+        "1" => { "title" => "Gone", "body" => "Removed", "_destroy" => "1" },
+        "3" => { "title" => "", "body" => "" }
+      }
+    )
+
+    assert_equal [{ "title" => "First", "body" => "Kept" }, { "title" => "Third", "body" => "Last" }], result["items"]
+    assert_empty schema.validate(items: { "0" => { "title" => "First", "body" => "Kept" } })
+  end
+
   def test_list_validate_skips_blank_and_destroyed_items
     schema = RecordingStudioPages::FieldSchema.new(
       items: { type: :list, item: { name: :string, url: :url } }

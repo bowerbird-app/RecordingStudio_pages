@@ -22,8 +22,9 @@
   <%= render FlatPack::TextInput::Component.new(name: "#{name}[text]", label: "#{label} text", value: value.is_a?(Hash) ? value["text"] : nil, disabled: disabled) %>
   <%= render FlatPack::UrlInput::Component.new(name: "#{name}[url]", label: "#{label} URL", value: value.is_a?(Hash) ? value["url"] : nil, disabled: disabled) %>
 <% elsif type == :list %>
+  <% items = RecordingStudioPages::FieldSchema.list_entries(value) %>
   <div class="flex flex-col gap-4">
-    <% Array(value).each_with_index do |item, index| %>
+    <% items.each_with_index do |item, index| %>
       <div class="flex flex-col gap-3 rounded-[var(--radius-md)] border border-[var(--surface-border-color)] p-4">
         <p class="text-sm font-medium"><%= "#{label} #{index + 1}" %></p>
         <% (spec[:item] || {}).each do |item_key, item_spec| %>
@@ -43,7 +44,7 @@
         ) %>
       </div>
     <% end %>
-    <% empty_index = Array(value).length %>
+    <% empty_index = items.length %>
     <div class="flex flex-col gap-3 rounded-[var(--radius-md)] border border-dashed border-[var(--surface-border-color)] p-4">
       <p class="text-sm font-medium">Add <%= label.downcase.sub(/s$/, "") %></p>
       <% (spec[:item] || {}).each do |item_key, item_spec| %>

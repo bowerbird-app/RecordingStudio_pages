@@ -330,6 +330,55 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">Update<"
   end
 
+  test "staff can update a feature grid from the editor form" do
+    page_recording = create_page!(parent_recording: @root, title: "Grid", actor: @actor)
+    section = add_section!(
+      page_recording: page_recording,
+      section_type: "feature_grid",
+      content: {
+        title: "What you get",
+        items: [
+          { title: "Pages", body: "A stack." },
+          { title: "Pieces", body: "Each has a job." }
+        ]
+      },
+      settings: { variant: "three_column" },
+      actor: @actor
+    )
+
+    patch recording_studio_pages.admin_page_section_path(page_id: page_recording.id, id: section.id),
+          params: {
+            section: {
+              content: {
+                title: "What changed",
+                body: "Still a grid.",
+                items: {
+                  "0" => { title: "Pages", body: "A stack you can reorder." },
+                  "1" => { title: "Pieces", body: "Each piece has a job." },
+                  "2" => { title: "", body: "" }
+                }
+              },
+              settings: { variant: "icon_grid" }
+            }
+          }
+
+    assert_redirected_to recording_studio_pages.edit_admin_page_section_path(
+      page_id: page_recording.id,
+      id: section.id
+    )
+    saved = section.reload.recordable
+    assert_equal "What changed", saved.content["title"]
+    assert_equal "Still a grid.", saved.content["body"]
+    assert_equal [
+      { "title" => "Pages", "body" => "A stack you can reorder." },
+      { "title" => "Pieces", "body" => "Each piece has a job." }
+    ], saved.content["items"]
+    assert_equal "icon_grid", saved.settings["variant"]
+    follow_redirect!
+    assert_includes response.body, "Updated."
+    assert_includes response.body, "What changed"
+  end
+
   test "staff can save hero style colours" do
     page_recording = create_page!(parent_recording: @root, title: "Paint", actor: @actor)
     section = add_section!(
