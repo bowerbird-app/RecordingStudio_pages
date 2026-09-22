@@ -212,7 +212,7 @@ Sign in with `admin@admin.com` / `Password`.
 - `/start` dummy catcher for that URL field
 - `/studio` same signed-in home as `/`
 - `/recording_studio_pages/admin/pages` page builder
-- `/admin` RS Admin hub. Switch to the Admin root from the top-bar switcher first. **Page** opens the new-page form. **View all** opens the Admin Pages list. Dummy loads Turbo and RS Admin Stimulus so Published and Drafts show counts instead of staying on the shimmer. Those cards open the Pages list; Drafts arrives with Draft selected, Published with Published selected. The list filters status and home. **Page** sits under the title. Live page names link out. Status sits left of the Edit / Trash row menu.
+- `/admin` RS Admin hub. Dummy switches the current root to Admin when the signed-in actor has Accessible `:view` on that root. **Page** opens the new-page form. **View all** opens the Admin Pages list. Dummy loads Turbo and RS Admin Stimulus so Published and Drafts show counts instead of staying on the shimmer. Those cards open the Pages list; Drafts arrives with Draft selected, Published with Published selected. The list filters status and home. **Page** sits under the title. Live page names link out. Status sits left of the Edit / Trash row menu.
 
 ## Upstream gaps
 

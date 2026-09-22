@@ -877,7 +877,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
                     "href=\"#{RecordingStudioPages::Admin.screen_path(status: RecordingStudioPages::Composition::STATUS_DRAFT)}\""
   end
 
-  test "the RS Admin hub is forbidden while the current root is a workspace" do
+  test "visiting the RS Admin hub switches to the Admin root" do
     patch "/recording_studio_root_switchable/v1/root_switch", params: {
       scope: "all_workspaces",
       root_switch: {
@@ -887,8 +887,51 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     }
     follow_redirect!
 
-    get "/admin"
+    get "/admin", params: { anchor_url: "/" }
+
+    assert_response :success
+    assert_includes response.body, "Pages"
+    assert_includes response.body, ">Page<"
+    refute_equal 0, response.body.bytesize
+    assert RecordingStudio::RootSwitchable::Selection.where(
+      actor: @actor,
+      scope_key: "all_workspaces"
+    ).exists?(root_recording_id: @admin_root.id)
+  end
+
+  test "a signed-in user without Admin root access is still forbidden on the hub" do
+    stranger = create_actor!("admin-hub-stranger@example.com")
+    sign_in stranger
+
+    get "/admin", params: { anchor_url: "/" }
 
     assert_response :forbidden
+  end
+
+  test "a workspace admin without Admin root access is still forbidden on the hub" do
+    workspace_only = create_actor!("workspace-only-admin@example.com")
+    grant_admin!(@root, workspace_only)
+    sign_in workspace_only
+
+    patch "/recording_studio_root_switchable/v1/root_switch", params: {
+      scope: "all_workspaces",
+      root_switch: {
+        root_recording_id: @root.id,
+        return_to: "/studio"
+      }
+    }
+    follow_redirect!
+
+    get "/admin", params: { anchor_url: "/" }
+
+    assert_response :forbidden
+    assert RecordingStudio::RootSwitchable::Selection.where(
+      actor: workspace_only,
+      scope_key: "all_workspaces"
+    ).exists?(root_recording_id: @root.id)
+    refute RecordingStudio::RootSwitchable::Selection.where(
+      actor: workspace_only,
+      scope_key: "all_workspaces"
+    ).exists?(root_recording_id: @admin_root.id)
   end
 end

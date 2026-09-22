@@ -12,3 +12,13 @@ RecordingStudioAdmin.configure do |config|
   end
   config.site_admin_recording_resolver = config.access_recording_resolver
 end
+
+Rails.application.config.to_prepare do
+  next unless defined?(RecordingStudioAdmin::ApplicationController)
+
+  controller = RecordingStudioAdmin::ApplicationController
+  next if controller.included_modules.any? { |mod| mod.name == "SwitchToAdminRoot" }
+
+  controller.include SwitchToAdminRoot
+end
+
