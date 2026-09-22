@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.9] - 2026-09-22
+
+Dummy Home features include a sample picture.
+
+### Changed
+- Seeded features Pages, Pieces, and Reuse store `/images/feature-pages.jpg`, `/images/feature-pieces.jpg`, and `/images/feature-reuse.jpg`. A later seed fills a blank image on those titles and leaves a picture that is already set.
+
+### Upgrade notes
+- Nothing to run. Feature fields are unchanged. The pictures are dummy sample art.
+
 ## [0.3.8] - 2026-09-21
 
 Pages are a blank stack. Templates are gone.
@@ -310,7 +320,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.8...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.9...HEAD
+[0.3.9]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.8...v0.3.9
 [0.3.8]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.7...v0.3.8
 [0.3.7]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.6...v0.3.7
 [0.3.6]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.5...v0.3.6

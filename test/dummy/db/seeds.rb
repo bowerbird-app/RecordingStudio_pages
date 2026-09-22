@@ -79,6 +79,32 @@ sync_house_menu = lambda do |page_recording, links, join_url, actor|
   ).value!
 end
 
+sample_feature_images = {
+  "Pages" => "/images/feature-pages.jpg",
+  "Pieces" => "/images/feature-pieces.jpg",
+  "Reuse" => "/images/feature-reuse.jpg"
+}
+
+fill_sample_feature_images = lambda do |page_recording, actor|
+  grid = RecordingStudioPages::Composition.section_recordings_for(page_recording).find do |recording|
+    recording.recordable.section_type == "feature_grid"
+  end
+  return unless grid
+
+  RecordingStudioPages::Composition.child_section_recordings_for(grid).each do |child|
+    content = child.recordable.content.to_h
+    path = sample_feature_images[content["title"].to_s]
+    next if path.blank? || content["image"].present?
+
+    RecordingStudioPages::Services::ReviseSection.call(
+      section_recording: child,
+      content: content.merge("image" => path),
+      settings: child.recordable.settings,
+      actor: actor
+    ).value!
+  end
+end
+
 ensure_sections = lambda do |page_recording, entries, actor|
   expected_types = entries.map { |entry| entry.fetch(:type).to_s }
   hero_entry = entries.find { |entry| entry.fetch(:type).to_s == "hero" }
@@ -162,9 +188,30 @@ home_sections = [
     content: { title: "What you get" },
     settings: { variant: "three_column" },
     children: [
-      { type: :feature, content: { title: "Pages", body: "A page is a stack you can reorder." } },
-      { type: :feature, content: { title: "Pieces", body: "Each piece has a job. Change the layout without starting over." } },
-      { type: :feature, content: { title: "Reuse", body: "Add a type once, then drop it on any page." } }
+      {
+        type: :feature,
+        content: {
+          title: "Pages",
+          body: "A page is a stack you can reorder.",
+          image: "/images/feature-pages.jpg"
+        }
+      },
+      {
+        type: :feature,
+        content: {
+          title: "Pieces",
+          body: "Each piece has a job. Change the layout without starting over.",
+          image: "/images/feature-pieces.jpg"
+        }
+      },
+      {
+        type: :feature,
+        content: {
+          title: "Reuse",
+          body: "Add a type once, then drop it on any page.",
+          image: "/images/feature-reuse.jpg"
+        }
+      }
     ]
   },
   {
@@ -284,6 +331,7 @@ begin
   end
 
   ensure_sections.call(homepage_recording, home_sections, user)
+  fill_sample_feature_images.call(homepage_recording, user)
   publish_page.call(homepage_recording, "home", user)
 
   about_recording = find_page_recording.call("About")
