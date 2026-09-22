@@ -10,14 +10,7 @@
     <% if defined?(RecordingStudioPublishable) %>
       <%= render_publishable_quick_actions(page_recording) %>
     <% end %>
-    <%= render FlatPack::Button::Component.new(
-      text: "Settings",
-      href: edit_admin_page_path(id: page_recording.id),
-      icon: "cog-6-tooth",
-      style: :secondary,
-      size: :md,
-      data: { turbo_frame: "_top" }
-    ) %>
+    <%= render "recording_studio_pages/admin/pages/settings_dropdown" %>
   </div>
 
   <%= render FlatPack::Grid::Component.new(cols: 2, gap: :lg, align: :start) do %>

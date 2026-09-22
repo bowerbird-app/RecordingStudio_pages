@@ -4,31 +4,23 @@
      anchor_url: RecordingStudioPages::Admin.admin_mount_path
    ) %>
 
-<div class="flex w-full flex-col gap-6">
+<div class="flex w-full max-w-xl flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(title: "Settings", variant: :h1) %>
 
-  <%= form_with url: admin_page_path(id: page_recording.id), method: :patch, local: true do %>
-    <div class="flex flex-col gap-4">
-      <%= render FlatPack::TextInput::Component.new(
-        name: "page[title]",
-        label: "Name",
-        value: page_recording.recordable.title
-      ) %>
-      <%= render FlatPack::Checkbox::Component.new(
-        name: "page[homepage]",
-        label: "Use as the public home page",
-        checked: page_recording.recordable.homepage?
-      ) %>
+  <%= form_with url: admin_page_path(id: page_recording.id), method: :patch, local: true,
+                class: "flex w-full flex-col gap-4" do %>
+    <%= render FlatPack::TextInput::Component.new(
+      name: "page[title]",
+      label: "Name",
+      value: page_recording.recordable.title
+    ) %>
+    <%= render FlatPack::Checkbox::Component.new(
+      name: "page[homepage]",
+      label: "Use as the public home page",
+      checked: page_recording.recordable.homepage?
+    ) %>
+    <div class="flex flex-wrap items-center gap-3">
       <%= render FlatPack::Button::Component.new(text: "Save", style: :primary, size: :md, type: :submit) %>
     </div>
-  <% end %>
-
-  <%= form_with url: admin_page_path(id: page_recording.id), method: :delete, local: true do %>
-    <%= render FlatPack::Button::Component.new(
-      text: "Remove page",
-      style: :danger,
-      size: :md,
-      type: :submit
-    ) %>
   <% end %>
 </div>

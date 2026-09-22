@@ -150,7 +150,17 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     refute RecordingStudio.capability_enabled?(:accessible, for: RecordingStudioPages::Page)
     assert RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Section)
     refute RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Page)
+    assert RecordingStudio.capability_enabled?(:trashable, for: RecordingStudioPages::Page)
+    refute RecordingStudio.capability_enabled?(:trashable, for: RecordingStudioPages::Section)
     assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
+  end
+
+  test "dummy app mounts trashable for page trash" do
+    routes = File.read(Rails.root.join("config/routes.rb"))
+
+    assert defined?(RecordingStudioTrashable)
+    assert_includes routes, "RecordingStudioTrashable::Engine"
+    assert RecordingStudio.capability_enabled?(:trashable, for: RecordingStudioPages::Page)
   end
 
   test "dummy app mounts duplicatable for section copy" do

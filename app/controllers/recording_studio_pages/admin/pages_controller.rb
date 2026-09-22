@@ -47,7 +47,7 @@ module RecordingStudioPages
         result = Services::RemovePage.call(page_recording: page_recording, actor: current_admin_actor)
         return redirect_to(admin_pages_path, alert: result.error) if result.failure?
 
-        redirect_to admin_pages_path, notice: "Page removed."
+        redirect_to admin_pages_path, notice: "In the trash."
       end
 
       private

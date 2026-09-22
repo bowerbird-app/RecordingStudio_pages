@@ -107,6 +107,9 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Preview"
     assert_includes response.body, "Settings"
     assert_includes response.body, 'data-flat-pack--icon-name-value="cog-6-tooth"'
+    assert_includes response.body, "Trash"
+    assert_includes response.body, "Trash this page?"
+    refute_includes response.body, "Remove page"
     assert_includes response.body, "publishable_quick_actions_#{page_recording.id}"
     plus_at = response.body.index('data-flat-pack--icon-name-value="plus"')
     draft_at = response.body.index("publishable_quick_actions_#{page_recording.id}")
@@ -470,19 +473,32 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     refute_equal first.id, ordered.last.id
   end
 
-  test "staff can remove a page from edit" do
+  test "staff can trash a page from the editor Settings menu" do
     page_recording = create_page!(parent_recording: @root, title: "Throw away", actor: @actor)
+
+    get recording_studio_pages.admin_page_path(page_recording)
+    assert_response :success
+    assert_includes response.body, "Settings"
+    assert_includes response.body, "Trash"
+    assert_includes response.body, "Trash this page?"
+    assert_includes response.body, "id=\"trash-page-#{page_recording.id}\""
+    refute_includes response.body, "Remove page"
 
     get recording_studio_pages.edit_admin_page_path(page_recording)
     assert_response :success
     assert_includes response.body, "Settings"
-    assert_includes response.body, "Remove page"
+    assert_includes response.body, "max-w-xl"
+    refute_includes response.body, "Remove page"
     refute_includes response.body, "Edit page"
 
     delete recording_studio_pages.admin_page_path(page_recording)
     assert_redirected_to recording_studio_pages.admin_pages_path
     follow_redirect!
-    assert_includes response.body, "Page removed."
+    assert_includes response.body, "In the trash."
+    trashed = RecordingStudio::Recording.find(page_recording.id)
+    assert_not_nil trashed.trashed_at
+    assert trashed.trash_root
+    assert RecordingStudio.capability_enabled?(:trashable, for: RecordingStudioPages::Page)
     assert_nil RecordingStudio::Recording.find_by(id: page_recording.id, trashed_at: nil)
   end
 
