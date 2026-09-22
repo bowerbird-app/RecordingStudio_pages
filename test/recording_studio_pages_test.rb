@@ -452,6 +452,11 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes section_row, "subtitle"
     refute_includes section_row, "preview"
     refute_includes section_row, "leading:"
+    add_child = File.read(
+      File.expand_path("../app/views/recording_studio_pages/admin/sections/_add_child.html.erb", __dir__)
+    )
+    assert_includes add_child, "flex flex-wrap items-center gap-3"
+    assert_includes add_child, "child.name"
     assert_includes section_row, 'icon: "arrows-up-down"'
     assert_includes section_row, "hover: true"
     assert_includes section_row, "FlatPack::Link::Component"

@@ -8,14 +8,16 @@
     <%= hidden_field_tag "section[section_type]", child.key %>
     <%= hidden_field_tag "section[parent_section_id]", section_recording.id %>
   <% end %>
-  <%= render FlatPack::Button::Component.new(
-    text: child.name,
-    icon: "plus",
-    style: :primary,
-    size: :md,
-    type: :submit,
-    form: form_id
-  ) %>
+  <div class="flex flex-wrap items-center gap-3">
+    <%= render FlatPack::Button::Component.new(
+      text: child.name,
+      icon: "plus",
+      style: :primary,
+      size: :md,
+      type: :submit,
+      form: form_id
+    ) %>
+  </div>
 <% else %>
   <% child_definitions.each do |child| %>
     <% form_id = "add-child-#{section_recording.id}-#{child.key}" %>
@@ -27,6 +29,7 @@
       <%= hidden_field_tag "section[parent_section_id]", section_recording.id %>
     <% end %>
   <% end %>
+  <div class="flex flex-wrap items-center gap-3">
   <%= render FlatPack::Button::Dropdown::Component.new(
     text: "Add",
     icon: "plus",
@@ -43,4 +46,5 @@
       ) %>
     <% end %>
   <% end %>
+  </div>
 <% end %>
