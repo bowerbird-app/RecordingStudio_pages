@@ -329,6 +329,9 @@ class RecordingStudioPagesTest < Minitest::Test
     routes = File.read(File.expand_path("../config/routes.rb", __dir__))
     lib = File.read(File.expand_path("../lib/recording_studio_pages.rb", __dir__))
 
+    assert_includes editor, "ordered: false"
+    refute_includes editor, "ordered: true"
+    refute_includes editor, "list-decimal"
     assert_includes editor, "orderable_url:"
     refute_includes editor, "add_template_dropdown"
     refute_includes editor, "Use a template"
@@ -448,6 +451,7 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes section_row, "preview"
     refute_includes section_row, "leading:"
     assert_includes section_row, 'icon: "arrows-up-down"'
+    assert_includes section_row, "hover: true"
     assert_includes section_row, "FlatPack::Link::Component"
     assert_includes section_row, "edit_admin_page_section_path"
     assert_includes section_actions, 'icon: "ellipsis-horizontal"'
