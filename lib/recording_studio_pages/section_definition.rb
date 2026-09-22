@@ -46,15 +46,8 @@ module RecordingStudioPages
 
     def catalog
       {
-        key: key,
-        name: name,
-        category: category,
-        fields: fields.catalog,
-        settings: settings.catalog,
-        variants: variants,
-        source: source,
-        full_bleed: full_bleed?,
-        icon: icon
+        key:, name:, category:, fields: fields.catalog, settings: settings.catalog,
+        variants:, source:, full_bleed: full_bleed?, icon:
       }
     end
 

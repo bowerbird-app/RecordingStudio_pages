@@ -9,8 +9,7 @@ module RecordingStudioPages
         @page_recordings = page_scope
       end
 
-      def new
-      end
+      def new; end
 
       def create
         result = Services::CreatePage.call(
