@@ -910,7 +910,13 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
 
   test "a workspace admin without Admin root access is still forbidden on the hub" do
     workspace_only = create_actor!("workspace-only-admin@example.com")
-    grant_admin!(@root, workspace_only)
+    grant = RecordingStudioAccessible.grant_access(
+      recording: @root,
+      actor: workspace_only,
+      role: :admin,
+      manager_actor: @actor
+    )
+    assert grant.success?, grant.error.to_s
     sign_in workspace_only
 
     patch "/recording_studio_root_switchable/v1/root_switch", params: {
