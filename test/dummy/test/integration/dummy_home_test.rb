@@ -52,6 +52,7 @@ class DummyHomeTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "recording-studio-root-switchable--root-switch-dropdown"
     assert_includes response.body, 'href="/admin?anchor_url=%2F"'
     assert_includes response.body, 'href="/recording_studio_pages/admin/pages?anchor_url=%2F"'
+    refute_includes response.body, ">v#{FlatPack::VERSION}<"
     refute_includes response.body, "Page Builder studio"
     refute_includes response.body, "What's working"
     refute_includes response.body, "Next steps"

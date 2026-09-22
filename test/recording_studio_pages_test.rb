@@ -56,7 +56,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.4.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.0.2"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_users", tag: "v0.11.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.186"'
+    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.193"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.134"'
     refute_includes gemfile, 'tag: "0.3.5"'
@@ -257,6 +257,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes helper, '"/site"'
     assert_includes top_nav, "recording_studio_root_switch_dropdown"
     assert_includes sidebar, 'text: "Admin"'
+    assert_includes sidebar, "show_version: false"
     assert_includes routes, 'root to: "home#index"'
     assert_includes routes, 'root to: "recording_studio_pages/homepages#show"'
     assert_includes routes, 'get "/site"'

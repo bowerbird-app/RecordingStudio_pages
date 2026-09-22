@@ -228,7 +228,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.8. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.3.0`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Trashable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.186`.
+0.3.8. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.3.0`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Trashable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.193`.
 
 ## Upgrade
 
@@ -236,7 +236,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 2. Mount Pages, Duplicatable, and Publishable. Keep Pages off `/`.
 3. `RecordingStudioPages::Section` already opts into Duplicatable and Attachable when those gems are loaded. Do not add a second copy path or a Pages-owned Image type. Do not enable Attachable on Page for section photos.
 4. Public pages load `flat_pack/application` and use the host Flatpack theme on `html` (`FlatPack.configuration.default_theme`). Dummy sets `rounded`.
-5. Pin Flatpack `v0.1.186` (or later) so Hero `align:` / `on:` and `--hero-overlay-min-height` work, and so List `orderable_url` persists drag. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`. Pin Attachable `v0.5.1` (or later) for the image picker.
+5. Pin Flatpack `v0.1.193` (or later) so Hero `align:` / `on:` and `--hero-overlay-min-height` work, and so List `orderable_url` persists drag. Product sidebars pass `show_version: false` on `FlatPack::Sidebar::Header` so the kit version stays off the Pages mark. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`. Pin Attachable `v0.5.1` (or later) for the image picker.
 6. Gem screens use Recording Studio page nav. Dummy signed-in `/` is a sidebar shell with a root switcher. Dummy `/docs` keeps page-nav host chrome. Do not put that on gem screens.
 7. Install Recording Studio Trashable and keep Page’s `Capabilities::Trashable.to` so **Trash** calls `recording_studio_trashable_trash!`. Dummy mounts it at `/recording_studio_trashable`.
 8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.
