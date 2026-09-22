@@ -3,7 +3,17 @@
 
 <%= render FlatPack::List::Item.new(id: recording.id, class: "!items-center") do %>
   <div class="flex w-full items-center justify-between gap-3">
-    <p class="font-medium"><%= definition&.name || recordable.section_type %></p>
+    <% if definition %>
+      <%= render FlatPack::Link::Component.new(
+        href: edit_admin_page_section_path(page_id: page_recording.id, id: recording.id),
+        class: "font-medium",
+        data: { turbo_frame: "_top" }
+      ) do %>
+        <%= definition.name %>
+      <% end %>
+    <% else %>
+      <p class="font-medium"><%= recordable.section_type %></p>
+    <% end %>
     <%= render "recording_studio_pages/admin/pages/section_actions",
                recording: recording,
                definition: definition,

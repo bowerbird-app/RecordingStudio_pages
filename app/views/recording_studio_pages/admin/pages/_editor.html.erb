@@ -7,16 +7,17 @@
 
   <div class="flex flex-wrap items-center gap-3">
     <%= render "recording_studio_pages/admin/pages/add_section_dropdown" %>
+    <% if defined?(RecordingStudioPublishable) %>
+      <%= render_publishable_quick_actions(page_recording) %>
+    <% end %>
     <%= render FlatPack::Button::Component.new(
       text: "Settings",
       href: edit_admin_page_path(id: page_recording.id),
+      icon: "cog-6-tooth",
       style: :secondary,
       size: :md,
       data: { turbo_frame: "_top" }
     ) %>
-    <% if defined?(RecordingStudioPublishable) %>
-      <%= render_publishable_quick_actions(page_recording) %>
-    <% end %>
   </div>
 
   <%= render FlatPack::Grid::Component.new(cols: 2, gap: :lg, align: :start) do %>

@@ -44,6 +44,7 @@ module RecordingStudioPages
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::TopNavComponent",
         full_bleed: true,
+        icon: "bars-3",
         fields: {
           name: { type: :string, label: "Name" },
           image: { type: :attachment, kind: :image, label: "Mark" },
@@ -68,6 +69,7 @@ module RecordingStudioPages
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::HeroComponent",
         full_bleed: true,
+        icon: "photo",
         fields: {
           eyebrow: :string,
           title: { type: :string, required: true },
@@ -125,6 +127,7 @@ module RecordingStudioPages
         category: "content",
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::RichTextComponent",
+        icon: "document-text",
         fields: {
           title: { type: :string, required: true },
           body: :rich_text,
@@ -154,6 +157,7 @@ module RecordingStudioPages
         category: "content",
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::ImageTextComponent",
+        icon: "rectangle-group",
         fields: {
           title: { type: :string, required: true },
           body: :rich_text,
@@ -174,6 +178,7 @@ module RecordingStudioPages
         category: "marketing",
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::LogoCloudComponent",
+        icon: "building-office",
         fields: {
           title: :string,
           items: {
@@ -199,6 +204,7 @@ module RecordingStudioPages
         category: "marketing",
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::FeatureGridComponent",
+        icon: "squares-2x2",
         fields: {
           title: { type: :string, required: true },
           body: :text,
@@ -221,6 +227,7 @@ module RecordingStudioPages
         category: "marketing",
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::CallToActionComponent",
+        icon: "megaphone",
         fields: {
           title: { type: :string, required: true },
           body: :text,

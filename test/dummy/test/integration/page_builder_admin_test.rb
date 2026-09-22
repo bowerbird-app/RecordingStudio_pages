@@ -106,7 +106,16 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Add your first section"
     assert_includes response.body, "Preview"
     assert_includes response.body, "Settings"
+    assert_includes response.body, 'data-flat-pack--icon-name-value="cog-6-tooth"'
     assert_includes response.body, "publishable_quick_actions_#{page_recording.id}"
+    plus_at = response.body.index('data-flat-pack--icon-name-value="plus"')
+    draft_at = response.body.index("publishable_quick_actions_#{page_recording.id}")
+    cog_at = response.body.index('data-flat-pack--icon-name-value="cog-6-tooth"')
+    assert_operator plus_at, :<, draft_at
+    assert_operator draft_at, :<, cog_at
+    assert_includes response.body, 'data-flat-pack--icon-name-value="photo"'
+    assert_includes response.body, 'data-flat-pack--icon-name-value="bars-3"'
+    assert_includes response.body, 'data-flat-pack--icon-name-value="document-text"'
     assert_includes response.body, "Draft"
     refute_includes response.body, "Not public yet."
     refute_includes response.body, "Add section"
@@ -135,9 +144,14 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "ellipsis-horizontal"
     assert_includes response.body, "flat-pack--list-orderable"
     assert_includes response.body, "--card-padding-md"
-    sections = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
-    assert_equal %w[hero], sections.map { |recording| recording.recordable.section_type }
-    assert_equal "Hero", sections.first.recordable.content["title"]
+    hero = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload).first
+    assert_includes response.body, recording_studio_pages.edit_admin_page_section_path(page_recording, hero)
+    assert_equal "hero", hero.recordable.section_type
+    assert_equal "Hero", hero.recordable.content["title"]
+
+    get recording_studio_pages.edit_admin_page_section_path(page_recording, hero)
+    assert_response :success
+    assert_includes response.body, "Update"
   end
 
   test "page editor shows a Published control after the page is live" do

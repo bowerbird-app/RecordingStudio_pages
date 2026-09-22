@@ -85,6 +85,20 @@ class SectionRegistryTest < Minitest::Test
     )
 
     assert_equal({ "title" => "Probe" }, RecordingStudioPages.section(:probe).starter_content)
+    assert_equal "cube", RecordingStudioPages.section(:probe).menu_icon
+  end
+
+  def test_register_section_keeps_a_menu_icon
+    RecordingStudioPages.register_section(
+      key: :probe,
+      name: "Probe",
+      component: "RecordingStudioPages::Sections::HeroComponent",
+      icon: "sparkles"
+    )
+
+    assert_equal "sparkles", RecordingStudioPages.section(:probe).icon
+    assert_equal "sparkles", RecordingStudioPages.section(:probe).menu_icon
+    assert_equal "sparkles", RecordingStudioPages.section(:probe).catalog[:icon]
   end
 
   def test_full_bleed_is_opt_in
@@ -134,12 +148,14 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "hero", hero[:key]
     assert_equal "Hero", hero[:name]
     assert_equal true, hero[:full_bleed]
+    assert_equal "photo", hero[:icon]
     assert_includes hero[:variants], "split_image"
     menu = catalog[:sections].find { |entry| entry[:key] == "top_nav" }
 
     assert_equal "top_nav", menu[:key]
     assert_equal "Menu", menu[:name]
     assert_equal true, menu[:full_bleed]
+    assert_equal "bars-3", menu[:icon]
     assert_equal "string", menu[:fields][:name][:type]
     assert_equal "Name", menu[:fields][:name][:label]
     assert_equal "attachment", menu[:fields][:image][:type]

@@ -335,8 +335,11 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes editor, "FlatPack::EmptyState::Component"
     assert_includes editor, 'title: "Add your first section"'
     assert_includes editor, 'title: "Preview"'
-    assert_includes editor, 'text: "Settings"'
     assert_includes editor, "render_publishable_quick_actions"
+    assert_includes editor, 'text: "Settings"'
+    assert_includes editor, 'icon: "cog-6-tooth"'
+    assert_operator editor.index("add_section_dropdown"), :<, editor.index("render_publishable_quick_actions")
+    assert_operator editor.index("render_publishable_quick_actions"), :<, editor.index('text: "Settings"')
     assert_operator editor.index('text: "Settings"'), :<, editor.index("FlatPack::Grid::Component.new(cols: 2")
     refute_includes editor, 'text: "Publish"'
     refute_includes editor, "/publishable/edit"
@@ -353,6 +356,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes add_section_dropdown, "turbo_stream: true"
     assert_includes add_section_dropdown, 'text: "Section"'
     assert_includes add_section_dropdown, 'icon: "plus"'
+    assert_includes add_section_dropdown, "icon: definition.menu_icon"
     refute_includes add_section_dropdown, "Add section"
     refute_includes add_section_dropdown, 'turbo_frame: "page_editor"'
 
@@ -422,6 +426,8 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes section_row, "subtitle"
     refute_includes section_row, "preview"
     refute_includes section_row, "leading:"
+    assert_includes section_row, "FlatPack::Link::Component"
+    assert_includes section_row, "edit_admin_page_section_path"
     assert_includes section_actions, 'icon: "ellipsis-horizontal"'
     assert_includes section_actions, "show_chevron: false"
     refute_includes section_actions, 'text: "More"'
@@ -569,6 +575,13 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes built_ins, "type: :attachment"
     assert_includes built_ins, "key: :top_nav"
     assert_includes built_ins, "name: \"Menu\""
+    assert_includes built_ins, 'icon: "bars-3"'
+    assert_includes built_ins, 'icon: "photo"'
+    assert_includes built_ins, 'icon: "document-text"'
+    assert_includes built_ins, 'icon: "rectangle-group"'
+    assert_includes built_ins, 'icon: "building-office"'
+    assert_includes built_ins, 'icon: "squares-2x2"'
+    assert_includes built_ins, 'icon: "megaphone"'
     assert_includes built_ins, "full_bleed: true"
     assert_includes built_ins, 'label: "Preset"'
     assert_includes built_ins, "On a dark photo"

@@ -21,12 +21,19 @@ Pages are a blank stack. Templates are gone.
 - Dummy seed still creates Home, Tonight, Join, Walk in, and Start from a URL with `AddSection`.
 - `RecordingStudioPages.catalog` is `{ sections:, ctas: }`.
 - Create and revise no longer write `template_key`. The column stays.
+- The editor action row is **Section**, Publishable’s Draft/Published control, then **Settings** with a cog.
+- A section type name in the list opens that section’s edit screen.
+- **Section** menu items show a type icon. Built-ins register `icon`. Hosts can pass `icon:` on `register_section`. Missing icons use `cube`.
 
 ### Upgrade notes
 - Delete `register_template` calls and any `ApplyTemplate` usage. Add sections with `AddSection` or **Section**.
 - If you overrode `_editor` or `new`, drop **Use a template** and **Start from a template**.
 - Dummy hosts that registered Join / Walk in / Start from a URL templates should seed those pages with `AddSection` instead.
 - Do not drop the `template_key` column in this release. New pages leave it blank.
+- If you overrode `_editor`, put **Settings** last with `icon: "cog-6-tooth"`. Keep **Section** first and Publishable’s Draft/Published control in the middle.
+- If you overrode `_section_row`, make the type name a Flatpack Link to that section’s edit screen.
+- If you overrode `_add_section_dropdown`, pass `icon:` on each menu item (`definition.menu_icon`).
+- Optional `icon:` on `register_section` is a Flatpack Heroicon name. Catalog includes it.
 
 ## [0.3.7] - 2026-09-18
 
