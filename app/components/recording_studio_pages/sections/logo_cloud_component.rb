@@ -22,7 +22,8 @@ module RecordingStudioPages
       private
 
       def items
-        RecordingStudioPages::Composition.renderable_child_section_recordings_for(@rendered.recording).filter_map do |recording|
+        children = RecordingStudioPages::Composition.renderable_child_section_recordings_for(@rendered.recording)
+        children.filter_map do |recording|
           RecordingStudioPages::Renderer.section(recording, context: helpers)&.content
         end
       end

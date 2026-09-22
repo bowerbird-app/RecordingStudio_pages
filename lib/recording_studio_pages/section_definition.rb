@@ -26,9 +26,7 @@ module RecordingStudioPages
       icon.presence || "cube"
     end
 
-    def accepts_child?(key)
-      child_types.include?(key.to_s)
-    end
+    def accepts_child?(key) = child_types.include?(key.to_s)
 
     def child_definitions
       child_types.filter_map { |child_key| RecordingStudioPages.find_section(child_key) }
