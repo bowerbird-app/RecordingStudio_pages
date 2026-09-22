@@ -21,14 +21,6 @@
       name: "page[homepage]",
       label: "Use as the public home page"
     ) %>
-    <% if RecordingStudioPages.templates.any? %>
-      <%= render FlatPack::Select::Component.new(
-        name: "page[template_key]",
-        label: "Start from a template",
-        placeholder: "Empty page",
-        options: RecordingStudioPages.templates.map { |template| [template.name, template.key] }
-      ) %>
-    <% end %>
     <div class="flex flex-wrap items-center gap-3">
       <%= render FlatPack::Button::Component.new(text: "Create page", style: :primary, size: :md, type: :submit) %>
     </div>

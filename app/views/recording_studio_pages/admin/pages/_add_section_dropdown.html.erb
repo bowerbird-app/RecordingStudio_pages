@@ -17,6 +17,7 @@
   <% section_definitions.each do |definition| %>
     <% dropdown.menu_item(
       text: definition.name,
+      icon: definition.menu_icon,
       form: add_section_form_id(definition),
       type: "submit"
     ) %>

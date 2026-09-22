@@ -21,6 +21,7 @@ module RecordingStudioPages
             actor: actor
           ).value!
           copy_section_images(source: @section_recording, copy: copy)
+          copy_child_sections(source: @section_recording, copy: copy)
           copy
         end
       end
@@ -86,6 +87,21 @@ module RecordingStudioPages
         return if remapped == copy.recordable.content
 
         ReviseSection.call(section_recording: copy, content: remapped, actor: actor).value!
+      end
+
+      def copy_child_sections(source:, copy:)
+        Composition.child_section_recordings_for(source).each do |child|
+          child_copy = AddSection.call(
+            parent_recording: copy,
+            section_type: child.recordable.section_type,
+            content: child.recordable.content,
+            settings: child.recordable.settings,
+            enabled: child.recordable.enabled?,
+            actor: actor
+          ).value!
+          copy_section_images(source: child, copy: child_copy)
+          copy_child_sections(source: child, copy: child_copy)
+        end
       end
 
       def attachment_children(recording)

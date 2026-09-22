@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_08_015908) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_22_003811) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -143,6 +143,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_08_015908) do
     t.string "recordable_type", null: false
     t.integer "recording_studio_orderable_position"
     t.uuid "root_recording_id"
+    t.boolean "trash_root", default: false, null: false
     t.datetime "trashed_at"
     t.datetime "updated_at", null: false
     t.index ["parent_recording_id", "recording_studio_orderable_position"], name: "idx_rs_recordings_orderable_sibling_position"
@@ -155,6 +156,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_08_015908) do
     t.index ["root_recording_id", "recordable_type", "recordable_id"], name: "index_rs_recordings_on_root_and_recordable"
     t.index ["root_recording_id"], name: "idx_rs_attachable_root_active", where: "(((recordable_type)::text = 'RecordingStudioAttachable::Attachment'::text) AND (trashed_at IS NULL))"
     t.index ["root_recording_id"], name: "index_rs_recordings_on_root_recording"
+    t.index ["trashed_at", "trash_root"], name: "idx_rs_recordings_trashed_at_trash_root"
   end
 
   create_table "recording_studio_root_switchable_selections", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -174,6 +176,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_08_015908) do
     t.index ["actor_type", "actor_id", "device_key", "scope_key"], name: "idx_rs_root_switchable_actor_device_scope", unique: true, where: "(actor_id IS NOT NULL)"
     t.index ["device_key", "scope_key"], name: "idx_rs_root_switchable_anonymous_device_scope", unique: true, where: "(actor_id IS NULL)"
     t.index ["root_recording_id"], name: "idx_rs_root_switchable_root_recording"
+  end
+
+  create_table "recording_studio_trashable_retention_settings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "purge_after_days"
+    t.uuid "recording_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["recording_id"], name: "idx_rs_trashable_retention_on_recording", unique: true
   end
 
   create_table "recording_studio_user_identities", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -236,7 +246,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_08_015908) do
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
-    t.check_constraint "registered_with::text = ANY (ARRAY['password'::character varying, 'otp'::character varying]::text[])", name: "users_registered_with_check"
+    t.check_constraint "registered_with::text = ANY (ARRAY['password'::character varying::text, 'otp'::character varying::text])", name: "users_registered_with_check"
   end
 
   create_table "workspaces", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -250,6 +260,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_08_015908) do
   add_foreign_key "recording_studio_events", "recording_studio_recordings", column: "recording_id"
   add_foreign_key "recording_studio_recordings", "recording_studio_recordings", column: "parent_recording_id"
   add_foreign_key "recording_studio_recordings", "recording_studio_recordings", column: "root_recording_id"
+  add_foreign_key "recording_studio_trashable_retention_settings", "recording_studio_recordings", column: "recording_id"
   add_foreign_key "recording_studio_user_identities", "users"
   add_foreign_key "recording_studio_user_otp_challenges", "users"
   add_foreign_key "recording_studio_user_profiles", "users"

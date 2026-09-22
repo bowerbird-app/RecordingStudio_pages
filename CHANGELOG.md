@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.8] - 2026-09-21
+
+Pages are a blank stack. Templates are gone.
+
+### Removed
+- `register_template`, `templates`, `template`, `ApplyTemplate`, and the in-memory template registry.
+- Built-in `marketing_home` and `full_bleed_hero` recipes.
+- Editor **Use a template**. New page **Start from a template**.
+- Dummy `join`, `walk_in`, and `start_from_url` template registrations.
+
+### Changed
+- Dummy seed still creates Home, Tonight, Join, Walk in, and Start from a URL with `AddSection`.
+- `RecordingStudioPages.catalog` is `{ sections:, ctas: }`.
+- Create and revise no longer write `template_key`. The column stays.
+- The editor action row is **Section**, Publishable’s Draft/Published control, then **Settings** (cog dropdown). The menu has **Settings** and **Trash**.
+- A section type name in the list opens that section’s edit screen. Each row shows Flatpack List’s `arrows-up-down` icon so staff can see the row drags. The list is unordered (`ordered: false`) and rows use `hover: true`.
+- **Section** menu items show a type icon. Built-ins register `icon`. Hosts can pass `icon:` on `register_section`. Missing icons use `cube`.
+- The Settings form is a reading-width column. **Save** is compact. **Remove page** is gone; **Trash** lives on the editor Settings menu and calls Trashable.
+- Dummy installs Recording Studio Trashable. Page opts into `Capabilities::Trashable`. `TrashRecording` calls `recording_studio_trashable_trash!` when that capability is on.
+- Dummy `/admin` switches the current root to Admin when the signed-in actor has Accessible `:view` on that root. A workspace selection no longer blanks the hub. People without that grant still get 403.
+- Dummy pins Flatpack `v0.1.193`. The signed-in sidebar header passes `show_version: false`.
+- Feature grid, logo cloud, and menu lists accept the editor’s indexed rows (`items[0]`, `items[1]`). Saving one no longer raises.
+- A feature grid holds `feature` sections. A logo cloud holds `logo` sections. `register_section` takes `child_types:`. The page **Section** menu lists types that are not anyone else's child. Add, drag, turn off, copy, and remove those children on the parent section. Section opts into Orderable for that list. Copying a parent copies the children and their pictures. Removing a parent removes the children.
+- `AddSection` takes `parent_recording:` for a child section. `page_recording:` still adds a section on a page.
+- `Composition.child_section_recordings_for` returns a section's children in order. Public feature grids and logo clouds render the enabled ones.
+- `UpgradeNestedSections` turns a saved `items` list into those child sections, copies each item image onto the child, then clears `items`.
+
+### Upgrade notes
+- Delete `register_template` calls and any `ApplyTemplate` usage. Add sections with `AddSection` or **Section**.
+- If you overrode `_editor` or `new`, drop **Use a template** and **Start from a template**.
+- Dummy hosts that registered Join / Walk in / Start from a URL templates should seed those pages with `AddSection` instead.
+- Do not drop the `template_key` column in this release. New pages leave it blank.
+- If you overrode `_editor`, put **Settings** last as a cog dropdown (Settings + **Trash**). Keep **Section** first and Publishable’s Draft/Published control in the middle. The section list is `ordered: false` (no `1.` markers) and still `orderable: true`. Drop `list-decimal`.
+- If you overrode `_section_row`, make the type name a Flatpack Link to that section’s edit screen. Pass `icon: "arrows-up-down"` and `hover: true` on `FlatPack::List::Item`.
+- If you overrode `_add_section_dropdown`, pass `icon:` on each menu item (`definition.menu_icon`).
+- Optional `icon:` on `register_section` is a Flatpack Heroicon name. Catalog includes it.
+- If you overrode `_editor` or `edit`, drop **Remove page** from Settings. The Settings form is `max-w-xl` with a compact **Save**.
+- Install Trashable and keep Page’s `Capabilities::Trashable.to` so **Trash** calls `recording_studio_trashable_trash!`.
+- Dummy hosts that linked `/admin` from a workspace can drop the manual root switch. Keep Accessible grants on the Admin root. People without that grant still get 403.
+- Pin Flatpack `v0.1.193`. Pass `show_version: false` on a product `FlatPack::Sidebar::Header` so the kit version badge stays off the title.
+- List fields on a section accept either an array or the editor’s indexed hash. Blank and removed rows are dropped. Menu links still use a list.
+- Run `RecordingStudioPages::Services::UpgradeNestedSections.call` once. Existing feature grids and logo clouds become child sections. New saves do not write `items`.
+- Add a feature or logo on its parent section. The page **Section** menu does not offer them.
+- A section may sit under a page or a section. `AddSection` is what decides which type is allowed. Pass `parent_recording:` for a child. Keep `page_recording:` for a page section.
+- If you overrode the feature grid or logo cloud component, render child sections. `content["items"]` is gone.
+- If you overrode the section edit screen, show the child list when `child_types` is present. One child type is a single button. The row label is the feature title or the logo name.
+
 ## [0.3.7] - 2026-09-18
 
 The Admin Pages list keeps Status next to the row menu and links live names out. Page builder screens close to the original trigger.
@@ -263,7 +310,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.7...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.8...HEAD
+[0.3.8]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.7...v0.3.8
 [0.3.7]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.6...v0.3.7
 [0.3.6]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.5...v0.3.6
 [0.3.5]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.4...v0.3.5

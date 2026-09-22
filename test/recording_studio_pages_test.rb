@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.7", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.8", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -53,9 +53,10 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_publishable", tag: "v0.3.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_orderable", tag: "v0.2.2"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_duplicatable", tag: "v0.4.1"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.4.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.0.2"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_users", tag: "v0.11.0"'
-    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.186"'
+    assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.193"'
     refute_includes gemfile, "recording_studio/v3.0.0"
     refute_includes gemfile, 'tag: "v0.1.134"'
     refute_includes gemfile, 'tag: "0.3.5"'
@@ -70,7 +71,18 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes section_source, "image/*"
     assert_includes service_source, "duplicate_in_place!"
     assert_includes service_source, "record_attachment_upload"
-    refute_includes service_source, "AddSection.call"
+    assert_includes service_source, "copy_child_sections"
+    assert_includes section_source, "Capabilities::Orderable.to"
+  end
+
+  def test_page_opts_into_trashable
+    page_source = File.read(File.expand_path("../app/models/recording_studio_pages/page.rb", __dir__))
+    trash_source = File.read(File.expand_path("../lib/recording_studio_pages/services/trash_recording.rb", __dir__))
+
+    assert_includes page_source, "Capabilities::Trashable.to"
+    assert_includes trash_source, "recording_studio_trashable_trash!"
+    assert_includes trash_source, "capability_enabled?(:trashable"
+    refute_includes trash_source, "respond_to?(:trash!)"
   end
 
   def test_template_does_not_ship_copied_core_hooks_or_base_service
@@ -221,6 +233,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes readme, "recording_studio_pages_flash"
     assert_includes readme, "RS Publishable"
     refute_includes readme, "internal template"
+    refute_includes readme, "register_template"
+    refute_includes readme, "ApplyTemplate"
+    refute_includes readme, "Use a template"
     refute_includes readme, "ExampleService"
     refute_includes readme, "v3 declarations"
   end
@@ -243,6 +258,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes helper, '"/site"'
     assert_includes top_nav, "recording_studio_root_switch_dropdown"
     assert_includes sidebar, 'text: "Admin"'
+    assert_includes sidebar, "show_version: false"
     assert_includes routes, 'root to: "home#index"'
     assert_includes routes, 'root to: "recording_studio_pages/homepages#show"'
     assert_includes routes, 'get "/site"'
@@ -311,20 +327,35 @@ class RecordingStudioPagesTest < Minitest::Test
     editor = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/_editor.html.erb", __dir__))
     index = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/index.html.erb", __dir__))
     edit = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/edit.html.erb", __dir__))
-    template_dropdown = File.read(
-      File.expand_path("../app/views/recording_studio_pages/admin/pages/_add_template_dropdown.html.erb", __dir__)
-    )
+    new_page = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/new.html.erb", __dir__))
+    routes = File.read(File.expand_path("../config/routes.rb", __dir__))
+    lib = File.read(File.expand_path("../lib/recording_studio_pages.rb", __dir__))
 
+    assert_includes editor, "ordered: false"
+    refute_includes editor, "ordered: true"
+    refute_includes editor, "list-decimal"
     assert_includes editor, "orderable_url:"
-    assert_includes editor, "add_template_dropdown"
+    refute_includes editor, "add_template_dropdown"
+    refute_includes editor, "Use a template"
+    refute_includes new_page, "template_key"
+    refute_includes new_page, "Start from a template"
+    refute_includes routes, "apply_template"
+    refute_includes lib, "register_template"
+    refute File.exist?(File.expand_path("../app/views/recording_studio_pages/admin/pages/_add_template_dropdown.html.erb", __dir__))
+    refute File.exist?(File.expand_path("../app/views/recording_studio_pages/admin/pages/apply_template.turbo_stream.erb", __dir__))
+    refute File.exist?(File.expand_path("../lib/recording_studio_pages/template_registry.rb", __dir__))
+    refute File.exist?(File.expand_path("../lib/recording_studio_pages/page_template.rb", __dir__))
+    refute File.exist?(File.expand_path("../lib/recording_studio_pages/services/apply_template.rb", __dir__))
     assert_includes editor, "FlatPack::Grid::Component.new(cols: 2"
     assert_includes editor, "FlatPack::Card::Component.new(padding: :md)"
     assert_includes editor, "FlatPack::EmptyState::Component"
     assert_includes editor, 'title: "Add your first section"'
     assert_includes editor, 'title: "Preview"'
-    assert_includes editor, 'text: "Settings"'
     assert_includes editor, "render_publishable_quick_actions"
-    assert_operator editor.index('text: "Settings"'), :<, editor.index("FlatPack::Grid::Component.new(cols: 2")
+    assert_includes editor, "settings_dropdown"
+    assert_operator editor.index("add_section_dropdown"), :<, editor.index("render_publishable_quick_actions")
+    assert_operator editor.index("render_publishable_quick_actions"), :<, editor.index("settings_dropdown")
+    assert_operator editor.index("settings_dropdown"), :<, editor.index("FlatPack::Grid::Component.new(cols: 2")
     refute_includes editor, 'text: "Publish"'
     refute_includes editor, "/publishable/edit"
     refute_includes editor, "padding: :none"
@@ -334,18 +365,25 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes editor, "local_assigns[:notice]"
     refute_includes editor, "Nothing live yet"
     refute_includes editor, "Nothing here yet"
-    assert_includes template_dropdown, "Use a template"
-    assert_includes template_dropdown, "turbo_stream: true"
-    refute_includes template_dropdown, 'turbo_frame: "page_editor"'
-
     add_section_dropdown = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/pages/_add_section_dropdown.html.erb", __dir__)
     )
     assert_includes add_section_dropdown, "turbo_stream: true"
     assert_includes add_section_dropdown, 'text: "Section"'
     assert_includes add_section_dropdown, 'icon: "plus"'
+    assert_includes add_section_dropdown, "icon: definition.menu_icon"
     refute_includes add_section_dropdown, "Add section"
     refute_includes add_section_dropdown, 'turbo_frame: "page_editor"'
+    settings_dropdown = File.read(
+      File.expand_path("../app/views/recording_studio_pages/admin/pages/_settings_dropdown.html.erb", __dir__)
+    )
+    assert_includes settings_dropdown, 'text: "Settings"'
+    assert_includes settings_dropdown, 'icon: "cog-6-tooth"'
+    assert_includes settings_dropdown, 'text: "Trash"'
+    assert_includes settings_dropdown, 'icon: "trash"'
+    assert_includes settings_dropdown, "Trash this page?"
+    assert_includes settings_dropdown, "method: :delete"
+    refute_includes settings_dropdown, "Remove page"
 
     flash_partial = File.read(File.expand_path("../app/views/recording_studio_pages/_flash.html.erb", __dir__))
     assert_includes flash_partial, 'id="flash"'
@@ -362,14 +400,9 @@ class RecordingStudioPagesTest < Minitest::Test
     create_stream = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/sections/create.turbo_stream.erb", __dir__)
     )
-    apply_stream = File.read(
-      File.expand_path("../app/views/recording_studio_pages/admin/pages/apply_template.turbo_stream.erb", __dir__)
-    )
-    [create_stream, apply_stream].each do |stream|
-      assert_includes stream, 'turbo_stream.replace "flash"'
-      assert_includes stream, 'turbo_stream.update "page_editor"'
-      refute_includes stream, "notice:"
-    end
+    assert_includes create_stream, 'turbo_stream.replace "flash"'
+    assert_includes create_stream, 'turbo_stream.update "page_editor"'
+    refute_includes create_stream, "notice:"
 
     section_edit = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/sections/edit.html.erb", __dir__)
@@ -405,7 +438,10 @@ class RecordingStudioPagesTest < Minitest::Test
     pages_controller = File.read(
       File.expand_path("../app/controllers/recording_studio_pages/admin/pages_controller.rb", __dir__)
     )
-    assert_includes pages_controller, 'flash.now[:notice] = "Template sections added."'
+    refute_includes pages_controller, "Template sections added."
+    refute_includes pages_controller, "apply_template"
+    refute_includes pages_controller, "template_key"
+    assert_includes pages_controller, 'notice: "In the trash."'
 
     section_row = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/pages/_section_row.html.erb", __dir__)
@@ -416,6 +452,15 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes section_row, "subtitle"
     refute_includes section_row, "preview"
     refute_includes section_row, "leading:"
+    add_child = File.read(
+      File.expand_path("../app/views/recording_studio_pages/admin/sections/_add_child.html.erb", __dir__)
+    )
+    assert_includes add_child, "flex flex-wrap items-center gap-3"
+    assert_includes add_child, "child.name"
+    assert_includes section_row, 'icon: "arrows-up-down"'
+    assert_includes section_row, "hover: true"
+    assert_includes section_row, "FlatPack::Link::Component"
+    assert_includes section_row, "edit_admin_page_section_path"
     assert_includes section_actions, 'icon: "ellipsis-horizontal"'
     assert_includes section_actions, "show_chevron: false"
     refute_includes section_actions, 'text: "More"'
@@ -462,13 +507,16 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes dummy_screen, 'icon: (button.name.to_s == "new_page" ? "plus" : nil)'
     assert_includes dummy_screen, "page_title.slot"
     refute_includes dummy_screen, "recording_studio_page_nav_right"
-    assert_includes edit, "Remove page"
+    assert_includes edit, "max-w-xl"
+    assert_includes edit, "flex-wrap items-center gap-3"
     assert_includes edit, 'title: "Settings"'
+    refute_includes edit, "Remove page"
     refute_includes edit, "Edit page"
 
     page_model = File.read(File.expand_path("../app/models/recording_studio_pages/page.rb", __dir__))
     assert_includes page_model, "respond_to?(:page_parent_types)"
     assert_includes page_model, 'public_layout: "recording_studio_pages/public"'
+    assert_includes page_model, "Capabilities::Trashable.to"
 
     hero = File.read(File.expand_path("../app/components/recording_studio_pages/sections/hero_component.rb", __dir__))
     assert_includes hero, "--hero-overlay-min-height: 100dvh"
@@ -527,12 +575,16 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes cta_js, "panelTargets"
     assert_includes cta_js, "field.disabled"
     dummy_initializer = File.read(File.expand_path("dummy/config/initializers/recording_studio_pages.rb", __dir__))
+    dummy_seeds = File.read(File.expand_path("dummy/db/seeds.rb", __dir__))
     assert_includes dummy_initializer, "register_cta"
     assert_includes dummy_initializer, ":social_logins"
     assert_includes dummy_initializer, ":url_form"
-    assert_includes dummy_initializer, "key: :walk_in"
-    assert_includes dummy_initializer, 'type: "social_logins"'
-    assert_includes dummy_initializer, "fullscreen_image"
+    refute_includes dummy_initializer, "register_template"
+    refute_includes dummy_initializer, "key: :walk_in"
+    assert_includes dummy_seeds, 'type: "social_logins"'
+    assert_includes dummy_seeds, "fullscreen_image"
+    refute_includes dummy_seeds, "ApplyTemplate"
+    refute_includes dummy_seeds, "restore_template_sections"
     social = File.read(File.expand_path("dummy/app/components/dummy/ctas/social_logins_component.rb", __dir__))
     url_form = File.read(File.expand_path("dummy/app/components/dummy/ctas/url_form_component.rb", __dir__))
     assert_includes social, "recording_studio_user_omniauth_provider_names"
@@ -559,6 +611,13 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes built_ins, "type: :attachment"
     assert_includes built_ins, "key: :top_nav"
     assert_includes built_ins, "name: \"Menu\""
+    assert_includes built_ins, 'icon: "bars-3"'
+    assert_includes built_ins, 'icon: "photo"'
+    assert_includes built_ins, 'icon: "document-text"'
+    assert_includes built_ins, 'icon: "rectangle-group"'
+    assert_includes built_ins, 'icon: "building-office"'
+    assert_includes built_ins, 'icon: "squares-2x2"'
+    assert_includes built_ins, 'icon: "megaphone"'
     assert_includes built_ins, "full_bleed: true"
     assert_includes built_ins, 'label: "Preset"'
     assert_includes built_ins, "On a dark photo"

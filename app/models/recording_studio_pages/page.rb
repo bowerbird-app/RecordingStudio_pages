@@ -8,6 +8,10 @@ begin
   require "recording_studio_orderable"
 rescue LoadError
 end
+begin
+  require "recording_studio_trashable"
+rescue LoadError
+end
 
 module RecordingStudioPages
   class Page < ApplicationRecord
@@ -40,6 +44,8 @@ module RecordingStudioPages
     if defined?(RecordingStudio::Capabilities::Orderable)
       include RecordingStudio::Capabilities::Orderable.to(allows: ["RecordingStudioPages::Section"])
     end
+
+    include RecordingStudio::Capabilities::Trashable.to if defined?(RecordingStudio::Capabilities::Trashable)
 
     def homepage?
       homepage == true

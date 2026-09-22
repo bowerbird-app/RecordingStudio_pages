@@ -9,7 +9,7 @@ module RecordingStudioPages
       before_action :require_admin_access!
 
       helper_method :page_recording, :section_recordings, :page_builder_page_path, :section_definitions,
-                    :add_section_form_id, :section_action_form_id
+                    :add_section_form_id, :section_action_form_id, :trash_page_form_id
 
       def default_url_options
         options = super || {}
@@ -27,7 +27,7 @@ module RecordingStudioPages
       end
 
       def section_definitions
-        RecordingStudioPages.sections
+        RecordingStudioPages.page_sections
       end
 
       def add_section_form_id(definition)
@@ -36,6 +36,10 @@ module RecordingStudioPages
 
       def section_action_form_id(recording, action)
         "section-#{recording.id}-#{action}"
+      end
+
+      def trash_page_form_id(recording = page_recording)
+        "trash-page-#{recording.id}"
       end
 
       def load_editor

@@ -7,7 +7,6 @@ module RecordingStudioPages
     def register!
       register_ctas!
       register_sections!
-      register_templates!
     end
 
     def register_ctas!
@@ -19,96 +18,11 @@ module RecordingStudioPages
       register_hero!
       register_rich_text!
       register_image_text!
+      register_logo!
       register_logo_cloud!
+      register_feature!
       register_feature_grid!
       register_call_to_action!
-    end
-
-    def register_templates!
-      register_marketing_home_template!
-      register_full_bleed_hero_template!
-    end
-
-    def register_marketing_home_template!
-      RecordingStudioPages.register_template(
-        key: :marketing_home,
-        name: "Marketing home",
-        source: "recording_studio_pages",
-        sections: [
-          {
-            type: :top_nav,
-            content: {
-              name: "House",
-              links: [
-                { text: "About", url: "/" },
-                { text: "Tonight", url: "/" }
-              ],
-              cta: { type: "button", text: "Join", url: "/users/sign_in" }
-            }
-          },
-          {
-            type: :hero,
-            content: {
-              eyebrow: "Open tonight",
-              title: "The page is the front door",
-              body: "Stack a few pieces. Move them around. Put it live when it feels like a site.",
-              cta: { type: "button", text: "Come in", url: "/users/sign_in" }
-            },
-            settings: { variant: "centered", alignment: "left" }
-          },
-          {
-            type: :logo_cloud,
-            content: {
-              title: "Names on the door",
-              items: [
-                { name: "House lights" },
-                { name: "Late show" },
-                { name: "Stage door" }
-              ]
-            }
-          },
-          {
-            type: :feature_grid,
-            content: {
-              title: "What you get",
-              items: [
-                { title: "Pages", body: "A page is a stack you can reorder." },
-                { title: "Pieces", body: "Each piece has a job. Change the layout without starting over." },
-                { title: "Reuse", body: "Add a type once, then drop it on any page." }
-              ]
-            },
-            settings: { variant: "three_column" }
-          },
-          {
-            type: :call_to_action,
-            content: {
-              title: "Ready when you are",
-              body: "Keep it private until it looks right. Then put it on the street.",
-              primary_action: { text: "Have a look", url: "/users/sign_in" }
-            }
-          }
-        ]
-      )
-    end
-
-    def register_full_bleed_hero_template!
-      RecordingStudioPages.register_template(
-        key: :full_bleed_hero,
-        name: "Full-bleed hero",
-        source: "recording_studio_pages",
-        sections: [
-          {
-            type: :hero,
-            content: {
-              eyebrow: "Doors at eight",
-              title: "The floor is already warm",
-              body: "One picture. One line. Come in if you want a seat.",
-              cta: { type: "button", text: "Take a seat", url: "/users/sign_in" }
-            },
-            settings: { variant: "fullscreen_image", alignment: "left" }
-          }
-        ]
-      )
     end
 
     def register_button_cta!
@@ -132,6 +46,7 @@ module RecordingStudioPages
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::TopNavComponent",
         full_bleed: true,
+        icon: "bars-3",
         fields: {
           name: { type: :string, label: "Name" },
           image: { type: :attachment, kind: :image, label: "Mark" },
@@ -156,6 +71,7 @@ module RecordingStudioPages
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::HeroComponent",
         full_bleed: true,
+        icon: "photo",
         fields: {
           eyebrow: :string,
           title: { type: :string, required: true },
@@ -213,6 +129,7 @@ module RecordingStudioPages
         category: "content",
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::RichTextComponent",
+        icon: "document-text",
         fields: {
           title: { type: :string, required: true },
           body: :rich_text,
@@ -242,6 +159,7 @@ module RecordingStudioPages
         category: "content",
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::ImageTextComponent",
+        icon: "rectangle-group",
         fields: {
           title: { type: :string, required: true },
           body: :rich_text,
@@ -255,6 +173,22 @@ module RecordingStudioPages
       )
     end
 
+    def register_logo!
+      RecordingStudioPages.register_section(
+        key: :logo,
+        name: "Logo",
+        category: "marketing",
+        source: "recording_studio_pages",
+        component: "RecordingStudioPages::Sections::LogoComponent",
+        icon: "photo",
+        fields: {
+          name: { type: :string, required: true, label: "Name" },
+          url: { type: :url, label: "URL" },
+          image: { type: :attachment, kind: :image, label: "Image" }
+        }
+      )
+    end
+
     def register_logo_cloud!
       RecordingStudioPages.register_section(
         key: :logo_cloud,
@@ -262,21 +196,31 @@ module RecordingStudioPages
         category: "marketing",
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::LogoCloudComponent",
+        icon: "building-office",
+        child_types: [:logo],
         fields: {
-          title: :string,
-          items: {
-            type: :list,
-            item: {
-              name: :string,
-              url: :url,
-              image: { type: :attachment, kind: :image, label: "Image" }
-            }
-          }
+          title: :string
         },
         settings: {
           variant: :string
         },
         variants: %w[simple compact]
+      )
+    end
+
+    def register_feature!
+      RecordingStudioPages.register_section(
+        key: :feature,
+        name: "Feature",
+        category: "marketing",
+        source: "recording_studio_pages",
+        component: "RecordingStudioPages::Sections::FeatureComponent",
+        icon: "sparkles",
+        fields: {
+          title: { type: :string, required: true },
+          body: :text,
+          image: { type: :attachment, kind: :image, label: "Image" }
+        }
       )
     end
 
@@ -287,13 +231,11 @@ module RecordingStudioPages
         category: "marketing",
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::FeatureGridComponent",
+        icon: "squares-2x2",
+        child_types: [:feature],
         fields: {
           title: { type: :string, required: true },
-          body: :text,
-          items: {
-            type: :list,
-            item: { title: :string, body: :text }
-          }
+          body: :text
         },
         settings: {
           variant: :string
@@ -309,6 +251,7 @@ module RecordingStudioPages
         category: "marketing",
         source: "recording_studio_pages",
         component: "RecordingStudioPages::Sections::CallToActionComponent",
+        icon: "megaphone",
         fields: {
           title: { type: :string, required: true },
           body: :text,

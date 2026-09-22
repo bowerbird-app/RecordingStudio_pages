@@ -31,7 +31,7 @@
   </div>
 
   <%= render FlatPack::Grid::Component.new(cols: 2, gap: :lg, align: :start) do %>
-    <div class="min-w-0">
+    <div class="flex min-w-0 flex-col gap-6">
       <% if @definition %>
         <%= render "recording_studio_pages/admin/sections/form",
                    url: admin_page_section_path(page_id: page_recording.id, id: @section_recording.id),
@@ -40,6 +40,11 @@
                    definition: @definition,
                    recordable: @section_recording.recordable,
                    section_recording: @section_recording %>
+        <% if @definition.child_types.any? %>
+          <%= render "recording_studio_pages/admin/sections/children",
+                     definition: @definition,
+                     section_recording: @section_recording %>
+        <% end %>
       <% else %>
         <%= render FlatPack::Alert::Component.new(
           style: :warning,

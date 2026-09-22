@@ -1,12 +1,22 @@
 # Migration Notes
 
+## 0.3.8 child sections
+
+Feature grids and logo clouds no longer store an `items` list. Each row is a child section (`feature` or `logo`). After you deploy this version, run once:
+
+```ruby
+RecordingStudioPages::Services::UpgradeNestedSections.call
+```
+
+That records one child per saved row, copies an item image onto that child, and clears `items`. Run it again and it leaves the tree alone. New saves do not write `items`.
+
 ## Current Requirements
 
 - Ruby 3.3 or newer
 - Rails 8.1 or newer
 - Recording Studio 4.x (`~> 4.1` in the gemspec; dummy GitHub tag `v4.2.0`)
 - Accessible dummy tag `v0.9.1`, Attachable dummy tag `v0.5.1`, Users dummy tag `v0.11.0`, Publishable dummy tag `v0.3.0`, Root Switchable dummy tag `v0.5.0`
-- FlatPack dummy tag `v0.1.186`
+- FlatPack dummy tag `v0.1.193`
 - Public RubyGems and GitHub access for dependency installation
 
 ## Verification

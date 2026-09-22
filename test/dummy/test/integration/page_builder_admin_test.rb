@@ -106,7 +106,19 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Add your first section"
     assert_includes response.body, "Preview"
     assert_includes response.body, "Settings"
+    assert_includes response.body, 'data-flat-pack--icon-name-value="cog-6-tooth"'
+    assert_includes response.body, "Trash"
+    assert_includes response.body, "Trash this page?"
+    refute_includes response.body, "Remove page"
     assert_includes response.body, "publishable_quick_actions_#{page_recording.id}"
+    plus_at = response.body.index('data-flat-pack--icon-name-value="plus"')
+    draft_at = response.body.index("publishable_quick_actions_#{page_recording.id}")
+    cog_at = response.body.index('data-flat-pack--icon-name-value="cog-6-tooth"')
+    assert_operator plus_at, :<, draft_at
+    assert_operator draft_at, :<, cog_at
+    assert_includes response.body, 'data-flat-pack--icon-name-value="photo"'
+    assert_includes response.body, 'data-flat-pack--icon-name-value="bars-3"'
+    assert_includes response.body, 'data-flat-pack--icon-name-value="document-text"'
     assert_includes response.body, "Draft"
     refute_includes response.body, "Not public yet."
     refute_includes response.body, "Add section"
@@ -134,10 +146,16 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "More"
     assert_includes response.body, "ellipsis-horizontal"
     assert_includes response.body, "flat-pack--list-orderable"
+    assert_includes response.body, 'data-flat-pack--icon-name-value="arrows-up-down"'
     assert_includes response.body, "--card-padding-md"
-    sections = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
-    assert_equal %w[hero], sections.map { |recording| recording.recordable.section_type }
-    assert_equal "Hero", sections.first.recordable.content["title"]
+    hero = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload).first
+    assert_includes response.body, recording_studio_pages.edit_admin_page_section_path(page_recording, hero)
+    assert_equal "hero", hero.recordable.section_type
+    assert_equal "Hero", hero.recordable.content["title"]
+
+    get recording_studio_pages.edit_admin_page_section_path(page_recording, hero)
+    assert_response :success
+    assert_includes response.body, "Update"
   end
 
   test "page editor shows a Published control after the page is live" do
@@ -312,6 +330,47 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">Update<"
   end
 
+  test "staff can update a feature grid from the editor form" do
+    page_recording = create_page!(parent_recording: @root, title: "Grid", actor: @actor)
+    section = add_section!(
+      page_recording: page_recording,
+      section_type: "feature_grid",
+      content: { title: "What you get" },
+      settings: { variant: "three_column" },
+      actor: @actor
+    )
+    add_section!(
+      parent_recording: section,
+      section_type: "feature",
+      content: { title: "Pages", body: "A stack." },
+      actor: @actor
+    )
+
+    patch recording_studio_pages.admin_page_section_path(page_id: page_recording.id, id: section.id),
+          params: {
+            section: {
+              content: { title: "What changed", body: "Still a grid." },
+              settings: { variant: "icon_grid" }
+            }
+          }
+
+    assert_redirected_to recording_studio_pages.edit_admin_page_section_path(
+      page_id: page_recording.id,
+      id: section.id
+    )
+    saved = section.reload.recordable
+    assert_equal "What changed", saved.content["title"]
+    assert_equal "Still a grid.", saved.content["body"]
+    refute saved.content.key?("items")
+    assert_equal "icon_grid", saved.settings["variant"]
+    follow_redirect!
+    assert_includes response.body, "Updated."
+    assert_includes response.body, "What changed"
+    assert_includes response.body, "Pages"
+    assert_select "input[name='section[section_type]'][value='feature']"
+    assert_select "button", text: "Feature"
+  end
+
   test "staff can save hero style colours" do
     page_recording = create_page!(parent_recording: @root, title: "Paint", actor: @actor)
     section = add_section!(
@@ -383,7 +442,9 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "data-controller=\"recording-studio-pages--section-list\""
     assert_includes response.body, "flat-pack--list-orderable"
     assert_includes response.body, "orderable-url-value"
-    assert_includes response.body, "list-decimal"
+    refute_includes response.body, "list-decimal"
+    assert_includes response.body, "--list-item-hover-background-color"
+    assert_includes response.body, 'data-flat-pack--icon-name-value="arrows-up-down"'
     refute_includes response.body, "Move up"
     refute_includes response.body, "Move down"
 
@@ -403,7 +464,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_equal false, response.parsed_body["ok"]
   end
 
-  test "the editor previews sections and can apply a template" do
+  test "the editor previews sections without a template action" do
     page_recording = create_page!(parent_recording: @root, title: "Preview me", actor: @actor)
     add_section!(
       page_recording: page_recording,
@@ -430,29 +491,11 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Visible notes"
     assert_includes response.body, "Staff can read this."
     assert_includes response.body, "max-w-prose"
-    assert_includes response.body, "Use a template"
-    assert_includes response.body, "apply-template-#{page_recording.id}-marketing_home"
-    assert_includes response.body, "apply-template-#{page_recording.id}-full_bleed_hero"
-    assert_includes response.body, "apply-template-#{page_recording.id}-join"
-    assert_includes response.body, "apply-template-#{page_recording.id}-walk_in"
-    assert_includes response.body, "apply-template-#{page_recording.id}-start_from_url"
+    refute_includes response.body, "Use a template"
+    refute_includes response.body, "apply-template-"
+    refute_includes response.body, "Start from a template"
     assert_includes response.body, "orderable-url-value"
     refute_includes response.body, "Staff preview"
-
-    post recording_studio_pages.apply_template_admin_page_path(page_recording),
-         params: { template_key: "marketing_home" },
-         as: :turbo_stream
-
-    assert_response :success
-    assert_includes response.body, "turbo-stream"
-    assert_includes response.body, 'target="flash"'
-    assert_select "turbo-stream[target=flash]", text: /Template sections added/
-    refute_includes css_select("turbo-stream[target=page_editor]").text, "Template sections added."
-    types = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload)
-                                             .map { |recording| recording.recordable.section_type }
-    assert_includes types, "hero"
-    assert_includes types, "top_nav"
-    assert_includes types, "call_to_action"
   end
 
   test "copied sections stay last in the orderable list" do
@@ -474,19 +517,32 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     refute_equal first.id, ordered.last.id
   end
 
-  test "staff can remove a page from edit" do
+  test "staff can trash a page from the editor Settings menu" do
     page_recording = create_page!(parent_recording: @root, title: "Throw away", actor: @actor)
+
+    get recording_studio_pages.admin_page_path(page_recording)
+    assert_response :success
+    assert_includes response.body, "Settings"
+    assert_includes response.body, "Trash"
+    assert_includes response.body, "Trash this page?"
+    assert_includes response.body, "id=\"trash-page-#{page_recording.id}\""
+    refute_includes response.body, "Remove page"
 
     get recording_studio_pages.edit_admin_page_path(page_recording)
     assert_response :success
     assert_includes response.body, "Settings"
-    assert_includes response.body, "Remove page"
+    assert_includes response.body, "max-w-xl"
+    refute_includes response.body, "Remove page"
     refute_includes response.body, "Edit page"
 
     delete recording_studio_pages.admin_page_path(page_recording)
     assert_redirected_to recording_studio_pages.admin_pages_path
     follow_redirect!
-    assert_includes response.body, "Page removed."
+    assert_includes response.body, "In the trash."
+    trashed = RecordingStudio::Recording.find(page_recording.id)
+    assert_not_nil trashed.trashed_at
+    assert trashed.trash_root
+    assert RecordingStudio.capability_enabled?(:trashable, for: RecordingStudioPages::Page)
     assert_nil RecordingStudio::Recording.find_by(id: page_recording.id, trashed_at: nil)
   end
 
@@ -560,6 +616,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     get RecordingStudioPages::Admin.new_page_path
     assert_response :success
     assert_includes response.body, "Give it a name"
+    refute_includes response.body, "Start from a template"
+    refute_includes response.body, "template_key"
     assert_includes response.body, 'name="page[title]"'
     assert_includes response.body, "max-w-xl"
     assert_includes response.body, "flex-wrap items-center gap-3"
@@ -860,7 +918,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
                     "href=\"#{RecordingStudioPages::Admin.screen_path(status: RecordingStudioPages::Composition::STATUS_DRAFT)}\""
   end
 
-  test "the RS Admin hub is forbidden while the current root is a workspace" do
+  test "visiting the RS Admin hub switches to the Admin root" do
     patch "/recording_studio_root_switchable/v1/root_switch", params: {
       scope: "all_workspaces",
       root_switch: {
@@ -870,8 +928,57 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     }
     follow_redirect!
 
-    get "/admin"
+    get "/admin", params: { anchor_url: "/" }
+
+    assert_response :success
+    assert_includes response.body, "Pages"
+    assert_includes response.body, ">Page<"
+    refute_equal 0, response.body.bytesize
+    assert RecordingStudio::RootSwitchable::Selection.where(
+      actor: @actor,
+      scope_key: "all_workspaces"
+    ).exists?(root_recording_id: @admin_root.id)
+  end
+
+  test "a signed-in user without Admin root access is still forbidden on the hub" do
+    stranger = create_actor!("admin-hub-stranger@example.com")
+    sign_in stranger
+
+    get "/admin", params: { anchor_url: "/" }
 
     assert_response :forbidden
+  end
+
+  test "a workspace admin without Admin root access is still forbidden on the hub" do
+    workspace_only = create_actor!("workspace-only-admin@example.com")
+    grant = RecordingStudioAccessible.grant_access(
+      recording: @root,
+      actor: workspace_only,
+      role: :admin,
+      manager_actor: @actor
+    )
+    assert grant.success?, grant.error.to_s
+    sign_in workspace_only
+
+    patch "/recording_studio_root_switchable/v1/root_switch", params: {
+      scope: "all_workspaces",
+      root_switch: {
+        root_recording_id: @root.id,
+        return_to: "/studio"
+      }
+    }
+    follow_redirect!
+
+    get "/admin", params: { anchor_url: "/" }
+
+    assert_response :forbidden
+    assert RecordingStudio::RootSwitchable::Selection.where(
+      actor: workspace_only,
+      scope_key: "all_workspaces"
+    ).exists?(root_recording_id: @root.id)
+    refute RecordingStudio::RootSwitchable::Selection.where(
+      actor: workspace_only,
+      scope_key: "all_workspaces"
+    ).exists?(root_recording_id: @admin_root.id)
   end
 end

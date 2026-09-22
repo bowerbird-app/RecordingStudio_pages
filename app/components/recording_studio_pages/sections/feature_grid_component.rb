@@ -25,7 +25,10 @@ module RecordingStudioPages
       private
 
       def items
-        Array(@rendered.content["items"])
+        children = RecordingStudioPages::Composition.renderable_child_section_recordings_for(@rendered.recording)
+        children.filter_map do |recording|
+          RecordingStudioPages::Renderer.section(recording, context: helpers)&.content
+        end
       end
 
       def grid_columns
@@ -40,15 +43,26 @@ module RecordingStudioPages
       def feature_card(item)
         helpers.render(FlatPack::Card::Component.new(style: card_style)) do |card|
           card.body do
-            helpers.render(
-              FlatPack::PageTitle::Component.new(
-                title: item["title"].to_s,
-                subtitle: item["body"].to_s,
-                variant: :h3
-              )
-            )
+            helpers.safe_join([feature_image(item), feature_copy(item)].compact)
           end
         end
+      end
+
+      def feature_copy(item)
+        helpers.render(
+          FlatPack::PageTitle::Component.new(
+            title: item["title"].to_s,
+            subtitle: item["body"].to_s.presence,
+            variant: :h3
+          )
+        )
+      end
+
+      def feature_image(item)
+        url = item["image"].to_s.strip
+        return if url.blank?
+
+        helpers.image_tag(url, alt: item["title"].to_s, class: "mb-4 max-h-40 max-w-full")
       end
 
       def card_style

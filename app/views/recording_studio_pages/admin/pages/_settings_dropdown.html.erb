@@ -1,0 +1,27 @@
+<%= form_with url: admin_page_path(id: page_recording.id),
+              method: :delete,
+              html: { id: trash_page_form_id, class: "hidden" } do %>
+<% end %>
+
+<%= render FlatPack::Button::Dropdown::Component.new(
+  text: "Settings",
+  icon: "cog-6-tooth",
+  style: :secondary,
+  size: :md,
+  placement: :bottom_right
+) do |dropdown| %>
+  <% dropdown.menu_item(
+    text: "Settings",
+    icon: "cog-6-tooth",
+    href: edit_admin_page_path(id: page_recording.id),
+    data: { turbo_frame: "_top" }
+  ) %>
+  <% dropdown.menu_item(
+    text: "Trash",
+    icon: "trash",
+    form: trash_page_form_id,
+    type: "submit",
+    destructive: true,
+    data: { turbo_confirm: "Trash this page?" }
+  ) %>
+<% end %>

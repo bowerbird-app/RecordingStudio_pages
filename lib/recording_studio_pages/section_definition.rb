@@ -3,22 +3,33 @@
 module RecordingStudioPages
   class SectionDefinition
     ATTRIBUTES = %i[
-      key name category component fields settings variants validations data source full_bleed
+      key name category component fields settings variants validations data source full_bleed icon child_types
     ].freeze
 
     attr_reader(*ATTRIBUTES)
 
     def initialize(key:, name:, component:, category: "content", fields: {}, settings: {}, variants: [],
-                   validations: [], data: nil, source: nil, full_bleed: false)
+                   validations: [], data: nil, source: nil, full_bleed: false, icon: nil, child_types: [])
       @key = key.to_s
       @name = name.to_s
       @category = category.to_s
       @component = component
-      assign_payload(fields, settings, variants, validations, data, source, full_bleed)
+      @child_types = Array(child_types).map(&:to_s).uniq
+      assign_payload(fields, settings, variants, validations, data, source, full_bleed, icon)
     end
 
     def full_bleed?
       @full_bleed == true
+    end
+
+    def menu_icon
+      icon.presence || "cube"
+    end
+
+    def accepts_child?(key) = child_types.include?(key.to_s)
+
+    def child_definitions
+      child_types.filter_map { |child_key| RecordingStudioPages.find_section(child_key) }
     end
 
     def read_content(raw)
@@ -42,14 +53,8 @@ module RecordingStudioPages
 
     def catalog
       {
-        key: key,
-        name: name,
-        category: category,
-        fields: fields.catalog,
-        settings: settings.catalog,
-        variants: variants,
-        source: source,
-        full_bleed: full_bleed?
+        key:, name:, category:, fields: fields.catalog, settings: settings.catalog,
+        variants:, source:, full_bleed: full_bleed?, icon:, child_types:
       }
     end
 
@@ -71,7 +76,7 @@ module RecordingStudioPages
 
     private
 
-    def assign_payload(fields, settings, variants, validations, data, source, full_bleed)
+    def assign_payload(fields, settings, variants, validations, data, source, full_bleed, icon)
       @fields = FieldSchema.new(fields)
       @settings = FieldSchema.new(settings)
       @variants = Array(variants).map(&:to_s)
@@ -79,6 +84,7 @@ module RecordingStudioPages
       @data = data
       @source = source
       @full_bleed = full_bleed
+      @icon = icon.to_s.presence
     end
 
     def normalize_variant(value)

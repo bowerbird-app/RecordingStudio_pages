@@ -12,8 +12,6 @@ require "recording_studio_pages/section_registry"
 require "recording_studio_pages/cta_definition"
 require "recording_studio_pages/cta_registry"
 require "recording_studio_pages/cta_renderer"
-require "recording_studio_pages/page_template"
-require "recording_studio_pages/template_registry"
 require "recording_studio_pages/composition"
 require "recording_studio_pages/renderer"
 require "recording_studio_pages/built_ins"
@@ -31,7 +29,8 @@ require "recording_studio_pages/services/duplicate_section"
 require "recording_studio_pages/services/trash_recording"
 require "recording_studio_pages/services/remove_section"
 require "recording_studio_pages/services/remove_page"
-require "recording_studio_pages/services/apply_template"
+require "recording_studio_pages/services/nested_section_item"
+require "recording_studio_pages/services/upgrade_nested_sections"
 require "recording_studio_pages/engine"
 
 module RecordingStudioPages
@@ -47,10 +46,6 @@ module RecordingStudioPages
 
     def section_registry
       @section_registry ||= SectionRegistry.new
-    end
-
-    def template_registry
-      @template_registry ||= TemplateRegistry.new
     end
 
     def cta_registry
@@ -81,6 +76,19 @@ module RecordingStudioPages
       section_registry.all
     end
 
+    def page_sections
+      nested = child_section_keys
+      sections.reject { |definition| nested.include?(definition.key) }
+    end
+
+    def page_section?(key)
+      section?(key) && !child_section_keys.include?(key.to_s)
+    end
+
+    def child_section_keys
+      sections.flat_map(&:child_types).uniq
+    end
+
     def cta(key)
       cta_registry.fetch(key)
     end
@@ -97,29 +105,15 @@ module RecordingStudioPages
       cta_registry.all
     end
 
-    def register_template(**attributes)
-      template_registry.register(**attributes)
-    end
-
-    def template(key)
-      template_registry.fetch(key)
-    end
-
-    def templates
-      template_registry.all
-    end
-
     def catalog
       {
         sections: section_registry.catalog,
-        templates: template_registry.catalog,
         ctas: cta_registry.catalog
       }
     end
 
     def reset!
       section_registry.clear!
-      template_registry.clear!
       cta_registry.clear!
     end
 

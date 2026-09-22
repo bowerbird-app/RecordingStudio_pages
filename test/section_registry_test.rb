@@ -85,6 +85,20 @@ class SectionRegistryTest < Minitest::Test
     )
 
     assert_equal({ "title" => "Probe" }, RecordingStudioPages.section(:probe).starter_content)
+    assert_equal "cube", RecordingStudioPages.section(:probe).menu_icon
+  end
+
+  def test_register_section_keeps_a_menu_icon
+    RecordingStudioPages.register_section(
+      key: :probe,
+      name: "Probe",
+      component: "RecordingStudioPages::Sections::HeroComponent",
+      icon: "sparkles"
+    )
+
+    assert_equal "sparkles", RecordingStudioPages.section(:probe).icon
+    assert_equal "sparkles", RecordingStudioPages.section(:probe).menu_icon
+    assert_equal "sparkles", RecordingStudioPages.section(:probe).catalog[:icon]
   end
 
   def test_full_bleed_is_opt_in
@@ -117,46 +131,37 @@ class SectionRegistryTest < Minitest::Test
     refute_empty errors
   end
 
-  def test_built_ins_and_marketing_home_template_are_registered
+  def test_built_in_sections_are_registered
     RecordingStudioPages::BuiltIns.register!
 
-    %w[top_nav hero rich_text image_text logo_cloud feature_grid call_to_action].each do |key|
+    %w[top_nav hero rich_text image_text logo_cloud feature_grid call_to_action feature logo].each do |key|
       assert RecordingStudioPages.section?(key), "expected #{key} to be registered"
     end
-    assert_equal "marketing_home", RecordingStudioPages.template(:marketing_home).key
-    hero_only = RecordingStudioPages.template(:full_bleed_hero)
-
-    assert_equal "full_bleed_hero", hero_only.key
-    assert_equal 1, hero_only.sections.length
-    assert_equal "hero", hero_only.sections.first.fetch("type")
-    assert_equal "fullscreen_image", hero_only.sections.first.fetch("settings").to_h.stringify_keys.fetch("variant")
-    assert_equal "left", hero_only.sections.first.fetch("settings").to_h.stringify_keys.fetch("alignment")
-
-    home = RecordingStudioPages.template(:marketing_home)
-    types = home.sections.map { |entry| entry.fetch("type") }
-    menu_copy = home.sections.first.fetch("content").to_h.stringify_keys
-    hero_copy = home.sections[1].fetch("content").to_h.stringify_keys
-    home_hero_settings = home.sections[1].fetch("settings").to_h.stringify_keys
-    feature_copy = home.sections[3].fetch("content").to_h.stringify_keys
-    cta_copy = home.sections[4].fetch("content").to_h.stringify_keys
-    blob = [menu_copy, hero_copy, feature_copy, cta_copy].to_json
-
-    assert_equal %w[top_nav hero logo_cloud feature_grid call_to_action], types
-    assert_equal "House", menu_copy.fetch("name")
-    assert_equal "Join", menu_copy.fetch("cta").to_h.stringify_keys.fetch("text")
-    assert_equal "The page is the front door", hero_copy.fetch("title")
-    assert_equal "centered", home_hero_settings.fetch("variant")
-    assert_equal "left", home_hero_settings.fetch("alignment")
-    assert_equal "button", hero_copy.fetch("cta").to_h.stringify_keys.fetch("type")
-    refute hero_copy.key?("primary_action")
-    refute_includes blob, "recording"
-    refute_includes blob, "recordable"
-    refute_includes blob, "section_type"
-    refute_includes blob, "gem owns"
-    refute_includes blob, "RS Publishable"
   end
 
-  def test_catalog_exposes_sections_and_templates_for_agents
+  def test_feature_and_logo_are_child_sections
+    RecordingStudioPages::BuiltIns.register!
+
+    grid = RecordingStudioPages.section(:feature_grid)
+    cloud = RecordingStudioPages.section(:logo_cloud)
+
+    assert_equal ["feature"], grid.child_types
+    assert_equal ["logo"], cloud.child_types
+    assert_empty RecordingStudioPages.section(:feature).child_types
+    assert_empty RecordingStudioPages.section(:logo).child_types
+    refute grid.fields.fields.key?(:items)
+    refute cloud.fields.fields.key?(:items)
+    refute RecordingStudioPages.page_section?(:feature)
+    refute RecordingStudioPages.page_section?(:logo)
+    assert RecordingStudioPages.page_section?(:hero)
+    page_keys = RecordingStudioPages.page_sections.map(&:key)
+    refute_includes page_keys, "feature"
+    refute_includes page_keys, "logo"
+    assert_includes page_keys, "feature_grid"
+    assert_equal ["feature"], grid.catalog[:child_types]
+  end
+
+  def test_catalog_exposes_sections_for_agents
     RecordingStudioPages::BuiltIns.register!
 
     catalog = RecordingStudioPages.catalog
@@ -165,12 +170,14 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "hero", hero[:key]
     assert_equal "Hero", hero[:name]
     assert_equal true, hero[:full_bleed]
+    assert_equal "photo", hero[:icon]
     assert_includes hero[:variants], "split_image"
     menu = catalog[:sections].find { |entry| entry[:key] == "top_nav" }
 
     assert_equal "top_nav", menu[:key]
     assert_equal "Menu", menu[:name]
     assert_equal true, menu[:full_bleed]
+    assert_equal "bars-3", menu[:icon]
     assert_equal "string", menu[:fields][:name][:type]
     assert_equal "Name", menu[:fields][:name][:label]
     assert_equal "attachment", menu[:fields][:image][:type]
@@ -217,9 +224,8 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "color", hero[:settings][:body_color][:type]
     assert_equal "Subtitle", hero[:settings][:body_color][:label]
     assert_equal "style", hero[:settings][:body_color][:group]
-    assert(catalog[:templates].any? { |entry| entry[:key] == "marketing_home" })
-    assert(catalog[:templates].any? { |entry| entry[:key] == "full_bleed_hero" })
     assert(catalog[:ctas].any? { |entry| entry[:key] == "button" })
+    refute catalog.key?(:templates)
   end
 
   def test_hero_upgrades_legacy_primary_action_on_read
@@ -255,13 +261,5 @@ class SectionRegistryTest < Minitest::Test
     assert_equal "attachment", catalog[:image][:type]
     assert_equal "image", catalog[:image][:kind]
     assert_equal "Image", catalog[:image][:label]
-  end
-
-  def test_duplicate_template_raises
-    RecordingStudioPages.register_template(key: :probe, name: "Probe", sections: [], source: "pages")
-
-    assert_raises(RecordingStudioPages::DuplicateRegistration) do
-      RecordingStudioPages.register_template(key: :probe, name: "Probe", sections: [])
-    end
   end
 end

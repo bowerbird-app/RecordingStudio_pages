@@ -8,6 +8,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal :application_layout, RecordingStudioRootSwitchable.configuration.layout
     assert_includes ApplicationController.ancestors, RecordingStudio::RootSwitchable::ControllerSupport
     assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
+    assert_equal "0.1.193", FlatPack::VERSION
   end
 
   test "dummy app validates recordable declarations" do
@@ -77,6 +78,16 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
                                                      .find { |recording| recording.recordable.section_type == "hero" }
                                                      &.recordable
     assert_equal %w[top_nav hero logo_cloud feature_grid call_to_action], homepage_types
+    logo_cloud = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
+                                                  .find { |recording| recording.recordable.section_type == "logo_cloud" }
+    feature_grid = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
+                                                    .find { |recording| recording.recordable.section_type == "feature_grid" }
+    logo_names = RecordingStudioPages::Composition.child_section_recordings_for(logo_cloud)
+                                                  .map { |recording| recording.recordable.content["name"] }
+    feature_titles = RecordingStudioPages::Composition.child_section_recordings_for(feature_grid)
+                                                      .map { |recording| recording.recordable.content["title"] }
+    assert_equal ["House lights", "Late show", "Stage door"], logo_names
+    assert_equal ["Pages", "Pieces", "Reuse"], feature_titles
     homepage_menu = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
                                                     .find { |recording| recording.recordable.section_type == "top_nav" }
                                                     &.recordable
@@ -150,7 +161,19 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     refute RecordingStudio.capability_enabled?(:accessible, for: RecordingStudioPages::Page)
     assert RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Section)
     refute RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Page)
+    assert RecordingStudio.capability_enabled?(:orderable, for: RecordingStudioPages::Section)
+    assert RecordingStudio.capability_enabled?(:orderable, for: RecordingStudioPages::Page)
+    assert RecordingStudio.capability_enabled?(:trashable, for: RecordingStudioPages::Page)
+    refute RecordingStudio.capability_enabled?(:trashable, for: RecordingStudioPages::Section)
     assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
+  end
+
+  test "dummy app mounts trashable for page trash" do
+    routes = File.read(Rails.root.join("config/routes.rb"))
+
+    assert defined?(RecordingStudioTrashable)
+    assert_includes routes, "RecordingStudioTrashable::Engine"
+    assert RecordingStudio.capability_enabled?(:trashable, for: RecordingStudioPages::Page)
   end
 
   test "dummy app mounts duplicatable for section copy" do
@@ -161,20 +184,14 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Section)
   end
 
-  test "dummy host registers extra hero CTAs and templates" do
+  test "dummy host registers extra hero CTAs and no templates" do
     assert RecordingStudioPages.cta?(:button)
     assert RecordingStudioPages.cta?(:social_logins)
     assert RecordingStudioPages.cta?(:url_form)
-    assert_equal "join", RecordingStudioPages.template(:join).key
-    assert_equal "walk_in", RecordingStudioPages.template(:walk_in).key
-    assert_equal "start_from_url", RecordingStudioPages.template(:start_from_url).key
-    walk_in = RecordingStudioPages.template(:walk_in)
-    walk_in_hero = walk_in.sections.first
-    walk_in_content = walk_in_hero.fetch("content").to_h.stringify_keys
-    assert_equal "hero", walk_in_hero.fetch("type").to_s
-    assert_equal "fullscreen_image", walk_in_hero.fetch("settings").to_h.stringify_keys.fetch("variant")
-    assert_equal "left", walk_in_hero.fetch("settings").to_h.stringify_keys.fetch("alignment")
-    assert_equal "social_logins", walk_in_content.fetch("cta").to_h.stringify_keys.fetch("type")
+    refute RecordingStudioPages.respond_to?(:register_template)
+    refute RecordingStudioPages.respond_to?(:template)
+    refute RecordingStudioPages.respond_to?(:templates)
+    refute RecordingStudioPages.catalog.key?(:templates)
     routes = File.read(Rails.root.join("config/routes.rb"))
 
     assert_includes routes, 'get "/start"'
