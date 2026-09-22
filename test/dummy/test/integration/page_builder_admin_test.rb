@@ -146,6 +146,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "More"
     assert_includes response.body, "ellipsis-horizontal"
     assert_includes response.body, "flat-pack--list-orderable"
+    assert_includes response.body, 'data-flat-pack--icon-name-value="arrows-up-down"'
     assert_includes response.body, "--card-padding-md"
     hero = RecordingStudioPages::Composition.section_recordings_for(page_recording.reload).first
     assert_includes response.body, recording_studio_pages.edit_admin_page_section_path(page_recording, hero)
@@ -401,6 +402,7 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "flat-pack--list-orderable"
     assert_includes response.body, "orderable-url-value"
     assert_includes response.body, "list-decimal"
+    assert_includes response.body, 'data-flat-pack--icon-name-value="arrows-up-down"'
     refute_includes response.body, "Move up"
     refute_includes response.body, "Move down"
 

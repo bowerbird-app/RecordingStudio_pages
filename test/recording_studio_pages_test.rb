@@ -447,6 +447,7 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes section_row, "subtitle"
     refute_includes section_row, "preview"
     refute_includes section_row, "leading:"
+    assert_includes section_row, 'icon: "arrows-up-down"'
     assert_includes section_row, "FlatPack::Link::Component"
     assert_includes section_row, "edit_admin_page_section_path"
     assert_includes section_actions, 'icon: "ellipsis-horizontal"'

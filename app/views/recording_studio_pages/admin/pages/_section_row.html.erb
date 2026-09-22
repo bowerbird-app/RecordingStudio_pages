@@ -1,7 +1,7 @@
 <% recordable = recording.recordable %>
 <% definition = RecordingStudioPages.find_section(recordable.section_type) %>
 
-<%= render FlatPack::List::Item.new(id: recording.id, class: "!items-center") do %>
+<%= render FlatPack::List::Item.new(id: recording.id, icon: "arrows-up-down", class: "!items-center") do %>
   <div class="flex w-full items-center justify-between gap-3">
     <% if definition %>
       <%= render FlatPack::Link::Component.new(

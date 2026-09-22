@@ -22,7 +22,7 @@ Pages are a blank stack. Templates are gone.
 - `RecordingStudioPages.catalog` is `{ sections:, ctas: }`.
 - Create and revise no longer write `template_key`. The column stays.
 - The editor action row is **Section**, Publishable’s Draft/Published control, then **Settings** (cog dropdown). The menu has **Settings** and **Trash**.
-- A section type name in the list opens that section’s edit screen.
+- A section type name in the list opens that section’s edit screen. Each row shows Flatpack List’s `arrows-up-down` icon so staff can see the row drags.
 - **Section** menu items show a type icon. Built-ins register `icon`. Hosts can pass `icon:` on `register_section`. Missing icons use `cube`.
 - The Settings form is a reading-width column. **Save** is compact. **Remove page** is gone; **Trash** lives on the editor Settings menu and calls Trashable.
 - Dummy installs Recording Studio Trashable. Page opts into `Capabilities::Trashable`. `TrashRecording` calls `recording_studio_trashable_trash!` when that capability is on.
@@ -33,7 +33,7 @@ Pages are a blank stack. Templates are gone.
 - Dummy hosts that registered Join / Walk in / Start from a URL templates should seed those pages with `AddSection` instead.
 - Do not drop the `template_key` column in this release. New pages leave it blank.
 - If you overrode `_editor`, put **Settings** last as a cog dropdown (Settings + **Trash**). Keep **Section** first and Publishable’s Draft/Published control in the middle.
-- If you overrode `_section_row`, make the type name a Flatpack Link to that section’s edit screen.
+- If you overrode `_section_row`, make the type name a Flatpack Link to that section’s edit screen. Pass `icon: "arrows-up-down"` on `FlatPack::List::Item`.
 - If you overrode `_add_section_dropdown`, pass `icon:` on each menu item (`definition.menu_icon`).
 - Optional `icon:` on `register_section` is a Flatpack Heroicon name. Catalog includes it.
 - If you overrode `_editor` or `edit`, drop **Remove page** from Settings. The Settings form is `max-w-xl` with a compact **Save**.
