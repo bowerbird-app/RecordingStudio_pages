@@ -88,6 +88,12 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
                                                       .map { |recording| recording.recordable.content["title"] }
     assert_equal ["House lights", "Late show", "Stage door"], logo_names
     assert_equal ["Pages", "Pieces", "Reuse"], feature_titles
+    feature_images = RecordingStudioPages::Composition.child_section_recordings_for(feature_grid)
+                                                      .map { |recording| recording.recordable.content["image"] }
+    assert_equal ["/images/feature-pages.jpg", "/images/feature-pieces.jpg", "/images/feature-reuse.jpg"], feature_images
+    %w[feature-pages feature-pieces feature-reuse].each do |name|
+      assert File.exist?(Rails.root.join("public/images/#{name}.jpg"))
+    end
     homepage_menu = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
                                                     .find { |recording| recording.recordable.section_type == "top_nav" }
                                                     &.recordable

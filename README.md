@@ -160,7 +160,7 @@ Dummy registers `social_logins` and `url_form`, so a one-section landing can be 
 
 ## Built-in sections
 
-hero, top_nav (Menu), rich_text, image_text, logo_cloud, feature_grid, call_to_action. `feature` and `logo` are child sections, so **Section** on the page does not list them. Add a feature on the feature grid, or a logo on the logo cloud. Each child is its own section recording: title and body (or name and URL), an optional picture, and Orderable so you can drag them. Turn one off and it stays off the page. Copying the parent copies the children and their pictures. Removing the parent removes the children. Registered variants change layout: image left/right, full-width or narrow rich text, compact logos, feature column counts, and CTA banner vs card. Hero **Style** is Align (Center or Left) plus optional text colours. A fullscreen photo also gets a **Preset**: On a dark photo or On a light photo (`on: :dark` or `:light`). Headline colour overrides overlay or surface headline tokens. Eyebrow and subtitle colours wrap those lines so they stay independent of each other. Skip the colours and the theme keeps the type.
+hero, top_nav (Menu), rich_text, image_text, logo_cloud, feature_grid, call_to_action. `feature` and `logo` are child sections, so **Section** on the page does not list them. Add a feature on the feature grid, or a logo on the logo cloud. Each child is its own section recording: title and body (or name and URL), an optional picture that fills the feature card to the border, and Orderable so you can drag them. Turn one off and it stays off the page. Copying the parent copies the children and their pictures. Removing the parent removes the children. Registered variants change layout: image left/right, full-width or narrow rich text, compact logos, feature column counts, and CTA banner vs card. Hero **Style** is Align (Center or Left) plus optional text colours. A fullscreen photo also gets a **Preset**: On a dark photo or On a light photo (`on: :dark` or `:light`). Headline colour overrides overlay or surface headline tokens. Eyebrow and subtitle colours wrap those lines so they stay independent of each other. Skip the colours and the theme keeps the type.
 
 A **Menu** is a sticky top bar (`FlatPack::TopNav`). Name and an optional mark sit on the left and link home. Links sit in the middle. Join on the right stays on the bar on a phone; the links fold into **More**. After the page has scrolled, the bar frosts. It is a section, not site chrome, so a page can skip it. It is full-bleed, like Hero. Hosts that `register_section` can set `full_bleed: true` to skip the `max-w-6xl` wrap. Pass `icon:` with a Flatpack Heroicon name for the **Section** menu. Missing icons use `cube`.
 
@@ -234,7 +234,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.8. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.3.0`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Trashable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.193`.
+0.3.9. Dummy GitHub tags: Recording Studio `v4.2.0`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.11.0`, Publishable `v0.3.0`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Trashable `v0.4.1`, Admin `v2.0.2`, FlatPack `v0.1.193`.
 
 ## Upgrade
 

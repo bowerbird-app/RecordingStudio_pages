@@ -149,6 +149,33 @@ class NestedSectionsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Pages"
     assert_includes response.body, "A stack you can reorder."
     refute_includes response.body, "Stay off the page."
+    refute_includes response.body, "aspect-[4/3]"
+  end
+
+  test "a feature picture fills the card to the border" do
+    isolate_public_homepage!
+    page_recording = create_page!(parent_recording: @root, title: "Picture grid", homepage: true, actor: @actor)
+    grid = add_section!(
+      page_recording: page_recording,
+      section_type: "feature_grid",
+      content: { title: "What you get" },
+      actor: @actor
+    )
+    add_section!(
+      parent_recording: grid,
+      section_type: "feature",
+      content: { title: "Pages", body: "A stack.", image: "/images/feature-pages.jpg" },
+      actor: @actor
+    )
+    publish_page!(page_recording, slug: "picture-grid-#{SecureRandom.hex(4)}", actor: @actor)
+
+    get site_path
+
+    assert_response :success
+    assert_includes response.body, 'src="/images/feature-pages.jpg"'
+    assert_includes response.body, "aspect-[4/3]"
+    assert_includes response.body, "h-full w-full object-cover"
+    refute_includes response.body, "max-h-40"
   end
 
   test "copying a grid copies its features and their pictures" do

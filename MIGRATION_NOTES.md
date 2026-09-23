@@ -1,5 +1,11 @@
 # Migration Notes
 
+## 0.3.9 sample feature pictures
+
+Dummy Home features Pages, Pieces, and Reuse now include a picture under `test/dummy/public/images/`. Hosts do not need to run anything. Feature image fields are unchanged.
+
+A feature picture fills the width of its card and meets the border. If you overrode the feature grid or feature component, render that picture in `card.media(aspect_ratio: "4/3", padding: :none)`.
+
 ## 0.3.8 child sections
 
 Feature grids and logo clouds no longer store an `items` list. Each row is a child section (`feature` or `logo`). After you deploy this version, run once:
