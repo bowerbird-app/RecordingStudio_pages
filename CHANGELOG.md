@@ -13,9 +13,11 @@ Dummy Home features include a sample picture.
 
 ### Changed
 - Seeded features Pages, Pieces, and Reuse store `/images/feature-pages.jpg`, `/images/feature-pieces.jpg`, and `/images/feature-reuse.jpg`. A later seed fills a blank image on those titles and leaves a picture that is already set.
+- A feature picture fills the card edge to edge. It sits in the card media slot (`padding: :none`, `aspect_ratio: "4/3"`) with `h-full w-full object-cover`. The title stays in the padded body.
 
 ### Upgrade notes
-- Nothing to run. Feature fields are unchanged. The pictures are dummy sample art.
+- Nothing to run for the sample pictures. Feature fields are unchanged.
+- If you overrode the feature grid or feature component, put the picture in `card.media(aspect_ratio: "4/3", padding: :none)` so it meets the card border. Keep the title in `card.body`.
 
 ## [0.3.8] - 2026-09-21
 

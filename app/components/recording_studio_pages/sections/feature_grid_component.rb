@@ -42,9 +42,9 @@ module RecordingStudioPages
 
       def feature_card(item)
         helpers.render(FlatPack::Card::Component.new(style: card_style)) do |card|
-          card.body do
-            helpers.safe_join([feature_image(item), feature_copy(item)].compact)
-          end
+          image = feature_image(item)
+          card.media(aspect_ratio: "4/3", padding: :none) { image } if image
+          card.body { feature_copy(item) }
         end
       end
 
@@ -62,7 +62,7 @@ module RecordingStudioPages
         url = item["image"].to_s.strip
         return if url.blank?
 
-        helpers.image_tag(url, alt: item["title"].to_s, class: "mb-4 max-h-40 max-w-full")
+        helpers.image_tag(url, alt: item["title"].to_s, class: "h-full w-full object-cover")
       end
 
       def card_style
