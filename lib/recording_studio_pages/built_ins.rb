@@ -23,6 +23,7 @@ module RecordingStudioPages
       register_feature!
       register_feature_grid!
       register_call_to_action!
+      register_footer!
     end
 
     def register_button_cta!
@@ -262,6 +263,30 @@ module RecordingStudioPages
           background: :string
         },
         variants: %w[centered banner]
+      )
+    end
+
+    def register_footer!
+      RecordingStudioPages.register_section(
+        key: :footer,
+        name: "Footer",
+        category: "marketing",
+        source: "recording_studio_pages",
+        component: "RecordingStudioPages::Sections::FooterComponent",
+        full_bleed: true,
+        icon: "bars-3-bottom-left",
+        fields: {
+          name: { type: :string, label: "Name" },
+          note: { type: :text, label: "Note" },
+          links: {
+            type: :list,
+            label: "Links",
+            item: {
+              text: { type: :string, label: "Label" },
+              url: { type: :url, label: "URL" }
+            }
+          }
+        }
       )
     end
   end

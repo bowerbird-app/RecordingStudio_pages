@@ -1,5 +1,9 @@
 # Migration Notes
 
+## 0.3.10 footer section
+
+**Footer** is a built-in page section: a name, a note, and links. It is full width. Add it from **Section**. Nothing to run. Existing pages stay as they are until you add one.
+
 ## 0.3.9 sample feature pictures
 
 Dummy Home features Pages, Pieces, and Reuse now include a picture under `test/dummy/public/images/`. Hosts do not need to run anything. Feature image fields are unchanged.

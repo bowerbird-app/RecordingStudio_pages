@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.10] - 2026-10-01
+
+Pages can end with a footer.
+
+### Added
+- **Footer** is a page section. It takes a name, a short note, and a list of links. It is full width, like Menu. Add it from **Section** and drag it to the bottom.
+
+### Upgrade notes
+- Nothing to run. Existing pages stay as they are until you add a footer.
+- If you overrode `_section.html.erb`, Footer uses `full_bleed?`, the same path as Hero and Menu.
+
 ## [0.3.9] - 2026-09-22
 
 Dummy Home features include a sample picture.
@@ -322,7 +333,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.9...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.10...HEAD
+[0.3.10]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.9...v0.3.10
 [0.3.9]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.8...v0.3.9
 [0.3.8]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.7...v0.3.8
 [0.3.7]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.6...v0.3.7
