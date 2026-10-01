@@ -11,6 +11,7 @@ class AdminRoot < ApplicationRecord
     recording_studio_admin_sections do
       section :pages
       section :users
+      section :terms
     end
   end
 end

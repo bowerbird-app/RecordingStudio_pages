@@ -8,7 +8,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal :application_layout, RecordingStudioRootSwitchable.configuration.layout
     assert_includes ApplicationController.ancestors, RecordingStudio::RootSwitchable::ControllerSupport
     assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
-    assert_equal "0.1.193", FlatPack::VERSION
+    assert_equal "0.1.196", FlatPack::VERSION
   end
 
   test "dummy app validates recordable declarations" do
@@ -30,6 +30,9 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert connection.table_exists?(:recording_studio_user_people)
     assert connection.table_exists?(:recording_studio_user_profiles)
     assert connection.table_exists?(:recording_studio_user_identities)
+    assert connection.table_exists?(:recording_studio_terms_and_conditions_terms)
+    assert connection.table_exists?(:recording_studio_terms_and_conditions_acceptances)
+    assert connection.column_exists?(:recording_studio_terms_and_conditions_terms, :kind)
     assert connection.column_exists?(:recording_studio_accesses, :depends_on_recording_id)
     refute connection.table_exists?(:pages)
     refute connection.table_exists?(:recording_studio_access_boundaries)
@@ -77,7 +80,16 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     homepage_hero = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
                                                      .find { |recording| recording.recordable.section_type == "hero" }
                                                      &.recordable
-    assert_equal %w[top_nav hero logo_cloud feature_grid call_to_action], homepage_types
+    assert_equal %w[top_nav hero logo_cloud feature_grid call_to_action footer], homepage_types
+    footer = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
+                                              .find { |recording| recording.recordable.section_type == "footer" }
+                                              &.recordable
+    footer_links = Array(footer.content["links"])
+    assert_equal %w[Terms Privacy], footer_links.map { |item| item["text"] }
+    assert footer_links.find { |item| item["text"] == "Terms" }["url"].to_s.include?("/terms/")
+    assert footer_links.find { |item| item["text"] == "Privacy" }["url"].to_s.include?("/privacy/")
+    assert RecordingStudioTermsAndConditions.current_published_for(workspace, kind: "terms_and_condition")
+    assert RecordingStudioTermsAndConditions.current_published_for(workspace, kind: "privacy_policy")
     logo_cloud = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
                                                   .find { |recording| recording.recordable.section_type == "logo_cloud" }
     feature_grid = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
@@ -203,5 +215,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_includes routes, 'get "/start"'
     assert_includes routes, "recording_studio_user_auth_for :users"
     assert_includes routes, "RecordingStudioUser::Engine"
+    assert_includes routes, "RecordingStudioTermsAndConditions::Engine"
+    assert_includes ApplicationController.ancestors, RecordingStudioTermsAndConditions::ForcesAcceptance
   end
 end

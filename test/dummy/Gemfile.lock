@@ -57,10 +57,10 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_publishable.git
-  revision: d65b79c43206b2c03201daf18dd7ffed59932afe
-  tag: v0.3.0
+  revision: c657fb6f947a491519945a1358b12f4505fb8358
+  tag: v0.3.1
   specs:
-    recording_studio_publishable (0.3.0)
+    recording_studio_publishable (0.3.1)
       rails (~> 8.1.0)
       recording_studio (~> 4.2)
       view_component (>= 3.0, < 5.0)
@@ -77,6 +77,20 @@ GIT
       recording_studio_accessible (~> 0.6)
 
 GIT
+  remote: https://github.com/bowerbird-app/RecordingStudio_terms_and_conditions.git
+  revision: 0dd11072b395a18ceff1046651b387eda97161ca
+  tag: v0.7.3
+  specs:
+    recording_studio_terms_and_conditions (0.7.3)
+      flat_pack (>= 0.1.196)
+      rails (~> 8.1.0)
+      recording_studio (~> 4.2)
+      recording_studio_accessible (~> 0.8)
+      recording_studio_admin (~> 2.0)
+      recording_studio_publishable (~> 0.3)
+      recording_studio_user (>= 0.12.2)
+
+GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_trashable.git
   revision: a3bcd74100575f60dd1850bacfda8bb0fd5d6672
   tag: v0.4.1
@@ -88,10 +102,10 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_users.git
-  revision: 62401500d19ae43d91c591d8071de7105952abf8
-  tag: v0.11.0
+  revision: 73c45ab82fdbde61779dd3293d22aa39e081546a
+  tag: v0.12.2
   specs:
-    recording_studio_user (0.11.0)
+    recording_studio_user (0.12.2)
       devise (~> 5.0)
       flat_pack (>= 0.1.144)
       omniauth (~> 2.1)
@@ -109,10 +123,10 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/flatpack.git
-  revision: a483d66a58e7d24f25047766a5cca8f6681356d2
-  tag: v0.1.193
+  revision: 3d6fdb6f669a1f2228cc17e1f56c798dfd8fc2db
+  tag: v0.1.196
   specs:
-    flat_pack (0.1.193)
+    flat_pack (0.1.196)
       pagy (~> 9.0)
       rails (>= 7.1, < 9)
       tailwind_merge (~> 0.13)
@@ -121,7 +135,7 @@ GIT
 PATH
   remote: ../..
   specs:
-    recording_studio_pages (0.3.10)
+    recording_studio_pages (0.3.11)
       rails (~> 8.1.0)
       recording_studio (~> 4.1)
       view_component (>= 3.0, < 5.0)
@@ -633,6 +647,7 @@ DEPENDENCIES
   recording_studio_pages!
   recording_studio_publishable!
   recording_studio_root_switchable!
+  recording_studio_terms_and_conditions!
   recording_studio_trashable!
   recording_studio_user!
   rubocop-rails-omakase
@@ -698,7 +713,7 @@ CHECKSUMS
   ffi (1.17.2-x86_64-darwin) sha256=981f2d4e32ea03712beb26e55e972797c2c5a7b0257955d8667ba58f2da6440e
   ffi (1.17.2-x86_64-linux-gnu) sha256=05d2026fc9dbb7cfd21a5934559f16293815b7ce0314846fee2ac8efbdb823ea
   ffi (1.17.2-x86_64-linux-musl) sha256=97c0eb3981414309285a64dc4d466bd149e981c279a56371ef811395d68cb95c
-  flat_pack (0.1.193)
+  flat_pack (0.1.196)
   fugit (1.12.1) sha256=5898f478ede9b415f0804e42b8f3fd53f814bd85eebffceebdbc34e1107aaf68
   globalid (1.4.0) sha256=037f12fbf1d9d7a014d501c2d5c77356fd4ddd96d7a7991d6700bba96706f427
   hashie (5.1.0) sha256=c266471896f323c446ea8207f8ffac985d2718df0a0ba98651a3057096ca3870
@@ -787,11 +802,12 @@ CHECKSUMS
   recording_studio_attachable (0.5.1)
   recording_studio_duplicatable (0.4.1)
   recording_studio_orderable (0.2.2)
-  recording_studio_pages (0.3.10)
-  recording_studio_publishable (0.3.0)
+  recording_studio_pages (0.3.11)
+  recording_studio_publishable (0.3.1)
   recording_studio_root_switchable (0.5.0)
+  recording_studio_terms_and_conditions (0.7.3)
   recording_studio_trashable (0.4.1)
-  recording_studio_user (0.11.0)
+  recording_studio_user (0.12.2)
   regexp_parser (2.11.3) sha256=ca13f381a173b7a93450e53459075c9b76a10433caadcb2f1180f2c741fc55a4
   reline (0.7.0) sha256=5b012d8e55dbf9d450f12bde2cf7d15ff546ae80b3f8f3b30e570d431815583d
   responders (3.2.0) sha256=89c2d6ac0ae16f6458a11524cae4a8efdceba1a3baea164d28ee9046bd3df55a

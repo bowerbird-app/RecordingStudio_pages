@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   mount RecordingStudioAccessible::Engine, at: "/admin/access"
   mount RecordingStudioAttachable::Engine, at: "/recording_studio_attachable"
   mount RecordingStudioPages::Engine, at: "/recording_studio_pages"
+  mount RecordingStudioTermsAndConditions::Engine, at: "/recording_studio_terms_and_conditions"
   mount RecordingStudioDuplicatable::Engine, at: "/recording_studio_duplicatable"
   mount RecordingStudioTrashable::Engine, at: "/recording_studio_trashable"
   mount RecordingStudioUser::Engine => RecordingStudioUser.config.mount_path, as: :recording_studio_users
