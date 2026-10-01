@@ -85,6 +85,47 @@ sample_feature_images = {
   "Reuse" => "/images/feature-reuse.jpg"
 }
 
+terms_recording_for_kind = lambda do |root_recording, kind|
+  RecordingStudioTermsAndConditions::KindPresence.recordings_for(root_recording, kind: kind)
+    .max_by { |recording| recording.created_at || Time.at(0) }
+end
+
+ensure_published_terms = lambda do |root_recording, user, kind:, title:, body:, slug:|
+  recording = terms_recording_for_kind.call(root_recording, kind)
+
+  if recording.blank?
+    recording = root_recording.record(
+      RecordingStudioTermsAndConditions::Terms,
+      actor: user
+    ) do |terms|
+      terms.title = title
+      terms.body = body
+      terms.kind = kind
+    end
+  elsif recording.recordable.title != title || recording.recordable.body != body ||
+        recording.recordable.kind.to_s != kind.to_s
+    recording = RecordingStudioTermsAndConditions::TermsWrite.call(
+      recording: recording,
+      actor: user,
+      title: title,
+      body: body,
+      kind: kind
+    )
+  end
+
+  current_slug = recording.try(:current_publishable)&.try(:slug)
+  if !recording.currently_published? || current_slug != slug
+    RecordingStudioPublishable::Services::Publishables::Update.call(
+      parent_recording: recording,
+      attributes: { slug: slug, status: "published" },
+      actor: user
+    ).value!
+    recording = recording.reload
+  end
+
+  recording
+end
+
 fill_sample_feature_images = lambda do |page_recording, actor|
   grid = RecordingStudioPages::Composition.section_recordings_for(page_recording).find do |recording|
     recording.recordable.section_type == "feature_grid"
@@ -330,7 +371,36 @@ begin
     ).value!
   end
 
-  ensure_sections.call(homepage_recording, home_sections, user)
+  terms_recording = ensure_published_terms.call(
+    root_recording,
+    user,
+    kind: RecordingStudioTermsAndConditions::Terms::KIND_TERMS,
+    title: RecordingStudioTermsAndConditions::SampleTerms::TITLE,
+    body: RecordingStudioTermsAndConditions::SampleTerms::BODY,
+    slug: "terms-and-conditions"
+  )
+  privacy_recording = ensure_published_terms.call(
+    root_recording,
+    user,
+    kind: RecordingStudioTermsAndConditions::Terms::KIND_PRIVACY,
+    title: "Privacy Policy",
+    body: "<p>We keep the version you agreed to, and a receipt of when you agreed.</p>",
+    slug: "privacy-policy"
+  )
+  homepage_sections = home_sections + [
+    {
+      type: :footer,
+      content: {
+        name: "House",
+        note: "The fine print lives here.",
+        links: [
+          { text: "Terms", url: terms_recording.recordable.published_url },
+          { text: "Privacy", url: privacy_recording.recordable.published_url }
+        ]
+      }
+    }
+  ]
+  ensure_sections.call(homepage_recording, homepage_sections, user)
   fill_sample_feature_images.call(homepage_recording, user)
   publish_page.call(homepage_recording, "home", user)
 

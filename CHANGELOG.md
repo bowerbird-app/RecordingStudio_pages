@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.11] - 2026-10-01
+
+Dummy hosts can publish Terms and a Privacy Policy, and signup agrees to them.
+
+### Added
+- Dummy installs `recording_studio_terms_and_conditions` `v0.7.3`. Seeded Home ends with a footer that links to the live Terms and Privacy Policy. Users create-password shows the continue notice and writes a receipt for each pending document.
+
+### Upgrade notes
+- Nothing to run for existing pages. Footer links are still whatever you save.
+- To publish Terms and Privacy Policy in a host, add `recording_studio_terms_and_conditions` `v0.7.3`. That gem needs Users `>= 0.12.2`, Publishable `v0.3.1`, and Flatpack `>= 0.1.196`. Run its install generator and migrations, register `RecordingStudioTermsAndConditions::Terms`, and enable Admin `section :terms`. Signup clickwrap comes from the gem. Do not add a second checkbox.
+
 ## [0.3.10] - 2026-10-01
 
 Pages can end with a footer.
@@ -333,7 +344,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.10...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.11...HEAD
+[0.3.11]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.10...v0.3.11
 [0.3.10]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.9...v0.3.10
 [0.3.9]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.8...v0.3.9
 [0.3.8]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.7...v0.3.8

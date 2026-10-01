@@ -13,6 +13,11 @@ namespace :flat_pack do
     sync_gem_path("recording_studio_pages", "app/components", "tmp/tailwind/recording_studio_pages_components")
     sync_gem_path("recording_studio_user", "app/views", "tmp/tailwind/recording_studio_user_views")
     sync_gem_path("recording_studio_attachable", "app/views", "tmp/tailwind/recording_studio_attachable_views")
+    sync_gem_path(
+      "recording_studio_terms_and_conditions",
+      "app/views",
+      "tmp/tailwind/recording_studio_terms_and_conditions_views"
+    )
   end
 end
 
