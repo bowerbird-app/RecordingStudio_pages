@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.9", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.10", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -618,6 +618,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes built_ins, 'icon: "building-office"'
     assert_includes built_ins, 'icon: "squares-2x2"'
     assert_includes built_ins, 'icon: "megaphone"'
+    assert_includes built_ins, "key: :footer"
+    assert_includes built_ins, "name: \"Footer\""
+    assert_includes built_ins, 'icon: "bars-3-bottom-left"'
     assert_includes built_ins, "full_bleed: true"
     assert_includes built_ins, 'label: "Preset"'
     assert_includes built_ins, "On a dark photo"

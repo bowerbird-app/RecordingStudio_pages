@@ -98,6 +98,8 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Hero"
     assert_includes response.body, "Menu"
     assert_includes response.body, "Call to action"
+    assert_includes response.body, "Footer"
+    assert_includes response.body, 'data-flat-pack--icon-name-value="bars-3-bottom-left"'
     assert_includes response.body, "add-section-#{page_recording.id}-hero"
     assert_includes response.body, 'id="page_editor"'
     assert_select "#flash", count: 1

@@ -112,6 +112,40 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_operator nav_at, :<, box_at
   end
 
+  test "a published page renders a full-bleed footer under the sections" do
+    page_recording = create_page!(parent_recording: @root, title: "Closing", homepage: true, actor: @actor)
+    add_section!(
+      page_recording: page_recording,
+      section_type: "rich_text",
+      content: { title: "The room", body: "Stay for the last line." },
+      actor: @actor
+    )
+    add_section!(
+      page_recording: page_recording,
+      section_type: "footer",
+      content: {
+        name: "House",
+        note: "Doors at eight.",
+        links: [{ text: "About", url: "/pages/about" }]
+      },
+      actor: @actor
+    )
+    publish_page!(page_recording, slug: "closing", actor: @actor)
+
+    get root_path
+
+    assert_response :success
+    assert_includes response.body, "The room"
+    assert_includes response.body, "<footer"
+    assert_includes response.body, "House"
+    assert_includes response.body, "Doors at eight."
+    assert_includes response.body, 'href="/pages/about"'
+    assert_includes response.body, "bg-[var(--surface-muted-background-color)]"
+    room_at = response.body.index("The room")
+    footer_at = response.body.index("<footer")
+    assert_operator room_at, :<, footer_at
+  end
+
   test "section variants change public markup" do
     page_recording = create_page!(parent_recording: @root, title: "Variant home", homepage: true, actor: @actor)
     add_section!(

@@ -134,7 +134,7 @@ class SectionRegistryTest < Minitest::Test
   def test_built_in_sections_are_registered
     RecordingStudioPages::BuiltIns.register!
 
-    %w[top_nav hero rich_text image_text logo_cloud feature_grid call_to_action feature logo].each do |key|
+    %w[top_nav hero rich_text image_text logo_cloud feature_grid call_to_action footer feature logo].each do |key|
       assert RecordingStudioPages.section?(key), "expected #{key} to be registered"
     end
   end
@@ -158,6 +158,13 @@ class SectionRegistryTest < Minitest::Test
     refute_includes page_keys, "feature"
     refute_includes page_keys, "logo"
     assert_includes page_keys, "feature_grid"
+    assert_includes page_keys, "footer"
+    footer = RecordingStudioPages.section(:footer)
+    assert_equal "Footer", footer.name
+    assert_equal true, footer.full_bleed?
+    assert_equal "bars-3-bottom-left", footer.menu_icon
+    assert_equal "list", footer.catalog[:fields][:links][:type]
+    refute footer.fields.fields.key?(:items)
     assert_equal ["feature"], grid.catalog[:child_types]
   end
 
