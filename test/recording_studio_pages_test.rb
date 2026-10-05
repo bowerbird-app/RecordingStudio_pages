@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.3.11", ::RecordingStudioPages::VERSION
+    assert_equal "0.3.12", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists

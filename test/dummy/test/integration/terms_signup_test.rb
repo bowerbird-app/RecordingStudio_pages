@@ -30,6 +30,11 @@ class TermsSignupTest < ActionDispatch::IntegrationTest
 
   test "create-password shows the continue notice and accepts both documents" do
     email = "signup-#{SecureRandom.hex(4)}@example.com"
+    # Signup accepts against Gate.root_for_signup (first root with live Terms when
+    # there is no current root). db:prepare seeds Studio Workspace with live docs,
+    # so that root can win over @workspace depending on recording UUID order.
+    signup_root = RecordingStudioTermsAndConditions::Gate.first_root_with_live_terms
+    assert_predicate signup_root, :present?
 
     post "/users/sign_up", params: { user: { email: email } }
     assert_redirected_to "/users/sign_up/password"
@@ -46,8 +51,8 @@ class TermsSignupTest < ActionDispatch::IntegrationTest
     end
 
     user = User.find_by!(email: email)
-    assert RecordingStudioTermsAndConditions.accepted?(user, @workspace, kind: "terms_and_condition")
-    assert RecordingStudioTermsAndConditions.accepted?(user, @workspace, kind: "privacy_policy")
+    assert RecordingStudioTermsAndConditions.accepted?(user, signup_root, kind: "terms_and_condition")
+    assert RecordingStudioTermsAndConditions.accepted?(user, signup_root, kind: "privacy_policy")
     receipt = RecordingStudioTermsAndConditions::Acceptance.where(actor: user).order(:created_at).last
     assert_equal({ "source" => "continue_notice" }, receipt.provenance)
   end
