@@ -49,7 +49,7 @@ Sign-in is email first (**Continue with email**), then password. Google and Appl
 - `/recording_studio_users/profile` - My Profile
 - `/admin` - RS Admin hub. Dummy switches the current root to **Admin** when the signed-in actor has Accessible `:view` on that root. People without that grant still get 403. **Page** goes to `/recording_studio_pages/admin/pages/new` (reading-width form, compact **Create page**). **View all** goes to `/admin/screens/pages`. Published and Drafts open that list; Drafts adds `status=Draft`, Published adds `status=Published`. Published and Drafts load through Turbo frames; dummy pins Turbo and RS Admin Stimulus so those cards leave the shimmer.
 - `/users/sign_in` - Users email-first sign-in
-- `/users/sign_up` - Users signup. Create-password includes the terms continue notice when Terms or a Privacy Policy is live
+- `/users/sign_up` - Users signup. Create-password includes the terms continue notice when Terms or a Privacy Policy is live. With no current root, signup accepts against the first workspace that has live Terms (`Gate.root_for_signup`), which after `db:prepare` is usually the seeded Studio Workspace
 - `/terms/:uuid/:slug` - published Terms
 - `/privacy/:uuid/:slug` - published Privacy Policy
 - `/recording_studio_terms_and_conditions` - Agree screen for a signed-in person who still owes a tick

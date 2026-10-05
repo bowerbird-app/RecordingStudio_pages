@@ -7,8 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.12] - 2026-10-05
+
+Dummy signup terms test follows the root signup actually uses.
+
+### Fixed
+- `TermsSignupTest` asserts acceptance against `Gate.first_root_with_live_terms` instead of a freshly published workspace. `db:prepare` seeds Studio Workspace with live Terms and Privacy, and signup picks the first live root by recording id, so asserting on a second workspace failed whenever that UUID sorted later.
+
 ### Changed
 - Pin `recording_studio` GitHub tag to `v4.2.2` (revision `036686aa`) in the root and dummy Gemfiles. Upstream gem version at that tag is `4.2.1`.
+
+### Upgrade notes
+- Nothing to run. Host signup behavior is unchanged.
+- Hosts that pin Recording Studio from GitHub should use tag `v4.2.2`.
 
 ## [0.3.11] - 2026-10-01
 
@@ -347,7 +358,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.11...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.12...HEAD
+[0.3.12]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.11...v0.3.12
 [0.3.11]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.10...v0.3.11
 [0.3.10]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.9...v0.3.10
 [0.3.9]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.8...v0.3.9
