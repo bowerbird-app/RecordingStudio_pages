@@ -1,5 +1,9 @@
 # Migration Notes
 
+## 0.3.12 signup terms test root
+
+Dummy signup terms coverage now asserts against `Gate.first_root_with_live_terms`, the same root create-password accepts when there is no current root. Nothing to run in hosts.
+
 ## 0.3.11 terms and privacy
 
 Dummy installs Recording Studio Terms and Conditions `v0.7.3` and pins Users `v0.12.2`, Publishable `v0.3.1`, and Flatpack `v0.1.196`. Seeded Home footer links to the published Terms and Privacy Policy. Create-password agrees to both.
