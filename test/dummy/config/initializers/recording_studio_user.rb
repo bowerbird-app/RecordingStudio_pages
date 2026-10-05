@@ -16,10 +16,11 @@ RecordingStudioUser.configure do |config|
   # First auth screen is always email. Next screen follows this setting:
   # :email → password, :otp → email code (requires otp_enabled and OTP flags).
   # config.primary_login_type = :email
-  # OmniAuth. Leave this empty: Continue-with buttons appear only for providers
-  # whose secrets are present in Rails credentials (`omniauth:`). Commented or
-  # blank credential keys stay hidden. Do not use ENV or OmniAuth test mode in
-  # the app. Add the YAML below with `bin/rails credentials:edit`.
+  # OmniAuth. Hosts leave this empty: Continue-with buttons appear only for
+  # providers whose secrets are present in Rails credentials (`omniauth:`).
+  # Dummy sets placeholders so Google and Apple still load when the shared
+  # master key is unset (CI and a fresh clone). Do not copy these into a host.
+  # Do not use ENV or OmniAuth test mode in the app.
   #
   # omniauth:
   #   google_oauth2:
@@ -51,7 +52,16 @@ RecordingStudioUser.configure do |config|
   # - Apple may send email only once (or a private relay). Later visits match Identity by uid.
   # Instagram uses omniauth-instagram-api (Instagram Login client id/secret).
   # Apple often uses client_secret: "" with team_id / key_id / pem options.
-  config.omniauth_providers = {}
+  config.omniauth_providers = {
+    google_oauth2: {
+      client_id: "dev_placeholder",
+      client_secret: "dev_placeholder"
+    },
+    apple: {
+      client_id: "dev_placeholder",
+      client_secret: "dev_placeholder"
+    }
+  }
   # When false, unknown provider emails do not create a User (fail closed).
   config.omniauth_create_account = true
   # Optional email OTP. Leave false unless the host has run OTP migrations

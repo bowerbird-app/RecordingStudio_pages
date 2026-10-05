@@ -46,6 +46,14 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes install_script, "test/dummy/config/master.key"
   end
 
+  def test_dummy_omniauth_placeholders_do_not_require_a_master_key
+    initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_user.rb", __dir__))
+
+    assert_includes initializer, "client_id: \"dev_placeholder\""
+    assert_includes initializer, "client_secret: \"dev_placeholder\""
+    refute_includes initializer, "config.omniauth_providers = {}"
+  end
+
   def test_dummy_gemfile_pins_verified_github_tags
     gemfile = File.read(File.expand_path("dummy/Gemfile", __dir__))
 
