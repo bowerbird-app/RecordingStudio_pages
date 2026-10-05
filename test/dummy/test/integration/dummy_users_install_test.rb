@@ -3,9 +3,9 @@
 require "test_helper"
 
 class DummyUsersInstallTest < ActionDispatch::IntegrationTest
-  test "dummy credentials enable Google and Apple continue-with providers" do
+  test "dummy credentials enable Google continue-with providers" do
     assert RecordingStudioUser.config.omniauth_configured?
-    assert_equal %i[google_oauth2 apple], RecordingStudioUser.config.omniauth_provider_names
+    assert_equal %i[google_oauth2], RecordingStudioUser.config.omniauth_provider_names
     assert User.devise_modules.include?(:omniauthable)
   end
 
@@ -40,11 +40,11 @@ class DummyUsersInstallTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "Continue with Google"
-    assert_includes response.body, "Continue with Apple"
+    refute_includes response.body, "Continue with Apple"
     assert_includes response.body, "mr-auto flex w-full max-w-sm flex-col gap-2"
     refute_includes response.body, "mx-auto flex w-full max-w-sm flex-col gap-2"
     assert_includes response.body, 'action="/users/auth/google_oauth2"'
-    assert_includes response.body, 'action="/users/auth/apple"'
+    refute_includes response.body, 'action="/users/auth/apple"'
     refute_includes response.body, 'href="/users/sign_in"'
     refute_includes response.body, ">Or<"
   end

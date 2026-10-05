@@ -18,9 +18,9 @@ RecordingStudioUser.configure do |config|
   # config.primary_login_type = :email
   # OmniAuth. Hosts leave this empty: Continue-with buttons appear only for
   # providers whose secrets are present in Rails credentials (`omniauth:`).
-  # Dummy sets placeholders so Google and Apple still load when the shared
-  # master key is unset (CI and a fresh clone). Do not copy these into a host.
-  # Do not use ENV or OmniAuth test mode in the app.
+  # Dummy sets a Google placeholder so Continue-with still loads when the
+  # shared master key is unset (CI and a fresh clone). Do not copy this into
+  # a host. Do not use ENV or OmniAuth test mode in the app.
   #
   # omniauth:
   #   google_oauth2:
@@ -54,10 +54,6 @@ RecordingStudioUser.configure do |config|
   # Apple often uses client_secret: "" with team_id / key_id / pem options.
   config.omniauth_providers = {
     google_oauth2: {
-      client_id: "dev_placeholder",
-      client_secret: "dev_placeholder"
-    },
-    apple: {
       client_id: "dev_placeholder",
       client_secret: "dev_placeholder"
     }

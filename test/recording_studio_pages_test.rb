@@ -49,8 +49,12 @@ class RecordingStudioPagesTest < Minitest::Test
   def test_dummy_omniauth_placeholders_do_not_require_a_master_key
     initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_user.rb", __dir__))
 
-    assert_includes initializer, "client_id: \"dev_placeholder\""
-    assert_includes initializer, "client_secret: \"dev_placeholder\""
+    providers = initializer[/config\.omniauth_providers = \{.*?\n  \}/m]
+
+    assert_includes providers, "google_oauth2:"
+    assert_includes providers, "client_id: \"dev_placeholder\""
+    assert_includes providers, "client_secret: \"dev_placeholder\""
+    refute_includes providers, "apple:"
     refute_includes initializer, "config.omniauth_providers = {}"
   end
 

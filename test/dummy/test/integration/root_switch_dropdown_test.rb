@@ -13,7 +13,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "Welcome back"
     assert_includes response.body, "Continue with email"
     assert_includes response.body, "Continue with Google"
-    assert_includes response.body, "Continue with Apple"
+    refute_includes response.body, "Continue with Apple"
     assert_includes response.body, "/users/auth/google_oauth2"
     assert_includes response.body, 'data-theme="rounded"'
     refute_includes response.body, "data-recording-studio-default-layout"

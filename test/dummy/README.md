@@ -34,7 +34,7 @@ Then open the app and sign in with:
 - Email: `admin@admin.com`
 - Password: `Password`
 
-Sign-in is email first (**Continue with email**), then password. Google and Apple Continue-with buttons show because dummy test/development credentials include placeholder `omniauth:` keys. Those ids are not real OAuth clients. Hosts put live secrets in Rails credentials and leave `omniauth_providers` empty.
+Sign-in is email first (**Continue with email**), then password. A Google Continue-with button shows because dummy sets a placeholder `omniauth_providers` entry (and dummy credentials also include `omniauth:` keys). That id is not a real OAuth client. Hosts put live secrets in Rails credentials and leave `omniauth_providers` empty.
 
 ## Useful Routes
 
