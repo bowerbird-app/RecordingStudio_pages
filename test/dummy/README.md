@@ -18,6 +18,8 @@ This Rails app exists to validate the Recording Studio Page Builder in a real ho
 
 ## Quick Start
 
+Dummy credentials (`config/credentials.yml.enc`, plus `config/credentials/development.yml.enc` and `test.yml.enc`) use the shared RecordingStudio_* development master key. Set `RAILS_MASTER_KEY` or write that key to `config/master.key` (gitignored). Env files also need `config/credentials/development.key` and `config/credentials/test.key` with the same value unless `RAILS_MASTER_KEY` is set. Do not generate a per-repo dummy key.
+
 ```bash
 cd test/dummy
 bundle install
@@ -32,7 +34,7 @@ Then open the app and sign in with:
 - Email: `admin@admin.com`
 - Password: `Password`
 
-Sign-in is email first (**Continue with email**), then password. Google and Apple Continue-with buttons show because dummy test/development credentials include placeholder `omniauth:` keys. Those ids are not real OAuth clients. Hosts put live secrets in Rails credentials and leave `omniauth_providers` empty.
+Sign-in is email first (**Continue with email**), then password. A Google Continue-with button shows because dummy sets a placeholder `omniauth_providers` entry (and dummy credentials also include `omniauth:` keys). That id is not a real OAuth client. Hosts put live secrets in Rails credentials and leave `omniauth_providers` empty.
 
 ## Useful Routes
 

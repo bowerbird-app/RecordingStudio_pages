@@ -411,11 +411,11 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, "Come as you are"
     assert_includes response.body, "Continue with Google"
-    assert_includes response.body, "Continue with Apple"
+    refute_includes response.body, "Continue with Apple"
     assert_includes response.body, "mx-auto flex w-full max-w-sm flex-col gap-2"
     refute_includes response.body, "mr-auto flex w-full max-w-sm flex-col gap-2"
     assert_includes response.body, "/users/auth/google_oauth2"
-    assert_includes response.body, "/users/auth/apple"
+    refute_includes response.body, "/users/auth/apple"
     refute_includes response.body, 'href="/users/sign_in"'
     refute_includes response.body, "Take a seat"
   end
@@ -446,11 +446,11 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "--hero-overlay-min-height: 100dvh"
     assert_includes response.body, "text-left"
     assert_includes response.body, "Continue with Google"
-    assert_includes response.body, "Continue with Apple"
+    refute_includes response.body, "Continue with Apple"
     assert_includes response.body, "mr-auto flex w-full max-w-sm flex-col gap-2"
     refute_includes response.body, "mx-auto flex w-full max-w-sm flex-col gap-2"
     assert_includes response.body, 'action="/users/auth/google_oauth2"'
-    assert_includes response.body, 'action="/users/auth/apple"'
+    refute_includes response.body, 'action="/users/auth/apple"'
     refute_includes response.body, 'href="/users/sign_in"'
     refute_includes response.body, ">Or<"
     refute_includes response.body, "Come as you are"

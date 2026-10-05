@@ -41,6 +41,21 @@ class RecordingStudioPagesTest < Minitest::Test
     install_script = File.read(File.expand_path("../.cursor/install.sh", __dir__))
 
     assert_includes install_script, "fetch-skills.sh"
+    assert_includes install_script, "RAILS_MASTER_KEY"
+    assert_includes install_script, "mkdir -p \"${ROOT}/test/dummy/config/credentials\""
+    assert_includes install_script, "test/dummy/config/master.key"
+  end
+
+  def test_dummy_omniauth_placeholders_do_not_require_a_master_key
+    initializer = File.read(File.expand_path("../test/dummy/config/initializers/recording_studio_user.rb", __dir__))
+
+    providers = initializer[/config\.omniauth_providers = \{.*?\n  \}/m]
+
+    assert_includes providers, "google_oauth2:"
+    assert_includes providers, "client_id: \"dev_placeholder\""
+    assert_includes providers, "client_secret: \"dev_placeholder\""
+    refute_includes providers, "apple:"
+    refute_includes initializer, "config.omniauth_providers = {}"
   end
 
   def test_dummy_gemfile_pins_verified_github_tags

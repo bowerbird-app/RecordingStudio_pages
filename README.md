@@ -156,7 +156,7 @@ Hero content looks like `cta: { type: "button", text: "Come in", url: "/users/si
 
 New pages start empty. Editing the hero is where you change Button / Social logins / URL field. **Section** does not list CTAs.
 
-Dummy registers `social_logins` and `url_form`, so a one-section landing can be a button, sign-in buttons, or a paste-a-link field. Dummy `social_logins` calls Recording Studio Users OmniAuth helpers (`recording_studio_user_omniauth_provider_names`, `recording_studio_user_omniauth_authorize_path`, and the provider label/logo helpers) and draws stacked Flatpack Continue-with buttons. The stack is `max-w-sm` (same cap as the Users auth shell) so `w-full` buttons stay equal without stretching across a fullscreen hero. A left hero docks that stack (`mr-auto`); a centered hero keeps `mx-auto`. That wrap is dummy’s, not Recording Studio Users — Users’ sign-in partial is a vertical stack with no side margin. Dummy `url_form` is a paste-a-link field with no visible field name; the button sits beside it. Native Flatpack UrlInput and Button `:md` heights still differ. It does not render `recording_studio_user/omniauth/continue_with_providers` — that partial is for the sign-in screen and includes an **Or** divider. Dummy test and development credentials enable Google and Apple so Join and Walk in can show those buttons. Hosts leave `omniauth_providers` empty and put real secrets in credentials; do not copy dummy client ids.
+Dummy registers `social_logins` and `url_form`, so a one-section landing can be a button, sign-in buttons, or a paste-a-link field. Dummy `social_logins` calls Recording Studio Users OmniAuth helpers (`recording_studio_user_omniauth_provider_names`, `recording_studio_user_omniauth_authorize_path`, and the provider label/logo helpers) and draws stacked Flatpack Continue-with buttons. The stack is `max-w-sm` (same cap as the Users auth shell) so `w-full` buttons stay equal without stretching across a fullscreen hero. A left hero docks that stack (`mr-auto`); a centered hero keeps `mx-auto`. That wrap is dummy’s, not Recording Studio Users — Users’ sign-in partial is a vertical stack with no side margin. Dummy `url_form` is a paste-a-link field with no visible field name; the button sits beside it. Native Flatpack UrlInput and Button `:md` heights still differ. It does not render `recording_studio_user/omniauth/continue_with_providers` — that partial is for the sign-in screen and includes an **Or** divider. Dummy sets a Google Continue-with placeholder so Join and Walk in can show that button. Hosts leave `omniauth_providers` empty and put real secrets in credentials; do not copy dummy client ids.
 
 ## Built-in sections
 
@@ -206,6 +206,8 @@ bundle install
 bin/rails db:setup
 bin/dev
 ```
+
+Dummy credentials (`test/dummy/config/credentials.yml.enc` plus development and test env files) are encrypted with the shared RecordingStudio_* development master key. Set `RAILS_MASTER_KEY` or put that key in `test/dummy/config/master.key` (gitignored). Env files also need `test/dummy/config/credentials/development.key` and `test/dummy/config/credentials/test.key` with the same value unless `RAILS_MASTER_KEY` is set. Keep the encrypted files; do not generate a per-repo dummy key.
 
 Sign in with `admin@admin.com` / `Password`.
 

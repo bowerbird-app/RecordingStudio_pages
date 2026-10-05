@@ -67,6 +67,9 @@ jobs:
       matrix:
         ruby-version: ["3.3", "3.4"]
 
+    env:
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
