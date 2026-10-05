@@ -14,8 +14,12 @@ Dummy signup terms test follows the root signup actually uses.
 ### Fixed
 - `TermsSignupTest` asserts acceptance against `Gate.first_root_with_live_terms` instead of a freshly published workspace. `db:prepare` seeds Studio Workspace with live Terms and Privacy, and signup picks the first live root by recording id, so asserting on a second workspace failed whenever that UUID sorted later.
 
+### Changed
+- Pin `recording_studio` GitHub tag to `v4.2.2` (revision `036686aa`) in the root and dummy Gemfiles. Upstream gem version at that tag is `4.2.1`.
+
 ### Upgrade notes
 - Nothing to run. Host signup behavior is unchanged.
+- Hosts that pin Recording Studio from GitHub should use tag `v4.2.2`.
 
 ## [0.3.11] - 2026-10-01
 
