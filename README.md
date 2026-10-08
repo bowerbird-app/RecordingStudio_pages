@@ -228,7 +228,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 1. **Publishable slugs cannot be `/`.** The slug regex is `[a-z0-9]+(?:-[a-z0-9]+)*`, and public path templates must include `:uuid`. Homepage routing lives in Page Builder.
 2. **Publishable slug uniqueness is not a hard unique constraint** across pages.
-3. **RS Admin is a hub of screens and widgets**, not a nested canvas for ordered sections. Admin 2.0.2 section links pass `url:` to Flatpack Button, which only navigates on `href:`. Dummy’s Pages hub view passes `href:` so **Page** and **View all** work. Dummy’s Pages list screen puts **Page** (plus icon) under the title, not in the top-right slot. Admin’s list button already uses `href:`.
+3. **RS Admin is a hub of screens and widgets**, not a nested canvas for ordered sections. Dummy’s Pages hub view passes Flatpack Button `href:` (and a plus icon on **Page**) so **Page** and **View all** work under the title, not in the top-right slot. Admin’s own screen/section views already use `href:`.
 4. **Action Text assumes mutable records.** Section copy is JSON plus `sanitize`.
 5. **Attachable is required by Publishable 0.3.0** even when you only want slug and status. Section photos also use Attachable. They are children of the section, not of the page.
 6. **Core has no `trash!`.** Page Builder calls `recording_studio_trashable_trash!` when Trashable is enabled on the type; otherwise it logs `trashed` and sets `trashed_at`. Dummy installs Trashable and enables it on Page.
@@ -236,7 +236,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.12. Dummy GitHub tags: Recording Studio `v4.2.2`, Accessible `v0.9.1`, Attachable `v0.5.1`, Users `v0.12.2`, Publishable `v0.3.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Trashable `v0.4.1`, Admin `v2.0.2`, Terms and Conditions `v0.7.3`, FlatPack `v0.1.196`.
+0.3.12. Dummy GitHub tags: Recording Studio `v4.2.2`, Accessible `v0.11.2`, Attachable `v0.7.4`, Users `v0.15.0`, Publishable `v0.3.1`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Trashable `v0.4.1`, Admin `v2.0.6`, Terms and Conditions `v0.7.3`, FlatPack `v0.1.207`.
 
 ## Upgrade
 
@@ -244,7 +244,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 2. Mount Pages, Duplicatable, and Publishable. Keep Pages off `/`.
 3. `RecordingStudioPages::Section` already opts into Duplicatable and Attachable when those gems are loaded. Do not add a second copy path or a Pages-owned Image type. Do not enable Attachable on Page for section photos.
 4. Public pages load `flat_pack/application` and use the host Flatpack theme on `html` (`FlatPack.configuration.default_theme`). Dummy sets `rounded`.
-5. Pin Flatpack `v0.1.193` (or later) so Hero `align:` / `on:` and `--hero-overlay-min-height` work, and so List `orderable_url` persists drag. Product sidebars pass `show_version: false` on `FlatPack::Sidebar::Header` so the kit version stays off the Pages mark. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`. Pin Attachable `v0.5.1` (or later) for the image picker.
+5. Pin Flatpack `v0.1.207` (or later) so Hero `align:` / `on:` and `--hero-overlay-min-height` work, List `orderable_url` persists drag, and Admin’s Flatpack constraint (`~> 0.1.207`) resolves. Product sidebars pass `show_version: false` on `FlatPack::Sidebar::Header` so the kit version stays off the Pages mark. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`. Pin Attachable `v0.7.4` (or later) for the image picker.
 6. Gem screens use Recording Studio page nav. Dummy signed-in `/` is a sidebar shell with a root switcher. Dummy `/docs` keeps page-nav host chrome. Do not put that on gem screens.
 7. Install Recording Studio Trashable and keep Page’s `Capabilities::Trashable.to` so **Trash** calls `recording_studio_trashable_trash!`. Dummy mounts it at `/recording_studio_trashable`.
 8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.

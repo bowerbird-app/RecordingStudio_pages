@@ -1,6 +1,5 @@
-<%# Flatpack Button only navigates when given href:. Admin 2.0.2 passes url:, which
-    renders a dead <button>. Dummy draws the same hub with href so Page and View all
-    actually go somewhere. The Pages "Page" link also gets the plus icon. %>
+<%# Admin already passes href: on hub links. Dummy keeps the same hub chrome and
+    adds the plus icon on the Pages "Page" link. %>
 <%= render layout: "recording_studio_admin/shared/page_shell" do %>
   <% access_recording = recording_studio_admin_context.root_recording || recording_studio_admin_context.access_recording %>
 
