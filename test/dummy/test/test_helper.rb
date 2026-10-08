@@ -10,9 +10,23 @@ module PageBuilderTestHelper
   TEST_PASSWORD = "Password123!"
 
   def create_actor!(email)
-    User.find_or_create_by!(email: email) do |user|
-      user.password = TEST_PASSWORD
-      user.password_confirmation = TEST_PASSWORD
+    user = User.find_or_create_by!(email: email) do |actor|
+      actor.password = TEST_PASSWORD
+      actor.password_confirmation = TEST_PASSWORD
+    end
+    accept_seeded_studio_terms!(user)
+    user
+  end
+
+  # Terms 0.7.7+ falls back to the first root with live Terms (seeded Studio
+  # Workspace). Accept those so signed-in staff are not sent to Agree while
+  # exercising Pages / Admin / home.
+  def accept_seeded_studio_terms!(actor)
+    studio = Workspace.find_by(name: "Studio Workspace")
+    return unless studio
+
+    RecordingStudioTermsAndConditions.pending_published_list(actor, studio).each do |terms|
+      RecordingStudioTermsAndConditions.accept!(actor, terms, { "source" => "test" })
     end
   end
 
