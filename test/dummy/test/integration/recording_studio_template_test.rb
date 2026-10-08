@@ -8,7 +8,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal :application_layout, RecordingStudioRootSwitchable.configuration.layout
     assert_includes ApplicationController.ancestors, RecordingStudio::RootSwitchable::ControllerSupport
     assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
-    assert_equal "0.1.196", FlatPack::VERSION
+    assert_equal "0.1.198", FlatPack::VERSION
   end
 
   test "dummy app validates recordable declarations" do
@@ -22,6 +22,11 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
 
     assert connection.column_exists?(:recording_studio_recordings, :root_recording_id)
     assert connection.table_exists?(:recording_studio_accesses)
+    assert connection.table_exists?(:recording_studio_access_invitations)
+    role = connection.columns(:recording_studio_accesses).find { |column| column.name == "role" }
+    assert_equal :string, role.type
+    assert connection.column_exists?(:recording_studio_attachable_attachments, :root_recording_id)
+    assert connection.column_exists?(:recording_studio_attachable_attachments, :caption)
     assert connection.table_exists?(:recording_studio_pages_pages)
     assert connection.table_exists?(:recording_studio_pages_sections)
     assert connection.column_exists?(:recording_studio_recordings, :recording_studio_orderable_position)
