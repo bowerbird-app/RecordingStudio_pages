@@ -17,8 +17,20 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
       user.password = TEST_PASSWORD
       user.password_confirmation = TEST_PASSWORD
     end
+    accept_seeded_studio_terms!(@user)
 
     sign_in @user
+  end
+
+  # Terms 0.7.7+ gates against the first root with live Terms (seeded Studio
+  # Workspace). Clear that for docs pages that are not about clickwrap.
+  def accept_seeded_studio_terms!(actor)
+    studio = Workspace.find_by(name: "Studio Workspace")
+    return unless studio
+
+    RecordingStudioTermsAndConditions.pending_published_list(actor, studio).each do |terms|
+      RecordingStudioTermsAndConditions.accept!(actor, terms, { "source" => "test" })
+    end
   end
 
   test "install page renders successfully" do

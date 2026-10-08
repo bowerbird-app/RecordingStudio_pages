@@ -22,11 +22,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
   end
 
   test "home page renders the root switch dropdown trigger" do
-    user = User.find_or_create_by!(email: "root-switch-test@example.com") do |record|
-      record.password = "Password123!"
-      record.password_confirmation = "Password123!"
-    end
-
+    user = create_actor!("root-switch-test@example.com")
     sign_in user
 
     workspace = Workspace.create!(name: "Dropdown Workspace")
@@ -42,11 +38,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
   end
 
   test "root switch page renders with the host default layout" do
-    user = User.find_or_create_by!(email: "root-switch-page-test@example.com") do |record|
-      record.password = "Password123!"
-      record.password_confirmation = "Password123!"
-    end
-
+    user = create_actor!("root-switch-page-test@example.com")
     sign_in user
 
     workspace = Workspace.create!(name: "Switch Page Workspace")
@@ -60,11 +52,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
   end
 
   test "switching returns to the current page when it is a valid internal route" do
-    user = User.find_or_create_by!(email: "root-switch-redirect-test@example.com") do |record|
-      record.password = "Password123!"
-      record.password_confirmation = "Password123!"
-    end
-
+    user = create_actor!("root-switch-redirect-test@example.com")
     sign_in user
 
     source_workspace = Workspace.create!(name: "Source Workspace")
@@ -84,11 +72,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
   end
 
   test "switching falls back to home when return_to is not a valid internal route" do
-    user = User.find_or_create_by!(email: "root-switch-fallback-test@example.com") do |record|
-      record.password = "Password123!"
-      record.password_confirmation = "Password123!"
-    end
-
+    user = create_actor!("root-switch-fallback-test@example.com")
     sign_in user
 
     source_workspace = Workspace.create!(name: "Fallback Source Workspace")

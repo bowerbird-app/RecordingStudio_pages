@@ -54,7 +54,7 @@ Sign-in is email first (**Continue with email**), then password. A Google Contin
 - `/users/sign_up` - Users signup. Create-password includes the terms continue notice when Terms or a Privacy Policy is live. With no current root, signup accepts against the first workspace that has live Terms (`Gate.root_for_signup`), which after `db:prepare` is usually the seeded Studio Workspace
 - `/terms/:uuid/:slug` - published Terms
 - `/privacy/:uuid/:slug` - published Privacy Policy
-- `/recording_studio_terms_and_conditions` - Agree screen for a signed-in person who still owes a tick
+- `/recording_studio_terms_and_conditions/acceptance` - Agree screen for a signed-in person who still owes a tick (engine root redirects here)
 - `/admin` also lists **Terms** for staff on the Admin root
 - `/docs/install`, `/docs/config`, `/docs/recordable_types`, `/docs/recordings_tree`, `/docs/gem_views`, `/docs/methods` - dummy-only starter pages
 - `/up` - Rails health check
