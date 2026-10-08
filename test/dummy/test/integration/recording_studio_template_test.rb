@@ -8,7 +8,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal :application_layout, RecordingStudioRootSwitchable.configuration.layout
     assert_includes ApplicationController.ancestors, RecordingStudio::RootSwitchable::ControllerSupport
     assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
-    assert_equal "0.1.198", FlatPack::VERSION
+    assert_equal "0.1.207", FlatPack::VERSION
   end
 
   test "dummy app validates recordable declarations" do
