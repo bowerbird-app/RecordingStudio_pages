@@ -8,7 +8,7 @@ Dummy and root Gemfiles pin Recording Studio to GitHub tag `v4.4.0`. The gemspec
 
 ## 0.3.11 terms and privacy
 
-Dummy installs Recording Studio Terms and Conditions `v0.8.1` and pins Users `v0.15.0`, Publishable `v0.4.4`, and Flatpack `v0.1.207`. Seeded Home footer links to the published Terms and Privacy Policy. Create-password agrees to both.
+Dummy installs Recording Studio Terms and Conditions `v0.8.1` and pins Users `v0.15.0`, Publishable `v0.6.0`, and Flatpack `v0.1.207`. Seeded Home footer links to the published Terms and Privacy Policy. Create-password agrees to both.
 
 Hosts that want the same documents install the terms gem, run its migrations, register `RecordingStudioTermsAndConditions::Terms`, and enable Admin `section :terms`. Page Builder does not depend on that gem. Existing footer links stay as saved.
 
@@ -37,7 +37,7 @@ That records one child per saved row, copies an item image onto that child, and 
 - Ruby 3.3 or newer
 - Rails 8.1 or newer
 - Recording Studio 4.x (`~> 4.1` in the gemspec; dummy GitHub tag `v4.4.0`)
-- Accessible dummy tag `v0.13.0`, Attachable dummy tag `v0.13.0`, Users dummy tag `v0.16.0`, Publishable dummy tag `v0.4.4`, Root Switchable dummy tag `v0.6.0`, Trashable dummy tag `v0.6.0`, Admin dummy tag `v2.1.0`
+- Accessible dummy tag `v0.13.0`, Attachable dummy tag `v0.13.0`, Users dummy tag `v0.16.0`, Publishable dummy tag `v0.6.0`, Root Switchable dummy tag `v0.6.0`, Trashable dummy tag `v0.6.0`, Admin dummy tag `v2.1.0`
 - Terms and Conditions dummy tag `v0.8.1`
 - FlatPack dummy tag `v0.1.213`
 - Public RubyGems and GitHub access for dependency installation
