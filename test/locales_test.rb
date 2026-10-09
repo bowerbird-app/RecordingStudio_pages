@@ -6,6 +6,8 @@ require "tmpdir"
 require "fileutils"
 
 class LocalesTest < ActiveSupport::TestCase
+  # I18n interpolation tokens use %{name}; RuboCop prefers %<name>s for Kernel#format.
+  # rubocop:disable Style/FormatStringToken
   EXPECTED = {
     "layout.page" => "Page",
     "index.title" => "Pages",
@@ -83,6 +85,7 @@ class LocalesTest < ActiveSupport::TestCase
     "fallbacks.mark" => "Mark",
     "fallbacks.more" => "More"
   }.freeze
+  # rubocop:enable Style/FormatStringToken
 
   test "engine ships only english locale files" do
     files = Dir[File.join(engine_locales_dir, "*")].map { |path| File.basename(path) }

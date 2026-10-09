@@ -49,7 +49,11 @@ module RecordingStudioPages
       def mark
         return if mark_url.blank?
 
-        helpers.image_tag(mark_url, alt: brand_name.presence || t("recording_studio.pages.fallbacks.mark"), class: "h-8 w-auto object-contain")
+        helpers.image_tag(
+          mark_url,
+          alt: brand_name.presence || t("recording_studio.pages.fallbacks.mark"),
+          class: "h-8 w-auto object-contain"
+        )
       end
 
       def name_button

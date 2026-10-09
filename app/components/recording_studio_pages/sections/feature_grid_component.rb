@@ -11,7 +11,8 @@ module RecordingStudioPages
         helpers.safe_join(
           [
             helpers.render(FlatPack::PageTitle::Component.new(
-                             title: @rendered.content["title"].presence || t("recording_studio.pages.fallbacks.features"),
+                             title: @rendered.content["title"].presence ||
+                                    t("recording_studio.pages.fallbacks.features"),
                              subtitle: @rendered.content["body"].to_s.presence,
                              variant: :h2
                            )),
