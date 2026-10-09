@@ -8,11 +8,6 @@ module RecordingStudioPages
       app.config.assets.paths << root.join("app/javascript") if app.config.respond_to?(:assets)
     end
 
-    initializer "recording_studio_pages.locales" do |app|
-      locale_path = root.join("config/locales")
-      app.config.i18n.load_path += Dir[locale_path.join("*.yml")] if locale_path.exist?
-    end
-
     initializer "recording_studio_pages.helpers" do
       ActiveSupport.on_load(:action_controller) do
         next unless respond_to?(:helper)

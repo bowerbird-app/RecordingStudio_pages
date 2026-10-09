@@ -138,9 +138,13 @@ class LocalesTest < ActiveSupport::TestCase
     refute tree.key?("recording_studio_pages")
   end
 
-  test "engine registers locales initializer" do
+  test "engine does not register an explicit locales load path initializer" do
     names = RecordingStudioPages::Engine.initializers.map(&:name)
-    assert_includes names, "recording_studio_pages.locales"
+
+    refute_includes names, "recording_studio_pages.locales"
+    engine_source = File.read(File.expand_path("../lib/recording_studio_pages/engine.rb", __dir__))
+    refute_includes engine_source, "config.i18n.load_path"
+    refute_includes engine_source, "I18n.load_path"
   end
 
   test "restores i18n load path after temporary mutation" do

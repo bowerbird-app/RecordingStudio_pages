@@ -211,7 +211,7 @@ Dummy credentials (`test/dummy/config/credentials.yml.enc` plus development and 
 
 ## Interface text (I18n)
 
-Static interface copy in this gem’s own views, partials, components, and public layout uses Rails I18n under `recording_studio.pages.*`. English ships in `config/locales/en.yml`. Hosts override by adding their own locale files; host files load after the engine. This gem does not depend on `recording_studio_internationalization`, and it never shipped a top-level `recording_studio_pages.*` locale namespace.
+Static interface copy in this gem’s own views, partials, components, and public layout uses Rails I18n under `recording_studio.pages.*`. English ships in `config/locales/en.yml` and is loaded by the engine’s normal `config/locales` path (no extra `i18n.load_path` initializer). Hosts override by adding their own locale files; host files load after the engine. This gem does not depend on `recording_studio_internationalization`, and it never shipped a top-level `recording_studio_pages.*` locale namespace.
 
 Database content (page titles, section bodies) stays with the host. Controllers’ flash notices and recordable registration labels are unchanged.
 

@@ -12,8 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Static interface copy in this gem’s own views, partials, components, and public layout uses Rails I18n (English only).
 
 ### Added
-- `config/locales/en.yml` under `en.recording_studio.pages` for admin chrome, section editor labels, attachment picker copy, and section fallback titles.
+- `config/locales/en.yml` under `en.recording_studio.pages` for admin chrome, section editor labels, attachment picker copy, and section fallback titles. Rails engines load that directory; there is no explicit `i18n.load_path` initializer (so host locale files stay after the gem and can override English).
 - `test/locales_test.rb` checks that nested keys resolve, English values match, and only `en.yml` ships.
+- Dummy `pages_host_locale_override_test` proves a host `config/locales` override wins on the admin pages index.
 
 ### Changed
 - Gem views and ViewComponents call `t("recording_studio.pages...")` for buttons, labels, headings, empty states, aria-labels, placeholders, confirms, and hints. Rendered English is unchanged.
