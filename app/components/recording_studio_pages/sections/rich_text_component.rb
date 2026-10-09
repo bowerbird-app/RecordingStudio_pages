@@ -54,7 +54,7 @@ module RecordingStudioPages
       def heading
         helpers.content_tag(
           :h1,
-          @rendered.content["title"].presence || "Notes",
+          @rendered.content["title"].presence || t("recording_studio.pages.fallbacks.notes"),
           class: HEADING_CLASS
         )
       end

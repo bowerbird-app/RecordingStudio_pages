@@ -1,28 +1,28 @@
 <% recording_studio_pages_nav(
-     title: "New page",
+     title: t("recording_studio.pages.new.title"),
      back_url: admin_pages_path,
      anchor_url: RecordingStudioPages::Admin.admin_mount_path
    ) %>
 
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
-    title: "New page",
-    subtitle: "Give it a name. You can add sections next.",
+    title: t("recording_studio.pages.new.title"),
+    subtitle: t("recording_studio.pages.new.subtitle"),
     variant: :h1
   ) %>
 
   <%= form_with url: admin_pages_path, method: :post, local: true, class: "flex w-full max-w-xl flex-col gap-4" do %>
     <%= render FlatPack::TextInput::Component.new(
       name: "page[title]",
-      label: "Name",
+      label: t("recording_studio.pages.new.name"),
       value: params.dig(:page, :title)
     ) %>
     <%= render FlatPack::Checkbox::Component.new(
       name: "page[homepage]",
-      label: "Use as the public home page"
+      label: t("recording_studio.pages.new.homepage")
     ) %>
     <div class="flex flex-wrap items-center gap-3">
-      <%= render FlatPack::Button::Component.new(text: "Create page", style: :primary, size: :md, type: :submit) %>
+      <%= render FlatPack::Button::Component.new(text: t("recording_studio.pages.new.create"), style: :primary, size: :md, type: :submit) %>
     </div>
   <% end %>
 </div>

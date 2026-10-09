@@ -31,12 +31,12 @@
   <p
     class="<%= chosen ? "hidden " : "" %>text-sm text-[var(--surface-muted-content-color)]"
     data-recording-studio-pages--attachment-field-target="empty">
-    No picture yet.
+    <%= t("recording_studio.pages.attachment.empty") %>
   </p>
 
   <div class="flex flex-wrap gap-3">
     <%= render FlatPack::Button::Component.new(
-      text: "Choose image",
+      text: t("recording_studio.pages.attachment.choose"),
       style: :secondary,
       size: :md,
       type: "button",
@@ -44,7 +44,7 @@
     ) %>
     <span data-recording-studio-pages--attachment-field-target="remove" <% unless chosen %>hidden<% end %>>
       <%= render FlatPack::Button::Component.new(
-        text: "Remove",
+        text: t("recording_studio.pages.attachment.remove"),
         style: :secondary,
         size: :md,
         type: "button",
@@ -55,8 +55,8 @@
 
   <%= render "recording_studio_attachable/attachment_image_pickers/modal",
              modal_id: modal_id,
-             modal_title: "Choose an image",
+             modal_title: t("recording_studio.pages.attachment.modal_title"),
              recording: picker_recording,
-             search_aria_label: "Search images",
-             empty_state_text: "No pictures here yet. Upload one." %>
+             search_aria_label: t("recording_studio.pages.attachment.search_aria"),
+             empty_state_text: t("recording_studio.pages.attachment.empty_state") %>
 </div>

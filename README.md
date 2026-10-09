@@ -209,6 +209,12 @@ bin/dev
 
 Dummy credentials (`test/dummy/config/credentials.yml.enc` plus development and test env files) are encrypted with the shared RecordingStudio_* development master key. Set `RAILS_MASTER_KEY` or put that key in `test/dummy/config/master.key` (gitignored). Env files also need `test/dummy/config/credentials/development.key` and `test/dummy/config/credentials/test.key` with the same value unless `RAILS_MASTER_KEY` is set. Keep the encrypted files; do not generate a per-repo dummy key.
 
+## Interface text (I18n)
+
+Static interface copy in this gem’s own views, partials, components, and public layout uses Rails I18n under `recording_studio.pages.*`. English ships in `config/locales/en.yml`. Hosts override by adding their own locale files; host files load after the engine. This gem does not depend on `recording_studio_internationalization`, and it never shipped a top-level `recording_studio_pages.*` locale namespace.
+
+Database content (page titles, section bodies) stays with the host. Controllers’ flash notices and recordable registration labels are unchanged.
+
 Sign in with `admin@admin.com` / `Password`.
 
 - `/` visitors see the published homepage (seeded Home starts with a Menu, then a left-aligned hero). Signed-in people see the host home: sidebar, root switcher, example page buttons.

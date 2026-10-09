@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-09
+
+Static interface copy in this gem’s own views, partials, components, and public layout uses Rails I18n (English only).
+
+### Added
+- `config/locales/en.yml` under `en.recording_studio.pages` for admin chrome, section editor labels, attachment picker copy, and section fallback titles.
+- `test/locales_test.rb` checks that nested keys resolve, English values match, and only `en.yml` ships.
+
+### Changed
+- Gem views and ViewComponents call `t("recording_studio.pages...")` for buttons, labels, headings, empty states, aria-labels, placeholders, confirms, and hints. Rendered English is unchanged.
+- Public layout document title fallback uses I18n with an English `default:` so meta output never shows “Translation missing”.
+
+### Upgrade notes
+- Nothing to run. Hosts that override English can drop a locale file under `recording_studio.pages` (host files load after the engine).
+- This gem never shipped a top-level `recording_studio_pages.*` locale namespace. New strings use the nested `recording_studio.pages` keys only.
+- No dependency on `recording_studio_internationalization`. Public helpers and constants are unchanged.
+
 ## [0.3.12] - 2026-10-05
 
 Dummy signup terms test follows the root signup actually uses.

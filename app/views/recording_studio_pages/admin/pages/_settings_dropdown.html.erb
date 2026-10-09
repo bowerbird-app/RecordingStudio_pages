@@ -4,24 +4,24 @@
 <% end %>
 
 <%= render FlatPack::Button::Dropdown::Component.new(
-  text: "Settings",
+  text: t("recording_studio.pages.settings.label"),
   icon: "cog-6-tooth",
   style: :secondary,
   size: :md,
   placement: :bottom_right
 ) do |dropdown| %>
   <% dropdown.menu_item(
-    text: "Settings",
+    text: t("recording_studio.pages.settings.label"),
     icon: "cog-6-tooth",
     href: edit_admin_page_path(id: page_recording.id),
     data: { turbo_frame: "_top" }
   ) %>
   <% dropdown.menu_item(
-    text: "Trash",
+    text: t("recording_studio.pages.settings.trash"),
     icon: "trash",
     form: trash_page_form_id,
     type: "submit",
     destructive: true,
-    data: { turbo_confirm: "Trash this page?" }
+    data: { turbo_confirm: t("recording_studio.pages.settings.trash_confirm") }
   ) %>
 <% end %>

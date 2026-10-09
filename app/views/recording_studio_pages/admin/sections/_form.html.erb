@@ -8,7 +8,7 @@
   <div class="flex flex-col gap-4" data-controller="recording-studio-pages--style-fields">
     <% definition.fields.fields.each do |key, spec| %>
       <% if spec[:type].to_s == "cta" %>
-        <%= render FlatPack::Divider::Component.new(label: "Call to action") %>
+        <%= render FlatPack::Divider::Component.new(label: t("recording_studio.pages.sections.call_to_action")) %>
       <% end %>
       <%= render "recording_studio_pages/admin/sections/field",
                  prefix: "section[content]",
@@ -21,7 +21,7 @@
     <% if definition.variants.any? %>
       <%= render FlatPack::Select::Component.new(
         name: "section[settings][variant]",
-        label: "Layout",
+        label: t("recording_studio.pages.sections.layout"),
         value: settings_values["variant"] || definition.variants.first,
         options: definition.variants.map { |variant| [variant.humanize, variant] }
       ) %>
@@ -37,7 +37,7 @@
     <% end %>
 
     <% if style_settings.any? %>
-      <%= render FlatPack::Divider::Component.new(label: "Style") %>
+      <%= render FlatPack::Divider::Component.new(label: t("recording_studio.pages.sections.style")) %>
       <% style_settings.each do |key, spec| %>
         <% if spec[:show_when] %>
           <% show_when = spec[:show_when].to_h.symbolize_keys %>

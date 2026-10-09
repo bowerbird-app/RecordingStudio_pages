@@ -18,8 +18,8 @@
       <% if @unknown_sections.any? %>
         <%= render FlatPack::Alert::Component.new(
           style: :warning,
-          title: "Some sections are waiting on a missing type",
-          description: "Their content is still saved. Register the section type to edit them again."
+          title: t("recording_studio.pages.editor.unknown_sections_title"),
+          description: t("recording_studio.pages.editor.unknown_sections_description")
         ) %>
       <% end %>
 
@@ -43,8 +43,8 @@
         <% end %>
       <% else %>
         <%= render FlatPack::EmptyState::Component.new(
-          title: "Add your first section",
-          description: "Open Section and pick a type."
+          title: t("recording_studio.pages.editor.empty_sections_title"),
+          description: t("recording_studio.pages.editor.empty_sections_description")
         ) %>
       <% end %>
     </div>
@@ -55,8 +55,8 @@
         </div>
       <% else %>
         <%= render FlatPack::EmptyState::Component.new(
-          title: "Preview",
-          description: "Turn a section on and it shows up here."
+          title: t("recording_studio.pages.editor.preview_title"),
+          description: t("recording_studio.pages.editor.preview_description")
         ) %>
       <% end %>
     </div>

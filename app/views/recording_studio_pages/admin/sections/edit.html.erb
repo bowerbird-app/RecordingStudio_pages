@@ -1,5 +1,5 @@
 <% recording_studio_pages_nav(
-     title: "Edit section",
+     title: t("recording_studio.pages.sections.edit_title"),
      back_url: page_builder_page_path,
      anchor_url: RecordingStudioPages::Admin.admin_mount_path
    ) %>
@@ -7,14 +7,14 @@
 
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
-    title: @definition&.name || "Unknown section",
+    title: @definition&.name || t("recording_studio.pages.sections.unknown"),
     variant: :h1
   ) %>
 
   <div class="flex flex-wrap items-center gap-3">
     <% if @definition %>
       <%= render FlatPack::Button::Component.new(
-        text: "Update",
+        text: t("recording_studio.pages.sections.update"),
         style: :primary,
         size: :md,
         type: :submit,
@@ -23,7 +23,7 @@
       ) %>
     <% end %>
     <%= render FlatPack::Button::Component.new(
-      text: "Cancel",
+      text: t("recording_studio.pages.sections.cancel"),
       style: :default,
       size: :md,
       href: page_builder_page_path
@@ -48,8 +48,11 @@
       <% else %>
         <%= render FlatPack::Alert::Component.new(
           style: :warning,
-          title: "This section type is not registered",
-          description: "The saved content is still here. Register #{@section_recording.recordable.section_type} to edit it."
+          title: t("recording_studio.pages.sections.unregistered_title"),
+          description: t(
+            "recording_studio.pages.sections.unregistered_description",
+            section_type: @section_recording.recordable.section_type
+          )
         ) %>
       <% end %>
     </div>
@@ -61,8 +64,8 @@
       <% else %>
         <%= render FlatPack::Alert::Component.new(
           style: :info,
-          title: "Nothing to preview",
-          description: "Register this type and it shows up here."
+          title: t("recording_studio.pages.sections.nothing_preview_title"),
+          description: t("recording_studio.pages.sections.nothing_preview_description")
         ) %>
       <% end %>
     </div>

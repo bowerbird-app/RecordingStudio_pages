@@ -22,7 +22,7 @@ module RecordingStudioPages
       end
 
       def label
-        @rendered.content["name"].presence || @rendered.content["url"].presence || "Logo"
+        @rendered.content["name"].presence || @rendered.content["url"].presence || t("recording_studio.pages.fallbacks.logo")
       end
     end
   end

@@ -5,9 +5,9 @@
 <div class="flex flex-col gap-4" data-controller="recording-studio-pages--cta-fields">
   <%= render FlatPack::Select::Component.new(
     name: "#{cta_name}[type]",
-    label: spec[:label].presence || "Call to action",
+    label: spec[:label].presence || t("recording_studio.pages.sections.cta_label"),
     value: selected_type,
-    placeholder: "None",
+    placeholder: t("recording_studio.pages.sections.cta_none"),
     options: RecordingStudioPages.ctas.map { |definition| [definition.name, definition.key] }
   ) %>
 
@@ -28,7 +28,7 @@
                      section_recording: local_assigns[:section_recording] %>
         <% end %>
       <% else %>
-        <p class="text-sm text-[var(--surface-muted-content-color)]">This one draws itself. Nothing to fill in.</p>
+        <p class="text-sm text-[var(--surface-muted-content-color)]"><%= t("recording_studio.pages.sections.cta_draws_itself") %></p>
       <% end %>
     </div>
   <% end %>

@@ -30,8 +30,11 @@
     <% end %>
   <% else %>
     <%= render FlatPack::EmptyState::Component.new(
-      title: "Add a #{child_definitions.first&.name&.downcase || "piece"}",
-      description: "They show up on the page."
+      title: t(
+        "recording_studio.pages.sections.empty_children_title",
+        name: child_definitions.first&.name&.downcase || t("recording_studio.pages.sections.empty_children_piece")
+      ),
+      description: t("recording_studio.pages.sections.empty_children_description")
     ) %>
   <% end %>
 </div>
