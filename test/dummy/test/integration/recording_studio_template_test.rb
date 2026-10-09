@@ -8,13 +8,15 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal :application_layout, RecordingStudioRootSwitchable.configuration.layout
     assert_includes ApplicationController.ancestors, RecordingStudio::RootSwitchable::ControllerSupport
     assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
-    assert_equal "0.1.207", FlatPack::VERSION
+    assert_equal "0.1.213", FlatPack::VERSION
   end
 
   test "dummy app validates recordable declarations" do
     assert RecordingStudio.validate_recordable_declarations!
     assert_equal %w[AdminRoot RecordingStudioUser::People Workspace].sort, RecordingStudio.root_recordable_types.sort
     assert_equal %w[Workspace Folder], RecordingStudio.allowed_parent_types_for("RecordingStudioPages::Page")
+    assert_includes RecordingStudio.configuration.recordable_types, "RecordingStudioAttachable::Library"
+    assert_includes RecordingStudio.configuration.recordable_types, "RecordingStudioAttachable::Placement"
   end
 
   test "dummy app schema keeps accessible grants and page builder tables" do
@@ -27,6 +29,8 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal :string, role.type
     assert connection.column_exists?(:recording_studio_attachable_attachments, :root_recording_id)
     assert connection.column_exists?(:recording_studio_attachable_attachments, :caption)
+    assert connection.table_exists?(:recording_studio_attachable_libraries)
+    assert connection.table_exists?(:recording_studio_attachable_placements)
     assert connection.table_exists?(:recording_studio_pages_pages)
     assert connection.table_exists?(:recording_studio_pages_sections)
     assert connection.column_exists?(:recording_studio_recordings, :recording_studio_orderable_position)
