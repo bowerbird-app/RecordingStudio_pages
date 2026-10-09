@@ -4,7 +4,7 @@ Next steps:
 
 1. Review config/initializers/recording_studio_pages.rb.
 2. Add `RecordingStudioPages::Page` and `RecordingStudioPages::Section` to `RecordingStudio.configuration.recordable_types`.
-3. Install Orderable's position column, Publishable's table, and Attachable. Publishable includes Attachable even when you only want slug and status. Section photos also use Attachable: add `RecordingStudioAttachable::Attachment` to `recordable_types`, mount the engine, and eager-load its Stimulus controllers. `RecordingStudioPages::Section` already opts in.
+3. Install Orderable's position column, Publishable's table, and Attachable. Publishable includes Attachable even when you only want slug and status. Section photos also use Attachable: add `RecordingStudioAttachable::Attachment` to `recordable_types` (and `Library` / `Placement` on Attachable `0.12+`), mount the engine, and eager-load its Stimulus controllers. `RecordingStudioPages::Section` already opts in.
 4. Install the engine migrations with `bin/rails generate recording_studio_pages:migrations`.
 5. Apply the migrations with `bin/rails db:migrate`.
 6. Mount Publishable at `/` and set `root to: "recording_studio_pages/homepages#show"`. Do not mount this engine at `/` if RS Admin already owns `/admin`.
