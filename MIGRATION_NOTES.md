@@ -37,9 +37,9 @@ That records one child per saved row, copies an item image onto that child, and 
 - Ruby 3.3 or newer
 - Rails 8.1 or newer
 - Recording Studio 4.x (`~> 4.1` in the gemspec; dummy GitHub tag `v4.4.0`)
-- Accessible dummy tag `v0.11.2`, Attachable dummy tag `v0.7.4`, Users dummy tag `v0.15.0`, Publishable dummy tag `v0.4.4`, Root Switchable dummy tag `v0.5.0`
+- Accessible dummy tag `v0.13.0`, Attachable dummy tag `v0.13.0`, Users dummy tag `v0.16.0`, Publishable dummy tag `v0.4.4`, Root Switchable dummy tag `v0.6.0`, Trashable dummy tag `v0.6.0`, Admin dummy tag `v2.1.0`
 - Terms and Conditions dummy tag `v0.8.1`
-- FlatPack dummy tag `v0.1.196`
+- FlatPack dummy tag `v0.1.213`
 - Public RubyGems and GitHub access for dependency installation
 
 ## Verification

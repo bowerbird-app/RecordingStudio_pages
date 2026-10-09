@@ -34,7 +34,9 @@ RecordingStudio.configure do |config|
     "Folder",
     "RecordingStudioPages::Page",
     "RecordingStudioPages::Section",
-    "RecordingStudioAttachable::Attachment"
+    "RecordingStudioAttachable::Attachment",
+    "RecordingStudioAttachable::Library",
+    "RecordingStudioAttachable::Placement"
   ]
   config.require_recordable_declarations = true
 end
@@ -242,7 +244,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.12. Dummy GitHub tags: Recording Studio `v4.4.0`, Accessible `v0.11.2`, Attachable `v0.7.4`, Users `v0.16.0`, Publishable `v0.4.4`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Trashable `v0.4.1`, Admin `v2.0.7`, Terms and Conditions `v0.8.1`, FlatPack `v0.1.207`.
+0.3.12. Dummy GitHub tags: Recording Studio `v4.4.0`, Accessible `v0.13.0`, Attachable `v0.13.0`, Users `v0.16.0`, Publishable `v0.4.4`, Orderable `v0.2.2`, Duplicatable `v0.4.1`, Trashable `v0.6.0`, Admin `v2.1.0`, Terms and Conditions `v0.8.1`, Root Switchable `v0.6.0`, FlatPack `v0.1.213`.
 
 ## Upgrade
 
@@ -250,12 +252,12 @@ These are limits in sibling gems. This gem documents them instead of forking the
 2. Mount Pages, Duplicatable, and Publishable. Keep Pages off `/`.
 3. `RecordingStudioPages::Section` already opts into Duplicatable and Attachable when those gems are loaded. Do not add a second copy path or a Pages-owned Image type. Do not enable Attachable on Page for section photos.
 4. Public pages load `flat_pack/application` and use the host Flatpack theme on `html` (`FlatPack.configuration.default_theme`). Dummy sets `rounded`.
-5. Pin Flatpack `v0.1.207` (or later) so Hero `align:` / `on:` and `--hero-overlay-min-height` work, List `orderable_url` persists drag, and Admin’s Flatpack constraint (`~> 0.1.207`) resolves. Product sidebars pass `show_version: false` on `FlatPack::Sidebar::Header` so the kit version stays off the Pages mark. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`. Pin Attachable `v0.7.4` (or later) for the image picker.
+5. Pin Flatpack `v0.1.213` (or later) so Attachable `0.12+` image modals resolve (`>= 0.1.213`), Hero `align:` / `on:` and `--hero-overlay-min-height` work, List `orderable_url` persists drag, and Admin’s Flatpack constraint (`~> 0.1.207`) resolves. Product sidebars pass `show_version: false` on `FlatPack::Sidebar::Header` so the kit version stays off the Pages mark. Pin Orderable `v0.2.2` (or later) so Copy and Add call `recording_studio_orderable_append!`. Pin Attachable `v0.13.0` (or later) for the image picker and i18n view copy.
 6. Gem screens use Recording Studio page nav. Dummy signed-in `/` is a sidebar shell with a root switcher. Dummy `/docs` keeps page-nav host chrome. Do not put that on gem screens.
 7. Install Recording Studio Trashable and keep Page’s `Capabilities::Trashable.to` so **Trash** calls `recording_studio_trashable_trash!`. Dummy mounts it at `/recording_studio_trashable`.
 8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.
 9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and call the Users OmniAuth helpers from a CTA component. Dummy Join and Walk in do that. The `continue_with_providers` partial is for the sign-in screen. Continue-with buttons follow Rails credentials under `omniauth:`.
-10. Built-in `image` fields are `{ type: :attachment, kind: :image }`. Old `image_url` rows still render. The next save writes `image` when someone picks a file. Mount Attachable, register `RecordingStudioAttachable::Attachment`, start Active Storage, and eager-load its Stimulus controllers. Public pages resolve ids to `rails_blob_path`. Copying a section copies that section's photos and rewrites the ids.
+10. Built-in `image` fields are `{ type: :attachment, kind: :image }`. Old `image_url` rows still render. The next save writes `image` when someone picks a file. Mount Attachable, register `RecordingStudioAttachable::Attachment` (and `Library` / `Placement` when on Attachable `0.12+`), start Active Storage, and eager-load its Stimulus controllers. Public pages resolve ids to `rails_blob_path`. Copying a section copies that section's photos and rewrites the ids.
 11. If you overrode the rich text component, take the extra bottom inset when a corner image is present (`pb-56`), or keep your layout on purpose.
 12. Built-in **Menu** (`top_nav`) is a full-bleed Flatpack TopNav section. Add it from **Section**. Old pages stay as they are until you add one. If you overrode `_section.html.erb`, take `full_bleed?` (Hero and Menu set `full_bleed: true`). Public layout should use `viewport-fit=cover`. Load Flatpack Stimulus (`controllers/flat_pack`) so **More** on a phone opens and so the bar frosts after scroll.
 13. RS Admin hub widgets need Turbo on the admin layout. Dummy imports `@hotwired/turbo-rails` and pins `controllers/recording_studio_admin`. Run `recording_studio_admin:install` in a host for that Stimulus pin. Without Turbo, Published and Drafts stay on the shimmer. Those cards open `/admin/screens/pages`. Drafts adds `status=Draft`. Published adds `status=Published`. If you overrode the Pages screen, take **Page** under the title (not in the top-right slot), columns Page / Home / Updated at / Status / Actions, live page names linked to the published URL, the Status filter (Draft / Scheduled / Published), Home page filter, Publishable status control, and the Edit / Trash row menu.
