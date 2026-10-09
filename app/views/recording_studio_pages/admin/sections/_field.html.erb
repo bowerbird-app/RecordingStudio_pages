@@ -19,8 +19,8 @@
 <% elsif type == :url %>
   <%= render FlatPack::UrlInput::Component.new(name: name, label: label, value: value, disabled: disabled) %>
 <% elsif type == :link %>
-  <%= render FlatPack::TextInput::Component.new(name: "#{name}[text]", label: "#{label} text", value: value.is_a?(Hash) ? value["text"] : nil, disabled: disabled) %>
-  <%= render FlatPack::UrlInput::Component.new(name: "#{name}[url]", label: "#{label} URL", value: value.is_a?(Hash) ? value["url"] : nil, disabled: disabled) %>
+  <%= render FlatPack::TextInput::Component.new(name: "#{name}[text]", label: t("recording_studio.pages.fields.link_text", label: label), value: value.is_a?(Hash) ? value["text"] : nil, disabled: disabled) %>
+  <%= render FlatPack::UrlInput::Component.new(name: "#{name}[url]", label: t("recording_studio.pages.fields.link_url", label: label), value: value.is_a?(Hash) ? value["url"] : nil, disabled: disabled) %>
 <% elsif type == :list %>
   <% items = RecordingStudioPages::FieldSchema.list_entries(value) %>
   <div class="flex flex-col gap-4">
@@ -38,7 +38,7 @@
         <% end %>
         <%= render FlatPack::Checkbox::Component.new(
           name: "#{name}[#{index}][_destroy]",
-          label: "Remove this item",
+          label: t("recording_studio.pages.fields.remove_item"),
           checked: false,
           disabled: disabled
         ) %>
@@ -46,7 +46,7 @@
     <% end %>
     <% empty_index = items.length %>
     <div class="flex flex-col gap-3 rounded-[var(--radius-md)] border border-dashed border-[var(--surface-border-color)] p-4">
-      <p class="text-sm font-medium">Add <%= label.downcase.sub(/s$/, "") %></p>
+      <p class="text-sm font-medium"><%= t("recording_studio.pages.fields.add_item", item: label.downcase.sub(/s$/, "")) %></p>
       <% (spec[:item] || {}).each do |item_key, item_spec| %>
         <%= render "recording_studio_pages/admin/sections/field",
                    prefix: "#{name}[#{empty_index}]",
@@ -61,7 +61,7 @@
 <% elsif type == :recording_ids %>
   <%= render FlatPack::TextArea::Component.new(
     name: name,
-    label: "#{label} (one id per line)",
+    label: t("recording_studio.pages.fields.recording_ids", label: label),
     value: Array(value).join("\n"),
     disabled: disabled
   ) %>

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-09
+
+Static interface copy in this gem’s own views, partials, components, and public layout uses Rails I18n (English only).
+
+### Added
+- `config/locales/en.yml` under `en.recording_studio.pages` for admin chrome, section editor labels, attachment picker copy, and section fallback titles. Rails engines load that directory automatically; there is no explicit `i18n.load_path` initializer.
+- `test/locales_test.rb` checks that nested keys resolve, English values match, and only `en.yml` ships.
+- Dummy `pages_host_locale_override_test` proves a host `config/locales` override of `recording_studio.pages.index.subtitle` wins on the admin pages index (override is scoped to that test so default English UI stays elsewhere).
+
+### Changed
+- Gem views and ViewComponents call `t("recording_studio.pages...")` for buttons, labels, headings, empty states, aria-labels, placeholders, confirms, and hints. Rendered English is unchanged.
+- Public layout document title fallback uses I18n with an English `default:` so meta output never shows “Translation missing”.
+
+### Upgrade notes
+- Nothing to run. Hosts override English by adding the same keys under `recording_studio.pages` in their own `config/locales`; a host’s translations take precedence over the engine’s.
+- This gem never shipped a top-level `recording_studio_pages.*` locale namespace. New strings use the nested `recording_studio.pages` keys only.
+- No dependency on `recording_studio_internationalization`. Public helpers and constants are unchanged.
+
 ## [0.3.12] - 2026-10-05
 
 Dummy signup terms test follows the root signup actually uses.
@@ -358,7 +376,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.12...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.12...v0.4.0
 [0.3.12]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.11...v0.3.12
 [0.3.11]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.10...v0.3.11
 [0.3.10]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.9...v0.3.10

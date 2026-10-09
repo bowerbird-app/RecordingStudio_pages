@@ -23,7 +23,8 @@ module RecordingStudioPages
         helpers.safe_join(
           [
             helpers.render(FlatPack::PageTitle::Component.new(
-                             title: @rendered.content["title"].presence || "Image and text",
+                             title: @rendered.content["title"].presence ||
+                                    t("recording_studio.pages.fallbacks.image_and_text"),
                              subtitle: helpers.sanitize(@rendered.content["body"].to_s),
                              variant: :h2
                            )),

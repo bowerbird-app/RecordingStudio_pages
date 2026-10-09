@@ -20,29 +20,29 @@
     show_chevron: false,
     placement: :bottom_right,
     trigger_attributes: {
-      title: "Actions",
-      aria: { label: "Actions" }
+      title: t("recording_studio.pages.section_actions.actions"),
+      aria: { label: t("recording_studio.pages.section_actions.actions") }
     }
   ) do |dropdown| %>
     <% if definition %>
       <% dropdown.menu_item(
-        text: "Edit",
+        text: t("recording_studio.pages.section_actions.edit"),
         href: edit_admin_page_section_path(page_id: page_recording.id, id: recording.id),
         data: { turbo_frame: "_top" }
       ) %>
     <% end %>
     <% dropdown.menu_item(
-      text: "Copy",
+      text: t("recording_studio.pages.section_actions.copy"),
       form: section_action_form_id(recording, "copy"),
       type: "submit"
     ) %>
     <% dropdown.menu_item(
-      text: recordable.enabled? ? "Turn off" : "Turn on",
+      text: recordable.enabled? ? t("recording_studio.pages.section_actions.turn_off") : t("recording_studio.pages.section_actions.turn_on"),
       form: section_action_form_id(recording, "toggle"),
       type: "submit"
     ) %>
     <% dropdown.menu_item(
-      text: "Remove",
+      text: t("recording_studio.pages.section_actions.remove"),
       form: section_action_form_id(recording, "remove"),
       type: "submit",
       destructive: true

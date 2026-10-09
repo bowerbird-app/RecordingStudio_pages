@@ -91,7 +91,7 @@ module RecordingStudioPages
       end
 
       def title
-        content["title"].presence || "Untitled"
+        content["title"].presence || t("recording_studio.pages.fallbacks.untitled")
       end
 
       def tagline
