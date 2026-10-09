@@ -14,7 +14,7 @@ Static interface copy in this gem’s own views, partials, components, and publi
 ### Added
 - `config/locales/en.yml` under `en.recording_studio.pages` for admin chrome, section editor labels, attachment picker copy, and section fallback titles. Rails engines load that directory automatically; there is no explicit `i18n.load_path` initializer.
 - `test/locales_test.rb` checks that nested keys resolve, English values match, and only `en.yml` ships.
-- Dummy `pages_host_locale_override_test` proves a host `config/locales` override wins on the admin pages index.
+- Dummy `pages_host_locale_override_test` proves a host `config/locales` override of `recording_studio.pages.index.subtitle` wins on the admin pages index (override is scoped to that test so default English UI stays elsewhere).
 
 ### Changed
 - Gem views and ViewComponents call `t("recording_studio.pages...")` for buttons, labels, headings, empty states, aria-labels, placeholders, confirms, and hints. Rendered English is unchanged.
