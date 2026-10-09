@@ -93,32 +93,39 @@ class LocalesTest < ActiveSupport::TestCase
     assert_equal ["en.yml"], files.sort
   end
 
-  test "rails i18n load path includes the gem english locale file" do
-    locale_path = File.join(engine_locales_dir, "en.yml")
+  test "engine exposes config/locales for rails to load" do
+    locale_path = File.expand_path(File.join(engine_locales_dir, "en.yml"))
+    engine_locale_paths = RecordingStudioPages::Engine.paths["config/locales"].existent.map do |path|
+      File.expand_path(path)
+    end
 
-    assert_includes I18n.load_path.map { |path| File.expand_path(path) }, File.expand_path(locale_path)
+    assert_includes engine_locale_paths, locale_path
   end
 
   test "english page keys resolve without missing translations" do
-    I18n.with_locale(:en) do
-      EXPECTED.each do |key, english|
-        full_key = "recording_studio.pages.#{key}"
-        translation = I18n.t(full_key, default: nil)
+    with_gem_english_locales do
+      I18n.with_locale(:en) do
+        EXPECTED.each do |key, english|
+          full_key = "recording_studio.pages.#{key}"
+          translation = I18n.t(full_key, default: nil)
 
-        assert_equal english, translation, "#{full_key} should resolve to #{english.inspect}"
-        assert_equal english, I18n.t(full_key, raise: true)
+          assert_equal english, translation, "#{full_key} should resolve to #{english.inspect}"
+          assert_equal english, I18n.t(full_key, raise: true)
+        end
       end
     end
   end
 
   test "interpolated keys expand values" do
-    I18n.with_locale(:en) do
-      assert_equal(
-        "The saved content is still here. Register hero to edit it.",
-        I18n.t("recording_studio.pages.sections.unregistered_description", section_type: "hero")
-      )
-      assert_equal "Link text", I18n.t("recording_studio.pages.fields.link_text", label: "Link")
-      assert_equal "Add a feature", I18n.t("recording_studio.pages.sections.empty_children_title", name: "feature")
+    with_gem_english_locales do
+      I18n.with_locale(:en) do
+        assert_equal(
+          "The saved content is still here. Register hero to edit it.",
+          I18n.t("recording_studio.pages.sections.unregistered_description", section_type: "hero")
+        )
+        assert_equal "Link text", I18n.t("recording_studio.pages.fields.link_text", label: "Link")
+        assert_equal "Add a feature", I18n.t("recording_studio.pages.sections.empty_children_title", name: "feature")
+      end
     end
   end
 
@@ -171,5 +178,22 @@ class LocalesTest < ActiveSupport::TestCase
 
   def locale_tree(path, locale)
     YAML.safe_load_file(path, aliases: true).fetch(locale)
+  end
+
+  # Unit suite does not boot the dummy app. Load gem English only inside this
+  # helper and restore I18n.load_path afterward. Host-override coverage lives in
+  # test/dummy/test/integration/pages_host_locale_override_test.rb.
+  def with_gem_english_locales
+    original = I18n.load_path.dup
+    locale_path = File.expand_path(File.join(engine_locales_dir, "en.yml"))
+
+    begin
+      I18n.load_path << locale_path unless I18n.load_path.map { |path| File.expand_path(path) }.include?(locale_path)
+      I18n.backend.load_translations
+      yield
+    ensure
+      I18n.load_path.replace(original)
+      I18n.backend.load_translations
+    end
   end
 end
