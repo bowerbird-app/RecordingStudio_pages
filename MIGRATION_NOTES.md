@@ -4,7 +4,7 @@
 
 Dummy signup terms coverage now asserts against `Gate.first_root_with_live_terms`, the same root create-password accepts when there is no current root. Nothing to run in hosts.
 
-Dummy and root Gemfiles pin Recording Studio to GitHub tag `v4.4.0`. The gemspec stays `~> 4.1`. Upstream gem version at that tag is `4.4.0`.
+Dummy and root Gemfiles pin Recording Studio to GitHub tag `v4.5.0`. The gemspec stays `~> 4.1`. Upstream gem version at that tag is `4.5.0`.
 
 ## 0.3.11 terms and privacy
 
@@ -36,7 +36,7 @@ That records one child per saved row, copies an item image onto that child, and 
 
 - Ruby 3.3 or newer
 - Rails 8.1 or newer
-- Recording Studio 4.x (`~> 4.1` in the gemspec; dummy GitHub tag `v4.4.0`)
+- Recording Studio 4.x (`~> 4.1` in the gemspec; dummy GitHub tag `v4.5.0`)
 - Accessible dummy tag `v0.13.0`, Attachable dummy tag `v0.13.0`, Users dummy tag `v0.16.0`, Publishable dummy tag `v0.6.0`, Root Switchable dummy tag `v0.8.0` (Metrics `v0.2.0` for Root Switchable 0.7+), Trashable dummy tag `v0.6.0`, Admin dummy tag `v2.1.0`
 - Terms and Conditions dummy tag `v0.8.1`
 - FlatPack dummy tag `v0.1.213`
