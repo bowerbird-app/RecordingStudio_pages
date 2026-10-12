@@ -57,7 +57,11 @@ module RecordingStudioPages
       def editor_subtitle
         return unless page_recording.recordable.homepage?
 
-        "Public home is #{RecordingStudioPages.homepage_path}."
+        Copy.t(
+          "flashes.public_home_is",
+          path: RecordingStudioPages.homepage_path,
+          default: "Public home is #{RecordingStudioPages.homepage_path}."
+        )
       end
 
       def require_admin_access!

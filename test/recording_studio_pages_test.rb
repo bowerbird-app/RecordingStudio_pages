@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.4.0", ::RecordingStudioPages::VERSION
+    assert_equal "0.5.0", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -448,7 +448,7 @@ class RecordingStudioPagesTest < Minitest::Test
       File.expand_path("../app/controllers/recording_studio_pages/admin/sections_controller.rb", __dir__)
     )
     assert_includes controller, "edit_admin_page_section_path"
-    assert_includes controller, 'notice: "Updated."'
+    assert_includes controller, 'Copy.t("flashes.updated", default: "Updated.")'
     refute_includes controller, "Section saved."
     assert_includes controller, "flash.now[:notice] = added_notice"
     refute_includes controller, "helper_method :added_notice"
@@ -459,7 +459,7 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes pages_controller, "Template sections added."
     refute_includes pages_controller, "apply_template"
     refute_includes pages_controller, "template_key"
-    assert_includes pages_controller, 'notice: "In the trash."'
+    assert_includes pages_controller, 'Copy.t("flashes.in_the_trash", default: "In the trash.")'
 
     section_row = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/pages/_section_row.html.erb", __dir__)
@@ -474,7 +474,7 @@ class RecordingStudioPagesTest < Minitest::Test
       File.expand_path("../app/views/recording_studio_pages/admin/sections/_add_child.html.erb", __dir__)
     )
     assert_includes add_child, "flex flex-wrap items-center gap-3"
-    assert_includes add_child, "child.name"
+    assert_includes add_child, "pages_definition_name(child)"
     assert_includes section_row, 'icon: "arrows-up-down"'
     assert_includes section_row, "hover: true"
     assert_includes section_row, "FlatPack::Link::Component"

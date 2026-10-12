@@ -4,6 +4,7 @@
   <% setting_fields = definition.settings.fields.except(:variant) %>
   <% ungrouped_settings = setting_fields.reject { |_key, spec| spec[:group].to_s == "style" } %>
   <% style_settings = setting_fields.select { |_key, spec| spec[:group].to_s == "style" } %>
+  <% i18n_scope = pages_i18n_scope_for(definition) %>
   <%= hidden_field_tag "section[section_type]", definition.key %>
   <div class="flex flex-col gap-4" data-controller="recording-studio-pages--style-fields">
     <% definition.fields.fields.each do |key, spec| %>
@@ -15,6 +16,7 @@
                  key: key,
                  spec: spec,
                  value: content_values[key.to_s],
+                 i18n_scope: i18n_scope,
                  section_recording: local_assigns[:section_recording] %>
     <% end %>
 
@@ -33,6 +35,7 @@
                  spec: spec,
                  value: settings_values[key.to_s],
                  settings_values: settings_values,
+                 i18n_scope: i18n_scope,
                  section_recording: local_assigns[:section_recording] %>
     <% end %>
 
@@ -51,6 +54,7 @@
                        spec: spec,
                        value: settings_values[key.to_s],
                        settings_values: settings_values,
+                       i18n_scope: i18n_scope,
                        section_recording: local_assigns[:section_recording] %>
           </div>
         <% else %>
@@ -59,6 +63,7 @@
                      spec: spec,
                      value: settings_values[key.to_s],
                      settings_values: settings_values,
+                     i18n_scope: i18n_scope,
                      section_recording: local_assigns[:section_recording] %>
         <% end %>
       <% end %>

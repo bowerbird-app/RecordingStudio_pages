@@ -132,13 +132,16 @@ module RecordingStudioPages
     class PagesSection < RecordingStudioAdmin::Section
       key SECTION_KEY
       icon :document_text
-      title "Pages"
-      subtitle "Compose public pages from registered sections"
+      title ->(_context) { Copy.t("admin.section.title", default: "Pages") }
+      subtitle lambda { |_context|
+        Copy.t("admin.section.subtitle", default: "Compose public pages from registered sections")
+      }
       blast_radius :site
-      link :new_page, text: "Page",
+      link :new_page, text: ->(_context) { Copy.t("admin.section.new_page", default: "Page") },
                       url: ->(context) { RecordingStudioPages::Admin.new_page_path(anchor_url: RecordingStudioPages::Admin.incoming_anchor_url(context)) },
                       style: :primary
-      link :pages, text: "View all", url: ->(context) { RecordingStudioPages::Admin.screen_path_for(context) },
+      link :pages, text: ->(_context) { Copy.t("admin.section.view_all", default: "View all") },
+                   url: ->(context) { RecordingStudioPages::Admin.screen_path_for(context) },
                    style: :secondary
       widget "widgets.pages.published_pages", view_variant: :compact
       widget "widgets.pages.draft_pages", view_variant: :compact
@@ -146,10 +149,12 @@ module RecordingStudioPages
 
     class PagesScreen < RecordingStudioAdmin::Screen
       key SCREEN_KEY
-      title "Pages"
+      title ->(_context) { Copy.t("admin.screen.title", default: "Pages") }
+      # Plain string: Admin v2.1.0 indexes screen.subtitle without evaluate in
+      # available_admin_items_resolver#link_item_search_text (needs Marco to fix).
       subtitle "Compose public pages from sections."
       blast_radius :site
-      button :new_page, text: "Page",
+      button :new_page, text: ->(_context) { Copy.t("admin.screen.new_page", default: "Page") },
                         url: ->(context) { RecordingStudioPages::Admin.new_page_path(anchor_url: RecordingStudioPages::Admin.incoming_anchor_url(context)) },
                         style: :primary
 
@@ -180,6 +185,7 @@ module RecordingStudioPages
         filter :home_page,
                options: RecordingStudioPages::Composition::HOMEPAGE_OPTIONS,
                apply: HOMEPAGE_FILTER
+        # Column headers stay English (Marco accepted).
         column :title, title: "Page", sortable: false, value: TITLE_CELL
         column :homepage, title: "Home", sortable: false,
                           value: ->(recording, _context) { recording.recordable&.homepage? ? "Home" : "" }
@@ -196,16 +202,18 @@ module RecordingStudioPages
       blast_radius :site
 
       action :edit,
-             text: "Edit",
+             text: ->(_recording, _context) { Copy.t("admin.resource.edit", default: "Edit") },
              icon: "pencil-square",
              required_role: :view,
              blast_radius: :site,
              url: ->(recording, context) { RecordingStudioPages::Admin.page_path(recording, anchor_url: RecordingStudioPages::Admin.incoming_anchor_url(context)) }
       action :trash,
-             text: "Trash",
+             text: ->(_recording, _context) { Copy.t("admin.resource.trash", default: "Trash") },
              icon: "trash",
              method: :delete,
-             confirm: "Trash this page?",
+             confirm: lambda { |_recording, _context|
+               Copy.t("admin.resource.trash_confirm", default: "Trash this page?")
+             },
              destructive: true,
              required_role: :edit,
              blast_radius: :site,
@@ -213,8 +221,10 @@ module RecordingStudioPages
     end
 
     PublishedPagesWidget = RecordingStudioAdmin::Widget.new("widgets.pages.published_pages") do
-      title "Published"
-      info "Pages that are on the public site."
+      title ->(_context) { Copy.t("admin.widgets.published.title", default: "Published") }
+      info lambda { |_context|
+        Copy.t("admin.widgets.published.info", default: "Pages that are on the public site.")
+      }
       blast_radius :site
       value do |_context|
         RecordingStudioPages::Composition.published_pages_count
@@ -225,12 +235,14 @@ module RecordingStudioPages
           status: RecordingStudioPages::Composition::STATUS_PUBLISHED
         )
       end
-      link_label "Published"
+      link_label ->(_context) { Copy.t("admin.widgets.published.link_label", default: "Published") }
     end
 
     DraftPagesWidget = RecordingStudioAdmin::Widget.new("widgets.pages.draft_pages") do
-      title "Drafts"
-      info "Pages that are still a draft."
+      title ->(_context) { Copy.t("admin.widgets.drafts.title", default: "Drafts") }
+      info lambda { |_context|
+        Copy.t("admin.widgets.drafts.info", default: "Pages that are still a draft.")
+      }
       blast_radius :site
       value do |_context|
         RecordingStudioPages::Composition.draft_pages_count
@@ -238,7 +250,7 @@ module RecordingStudioPages
       link_to do |context|
         RecordingStudioPages::Admin.screen_path_for(context, status: RecordingStudioPages::Composition::STATUS_DRAFT)
       end
-      link_label "Drafts"
+      link_label ->(_context) { Copy.t("admin.widgets.drafts.link_label", default: "Drafts") }
     end
   end
 end

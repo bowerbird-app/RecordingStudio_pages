@@ -83,7 +83,30 @@ class LocalesTest < ActiveSupport::TestCase
     "fallbacks.image_and_text" => "Image and text",
     "fallbacks.untitled" => "Untitled",
     "fallbacks.mark" => "Mark",
-    "fallbacks.more" => "More"
+    "fallbacks.more" => "More",
+    "flashes.page_created" => "Page created.",
+    "flashes.page_saved" => "Page saved.",
+    "flashes.in_the_trash" => "In the trash.",
+    "flashes.updated" => "Updated.",
+    "flashes.section_removed" => "Section removed.",
+    "flashes.section_copied" => "Section copied.",
+    "flashes.section_added" => "Section added.",
+    "flashes.named_section_added" => "%{name} added.",
+    "flashes.choose_place" => "Choose a place in the list.",
+    "flashes.public_home_is" => "Public home is %{path}.",
+    "errors.choose_workspace" => "Choose a workspace for this page.",
+    "errors.pages_belong_in_workspace" => "Pages belong in a workspace or folder.",
+    "errors.section_belongs_under_parent" => "%{name} belongs under its parent section.",
+    "errors.section_sits_on_page" => "A section sits on a page or another section.",
+    "errors.section_does_not_belong" => "%{name} does not belong on this section.",
+    "errors.no_access_to_copy" => "You don't have access to copy this section.",
+    "admin.section.title" => "Pages",
+    "admin.section.subtitle" => "Compose public pages from registered sections",
+    "admin.resource.trash_confirm" => "Trash this page?",
+    "built_ins.sections.hero.name" => "Hero",
+    "built_ins.sections.hero.fields.image" => "Image",
+    "built_ins.ctas.button.name" => "Button",
+    "built_ins.ctas.button.fields.text" => "Button text"
   }.freeze
   # rubocop:enable Style/FormatStringToken
 
@@ -154,6 +177,24 @@ class LocalesTest < ActiveSupport::TestCase
     refute_includes engine_source, "I18n.load_path"
   end
 
+  test "lib ruby files never mention i18n load path" do
+    Dir[File.expand_path("../lib/**/*.rb", __dir__)].each do |path|
+      source = File.read(path)
+      refute_includes source, "i18n.load_path", path
+      refute_includes source, "I18n.load_path", path
+    end
+  end
+
+  test "copy helpers resolve english defaults without missing translations" do
+    with_gem_english_locales do
+      I18n.with_locale(:en) do
+        assert_equal "Page created.", RecordingStudioPages::Copy.t("flashes.page_created", default: "Page created.")
+        assert_equal "Hero", RecordingStudioPages::Copy.section_name("hero", default: "Hero")
+        assert_equal "Button text", RecordingStudioPages::Copy.field_label("ctas", "button", "text", default: "Button text")
+      end
+    end
+  end
+
   test "restores i18n load path after temporary mutation" do
     original = I18n.load_path.dup
     extra = File.join(Dir.tmpdir, "recording_studio_pages_locale_probe.yml")
@@ -180,20 +221,46 @@ class LocalesTest < ActiveSupport::TestCase
     YAML.safe_load_file(path, aliases: true).fetch(locale)
   end
 
-  # Unit suite does not boot the dummy app. Load gem English only inside this
-  # helper and restore I18n.load_path afterward. Host-override coverage lives in
+  # Unit suite does not boot the dummy app. Seed gem English via store_translations
+  # and restore a deep backend snapshot afterward. Host-override coverage lives in
   # test/dummy/test/integration/pages_host_locale_override_test.rb.
   def with_gem_english_locales
-    original = I18n.load_path.dup
-    locale_path = File.expand_path(File.join(engine_locales_dir, "en.yml"))
+    snapshot = i18n_backend_translations_snapshot
+    tree = locale_tree(File.join(engine_locales_dir, "en.yml"), "en")
+    I18n.backend.store_translations(:en, tree)
+    yield
+  ensure
+    restore_i18n_backend_translations(snapshot) if snapshot
+  end
 
-    begin
-      I18n.load_path << locale_path unless I18n.load_path.map { |path| File.expand_path(path) }.include?(locale_path)
-      I18n.backend.load_translations
-      yield
-    ensure
-      I18n.load_path.replace(original)
-      I18n.backend.load_translations
+  def i18n_backend_translations_snapshot
+    backend = I18n.backend
+    backend.send(:init_translations) unless backend.initialized?
+    translations =
+      if backend.respond_to?(:translations)
+        backend.translations
+      else
+        backend.instance_variable_get(:@translations)
+      end
+    return unless translations
+
+    deep_plain_copy(translations)
+  end
+
+  def restore_i18n_backend_translations(snapshot)
+    backend = I18n.backend
+    backend.instance_variable_set(:@translations, snapshot)
+    backend.instance_variable_set(:@initialized, true) if backend.instance_variable_defined?(:@initialized)
+  end
+
+  def deep_plain_copy(value)
+    case value
+    when Hash
+      value.transform_values { |child| deep_plain_copy(child) }
+    when Array
+      value.map { |child| deep_plain_copy(child) }
+    else
+      value
     end
   end
 end

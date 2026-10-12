@@ -20,7 +20,7 @@ module RecordingStudioPages
           settings: payload[:settings],
           actor: current_admin_actor
         )
-        return redirect_to(section_home_path(parent), alert: result.error) if result.failure?
+        return redirect_to(section_home_path(parent), alert: Copy.user_message(result.error)) if result.failure?
 
         if parent.recordable_type == "RecordingStudioPages::Section"
           redirect_to section_home_path(parent), notice: added_notice_for(payload[:section_type])
@@ -50,24 +50,25 @@ module RecordingStudioPages
         if result.failure?
           return redirect_to(
             edit_admin_page_section_path(page_id: page_recording.id, id: section_recording.id),
-            alert: result.error
+            alert: Copy.user_message(result.error)
           )
         end
 
         redirect_to edit_admin_page_section_path(page_id: page_recording.id, id: section_recording.id),
-                    notice: "Updated."
+                    notice: Copy.t("flashes.updated", default: "Updated.")
       end
 
       def destroy
         recording = section_recording
         parent = recording.parent_recording
         Services::RemoveSection.call(section_recording: recording, actor: current_admin_actor).value!
-        redirect_to section_home_path(parent), notice: "Section removed."
+        redirect_to section_home_path(parent),
+                    notice: Copy.t("flashes.section_removed", default: "Section removed.")
       end
 
       def reorder
         position = params[:target_position].to_i
-        return reject_reorder("Choose a place in the list.") if position < 1
+        return reject_reorder(Copy.t("flashes.choose_place", default: "Choose a place in the list.")) if position < 1
 
         moving = moving_section_recording
         result = Services::MoveSection.call(
@@ -76,7 +77,7 @@ module RecordingStudioPages
           to_index: position - 1,
           actor: current_admin_actor
         )
-        return reject_reorder(result.error.to_s) if result.failure?
+        return reject_reorder(Copy.user_message(result.error)) if result.failure?
 
         render json: { ok: true }
       end
@@ -99,9 +100,10 @@ module RecordingStudioPages
           section_recording: recording,
           actor: current_admin_actor
         )
-        return redirect_to(section_home_path(parent), alert: result.error) if result.failure?
+        return redirect_to(section_home_path(parent), alert: Copy.user_message(result.error)) if result.failure?
 
-        redirect_to section_home_path(parent), notice: "Section copied."
+        redirect_to section_home_path(parent),
+                    notice: Copy.t("flashes.section_copied", default: "Section copied.")
       end
 
       private
@@ -173,12 +175,15 @@ module RecordingStudioPages
       end
 
       def added_notice
-        "Section added."
+        Copy.t("flashes.section_added", default: "Section added.")
       end
 
       def added_notice_for(section_type)
-        name = RecordingStudioPages.find_section(section_type)&.name
-        name.present? ? "#{name} added." : added_notice
+        definition = RecordingStudioPages.find_section(section_type)
+        return added_notice if definition.blank? || definition.name.blank?
+
+        name = Copy.section_name(definition.key, default: definition.name)
+        Copy.t("flashes.named_section_added", name: name, default: "#{definition.name} added.")
       end
 
       def reject_reorder(message)

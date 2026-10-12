@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-12
+
+i18n WAVE 2: translate the gem's remaining user-facing English outside views (controller flashes, admin DSL copy where Admin evaluates callables, built-in field labels at render), plus wave-1 leftovers. Translation-only — English output stays byte-identical to main when hosts leave defaults alone. Lib/service return values and raised messages stay main's English literals; controllers map them through `Copy.user_message` at render.
+
+### Added
+- English Rails I18n keys under `recording_studio.pages` for flashes, admin section/screen/resource/widget copy, built-in section/CTA names and field/option labels, and known service/validation error strings (mapped at render).
+- `Copy.user_message` maps known English lib/service messages to locale keys at controller render, falling back to the raw message. Whole-message match runs first (so link-URL and variant errors with commas map); joined errors split on `, ` only when every part maps, otherwise the original string is returned byte-for-byte.
+- Host English override coverage: test-only fixture `test/dummy/test/locales/pages_host_override.en.yml` loaded via `I18n.backend.load_translations` (no `I18n.load_path` mutation) plus a real-page assert on the admin pages index subtitle.
+- Always-loaded boot-order guard `test/dummy/config/locales/recording_studio_pages_host.en.yml` for a rarely shown flash key (`flashes.choose_place`), with a render assert on a bad reorder.
+- Locale regression: every `lib/**/*.rb` file must not mention `i18n.load_path` / `I18n.load_path`.
+- Render-level English asserts for controller flashes, admin trash confirm, admin search (`compose` finds Pages), and lib English literals under `:fr`.
+
+### Changed
+- Controller flashes and editor homepage subtitle resolve through `Copy.t` with English `default:`.
+- Admin DSL titles/buttons/confirm/widget copy use callables where Admin evaluates them at render. Screen `subtitle` stays the main plain string so Admin search indexing works (Admin v2.1.0 reads it without `evaluate`). Homepage cell value stays plain `"Home"` like column headers.
+- Built-in section/CTA names and field/option labels stay English in registration (public catalog); views translate at render via helpers.
+- FieldSchema, SectionDefinition, and service error strings stay main's English literals; controllers translate via `Copy.user_message` at render.
+
+### Upgrade Notes
+- Install Pages `0.5.0`. No migration.
+- English hosts need no change. Copy new `recording_studio.pages.flashes.*`, `errors.*`, `admin.*`, and `built_ins.*` keys into host locale files when translating.
+- Hosts override by defining the same nested keys in their own `config/locales`. Composition status tokens and built-in catalog English stay; displayed copy follows the locale with those as `default:`.
+- Filter options keep raw English tokens (`Draft` / `Home` / …) for matching; only display labels elsewhere are translated.
+- No dependency on `recording_studio_internationalization`.
+
 ## [0.4.0] - 2026-10-09
 
 Static interface copy in this gem’s own views, partials, components, and public layout uses Rails I18n (English only).
@@ -376,7 +401,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.12...v0.4.0
 [0.3.12]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.11...v0.3.12
 [0.3.11]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.10...v0.3.11

@@ -1,9 +1,10 @@
+<% i18n_scope = local_assigns[:i18n_scope] %>
 <% if spec[:options].present? %>
   <%= render FlatPack::Select::Component.new(
     name: "section[settings][#{key}]",
-    label: spec[:label].presence || key.to_s.humanize,
+    label: pages_field_label(spec[:label], field_key: key, i18n_scope: i18n_scope),
     value: value,
-    options: spec[:options]
+    options: pages_setting_options(spec, field_key: key, i18n_scope: i18n_scope)
   ) %>
 <% else %>
   <%= render "recording_studio_pages/admin/sections/field",
@@ -12,5 +13,6 @@
              spec: spec,
              value: value,
              preview: pages_colour_preview(key, settings_values),
+             i18n_scope: i18n_scope,
              section_recording: local_assigns[:section_recording] %>
 <% end %>
