@@ -137,7 +137,7 @@ module RecordingStudioPages
       key SECTION_KEY
       icon :document_text
       title ->(_context) { Copy.t("admin.section.title", default: "Pages") }
-      subtitle ->(_context) {
+      subtitle lambda { |_context|
         Copy.t("admin.section.subtitle", default: "Compose public pages from registered sections")
       }
       blast_radius :site
@@ -154,7 +154,7 @@ module RecordingStudioPages
     class PagesScreen < RecordingStudioAdmin::Screen
       key SCREEN_KEY
       title ->(_context) { Copy.t("admin.screen.title", default: "Pages") }
-      subtitle ->(_context) {
+      subtitle lambda { |_context|
         Copy.t("admin.screen.subtitle", default: "Compose public pages from sections.")
       }
       blast_radius :site
@@ -192,7 +192,7 @@ module RecordingStudioPages
         # Column headers stay English (Marco accepted).
         column :title, title: "Page", sortable: false, value: TITLE_CELL
         column :homepage, title: "Home", sortable: false,
-                          value: ->(recording, _context) {
+                          value: lambda { |recording, _context|
                             recording.recordable&.homepage? ? RecordingStudioPages::Admin.homepage_badge_label : ""
                           }
         column :updated_at
@@ -217,7 +217,7 @@ module RecordingStudioPages
              text: ->(_recording, _context) { Copy.t("admin.resource.trash", default: "Trash") },
              icon: "trash",
              method: :delete,
-             confirm: ->(_recording, _context) {
+             confirm: lambda { |_recording, _context|
                Copy.t("admin.resource.trash_confirm", default: "Trash this page?")
              },
              destructive: true,
@@ -228,7 +228,7 @@ module RecordingStudioPages
 
     PublishedPagesWidget = RecordingStudioAdmin::Widget.new("widgets.pages.published_pages") do
       title ->(_context) { Copy.t("admin.widgets.published.title", default: "Published") }
-      info ->(_context) {
+      info lambda { |_context|
         Copy.t("admin.widgets.published.info", default: "Pages that are on the public site.")
       }
       blast_radius :site
@@ -246,7 +246,7 @@ module RecordingStudioPages
 
     DraftPagesWidget = RecordingStudioAdmin::Widget.new("widgets.pages.draft_pages") do
       title ->(_context) { Copy.t("admin.widgets.drafts.title", default: "Drafts") }
-      info ->(_context) {
+      info lambda { |_context|
         Copy.t("admin.widgets.drafts.info", default: "Pages that are still a draft.")
       }
       blast_radius :site

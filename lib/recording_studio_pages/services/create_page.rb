@@ -15,6 +15,7 @@ module RecordingStudioPages
           if @parent_recording.blank?
             raise Error, Copy.t("errors.choose_workspace", default: "Choose a workspace for this page.")
           end
+
           unless RecordingStudioPages.page_parent?(@parent_recording)
             raise Error, Copy.t(
               "errors.pages_belong_in_workspace",

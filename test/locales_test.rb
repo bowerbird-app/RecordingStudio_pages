@@ -261,7 +261,7 @@ class LocalesTest < ActiveSupport::TestCase
   def deep_plain_copy(value)
     case value
     when Hash
-      value.each_with_object({}) { |(key, child), copy| copy[key] = deep_plain_copy(child) }
+      value.transform_values { |child| deep_plain_copy(child) }
     when Array
       value.map { |child| deep_plain_copy(child) }
     else
@@ -269,4 +269,3 @@ class LocalesTest < ActiveSupport::TestCase
     end
   end
 end
-

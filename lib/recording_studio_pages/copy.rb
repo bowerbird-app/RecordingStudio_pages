@@ -11,8 +11,8 @@ module RecordingStudioPages
 
     module_function
 
-    def t(key, **options)
-      I18n.t("#{PREFIX}.#{key}", **options)
+    def t(key, **)
+      I18n.t("#{PREFIX}.#{key}", **)
     end
 
     def section_name(key, default:)
@@ -45,6 +45,11 @@ module RecordingStudioPages
           value
         ]
       end
+    end
+
+    def variant_must_be_one_of(variants)
+      list = Array(variants).join(", ")
+      t("errors.variant_must_be_one_of", variants: list, default: "variant must be one of: #{list}")
     end
   end
 end
