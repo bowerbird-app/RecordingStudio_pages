@@ -58,7 +58,7 @@ class PagesHostLocaleOverrideTest < ActionDispatch::IntegrationTest
 
   # Test-only fixture applied via backend.load_translations(file) on top of the
   # already-initialized backend — never mutates I18n.load_path (Marshal).
-  test "fresh-backend last-file-wins host fixture overrides gem english on pages index" do
+  test "host locale file overrides gem pages index subtitle on the real admin pages index" do
     assert File.exist?(FRESH_HOST_LOCALE), "expected test-only host override fixture at #{FRESH_HOST_LOCALE}"
     assert_includes File.read(FRESH_HOST_LOCALE), HOST_SUBTITLE
 
