@@ -7,7 +7,7 @@
 
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
-    title: @definition&.name || t("recording_studio.pages.sections.unknown"),
+    title: (@definition && pages_definition_name(@definition)) || t("recording_studio.pages.sections.unknown"),
     variant: :h1
   ) %>
 

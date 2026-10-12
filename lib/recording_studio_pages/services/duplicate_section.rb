@@ -11,7 +11,10 @@ module RecordingStudioPages
       def perform
         with_rescue do
           unless duplicatable_enabled?
-            raise Error, "Enable Recording Studio Duplicatable on the section type before copying sections"
+            raise Error, Copy.t(
+              "errors.enable_duplicatable",
+              default: "Enable Recording Studio Duplicatable on the section type before copying sections"
+            )
           end
 
           copy = duplicate_in_place
@@ -56,9 +59,12 @@ module RecordingStudioPages
 
       def copy_error_message(error)
         if defined?(RecordingStudioDuplicatable::AccessDenied) && error.is_a?(RecordingStudioDuplicatable::AccessDenied)
-          "You don't have access to copy this section."
+          Copy.t("errors.no_access_to_copy", default: "You don't have access to copy this section.")
         else
-          "Enable Recording Studio Duplicatable on the section type before copying sections"
+          Copy.t(
+            "errors.enable_duplicatable",
+            default: "Enable Recording Studio Duplicatable on the section type before copying sections"
+          )
         end
       end
 

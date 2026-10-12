@@ -55,6 +55,49 @@ module RecordingStudioPages
       end
     end
 
+    # Translate built-in section/CTA display names at render. Catalog `#name` stays English.
+    def pages_definition_name(definition)
+      return definition.name if definition.blank?
+      return definition.name unless definition.source.to_s == "recording_studio_pages"
+
+      if definition.is_a?(RecordingStudioPages::CtaDefinition)
+        Copy.cta_name(definition.key, default: definition.name)
+      else
+        Copy.section_name(definition.key, default: definition.name)
+      end
+    end
+
+    def pages_field_label(label, field_key:, i18n_scope: nil)
+      english = label.presence || field_key.to_s.humanize
+      return english if i18n_scope.blank?
+
+      kind, owner = i18n_scope.to_s.split(".", 2)
+      return english if kind.blank? || owner.blank?
+
+      Copy.field_label(kind, owner, field_key, default: english)
+    end
+
+    def pages_setting_options(spec, field_key:, i18n_scope: nil)
+      options = spec[:options]
+      return options if options.blank? || i18n_scope.blank?
+
+      kind, owner = i18n_scope.to_s.split(".", 2)
+      return options if kind.blank? || owner.blank?
+
+      Copy.translate_options(kind, owner, field_key, options)
+    end
+
+    def pages_i18n_scope_for(definition)
+      return if definition.blank?
+      return unless definition.source.to_s == "recording_studio_pages"
+
+      if definition.is_a?(RecordingStudioPages::CtaDefinition)
+        "ctas.#{definition.key}"
+      else
+        "sections.#{definition.key}"
+      end
+    end
+
     COLOUR_PREVIEWS = {
       "eyebrow_color" => { "dark" => "#cccccc", "light" => "#555555", "plain" => "#6b7280" },
       "title_color" => { "dark" => "#ffffff", "light" => "#222222", "plain" => "#171717" },

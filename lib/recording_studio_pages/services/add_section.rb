@@ -54,17 +54,28 @@ module RecordingStudioPages
         if parent_type == "RecordingStudioPages::Page"
           return if RecordingStudioPages.page_section?(definition.key)
 
-          raise Error, "#{definition.name} belongs under its parent section."
+          raise Error, Copy.t(
+            "errors.section_belongs_under_parent",
+            name: Copy.section_name(definition.key, default: definition.name),
+            default: "#{definition.name} belongs under its parent section."
+          )
         end
 
         unless parent_type == "RecordingStudioPages::Section"
-          raise Error, "A section sits on a page or another section."
+          raise Error, Copy.t(
+            "errors.section_sits_on_page",
+            default: "A section sits on a page or another section."
+          )
         end
 
         parent_definition = RecordingStudioPages.find_section(@parent_recording.recordable.section_type)
         return if parent_definition&.accepts_child?(definition.key)
 
-        raise Error, "#{definition.name} does not belong on this section."
+        raise Error, Copy.t(
+          "errors.section_does_not_belong",
+          name: Copy.section_name(definition.key, default: definition.name),
+          default: "#{definition.name} does not belong on this section."
+        )
       end
     end
   end

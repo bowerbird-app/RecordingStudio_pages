@@ -9,9 +9,9 @@ class AdminSectionTest < Minitest::Test
     view_all = admin.index("link :pages")
 
     assert_operator new_page, :<, view_all
-    assert_includes admin, "text: \"Page\""
+    assert_includes admin, 'Copy.t("admin.section.new_page", default: "Page")'
     assert_includes admin, "style: :primary"
-    assert_includes admin, "text: \"View all\""
+    assert_includes admin, 'Copy.t("admin.section.view_all", default: "View all")'
     assert_includes admin, "style: :secondary"
     refute_includes admin, "View pages"
     refute_includes admin, "New page"
@@ -39,8 +39,8 @@ class AdminSectionTest < Minitest::Test
 
     assert_includes admin, "status: RecordingStudioPages::Composition::STATUS_PUBLISHED"
     assert_includes admin, "status: RecordingStudioPages::Composition::STATUS_DRAFT"
-    assert_includes admin, "link_label \"Published\""
-    assert_includes admin, "link_label \"Drafts\""
+    assert_includes admin, 'Copy.t("admin.widgets.published.link_label", default: "Published")'
+    assert_includes admin, 'Copy.t("admin.widgets.drafts.link_label", default: "Drafts")'
     refute_includes admin, "Live pages"
   end
 
@@ -88,10 +88,10 @@ class AdminSectionTest < Minitest::Test
     admin = File.read(File.expand_path("../lib/recording_studio_pages/admin.rb", __dir__))
 
     assert_includes admin, "class PagesResource"
-    assert_includes admin, "text: \"Edit\""
+    assert_includes admin, 'Copy.t("admin.resource.edit", default: "Edit")'
     assert_includes admin, "action :trash"
-    assert_includes admin, "text: \"Trash\""
-    assert_includes admin, "confirm: \"Trash this page?\""
+    assert_includes admin, 'Copy.t("admin.resource.trash", default: "Trash")'
+    assert_includes admin, 'Copy.t("admin.resource.trash_confirm", default: "Trash this page?")'
     assert_includes admin, "method: :delete"
     assert_includes admin, "required_role: :edit"
     refute_includes admin, "action :open"

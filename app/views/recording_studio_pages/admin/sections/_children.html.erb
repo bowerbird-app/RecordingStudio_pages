@@ -32,7 +32,7 @@
     <%= render FlatPack::EmptyState::Component.new(
       title: t(
         "recording_studio.pages.sections.empty_children_title",
-        name: child_definitions.first&.name&.downcase || t("recording_studio.pages.sections.empty_children_piece")
+        name: (child_definitions.first && pages_definition_name(child_definitions.first).downcase) || t("recording_studio.pages.sections.empty_children_piece")
       ),
       description: t("recording_studio.pages.sections.empty_children_description")
     ) %>

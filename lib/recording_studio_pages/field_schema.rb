@@ -56,7 +56,9 @@ module RecordingStudioPages
         errors.concat(validate_value(key, spec, source[key.to_s]))
       end
       extra = source.keys - fields.keys.map(&:to_s)
-      extra.each { |key| errors << "#{key} is not a registered field" }
+      extra.each do |key|
+        errors << Copy.t("errors.field_not_registered", key: key, default: "#{key} is not a registered field")
+      end
       errors
     end
 
@@ -207,12 +209,18 @@ module RecordingStudioPages
     end
 
     def validate_value(key, spec, value)
-      return ["#{key} is required"] if spec[:required] && blank_value?(spec, value)
+      if spec[:required] && blank_value?(spec, value)
+        return [Copy.t("errors.field_required", key: key, default: "#{key} is required")]
+      end
 
       type = spec[:type].to_sym
       return url_error(key) if type == :url && value.present? && !safe_url?(value)
-      return ["#{key} must be true or false"] unless boolean_ok?(spec, value)
-      return ["#{key} must be an integer"] unless integer_ok?(spec, value)
+      unless boolean_ok?(spec, value)
+        return [Copy.t("errors.field_must_be_boolean", key: key, default: "#{key} must be true or false")]
+      end
+      unless integer_ok?(spec, value)
+        return [Copy.t("errors.field_must_be_integer", key: key, default: "#{key} must be an integer")]
+      end
       return validate_link(key, value) if type == :link
       return validate_cta(key, value) if type == :cta
       return validate_list(key, spec, value) if type == :list
@@ -237,7 +245,7 @@ module RecordingStudioPages
     end
 
     def url_error(key)
-      ["#{key} must be a URL"]
+      [Copy.t("errors.field_must_be_url", key: key, default: "#{key} must be a URL")]
     end
 
     def blank_value?(spec, value)
@@ -259,9 +267,13 @@ module RecordingStudioPages
     end
 
     def validate_recording_ids(key, value)
-      return ["#{key} must be a list of recording ids"] unless value.nil? || value.is_a?(Array)
+      return [] if value.nil? || value.is_a?(Array)
 
-      []
+      [Copy.t(
+        "errors.field_must_be_recording_ids",
+        key: key,
+        default: "#{key} must be a list of recording ids"
+      )]
     end
 
     def coerce_cta(value)
@@ -298,11 +310,17 @@ module RecordingStudioPages
       return [] if link["url"].blank?
       return [] if safe_url?(link["url"])
 
-      ["#{key}.url must be a http, https, or relative path"]
+      [Copy.t(
+        "errors.link_url_must_be_safe",
+        key: key,
+        default: "#{key}.url must be a http, https, or relative path"
+      )]
     end
 
     def validate_list(key, spec, value)
-      return ["#{key} must be a list"] unless value.nil? || value.is_a?(Array) || value.is_a?(Hash)
+      unless value.nil? || value.is_a?(Array) || value.is_a?(Hash)
+        return [Copy.t("errors.field_must_be_list", key: key, default: "#{key} must be a list")]
+      end
 
       list_entries(value).flat_map.with_index do |item, index|
         hash = stringify_keys(item)
@@ -342,7 +360,7 @@ module RecordingStudioPages
       return [] if value.blank?
       return [] if HEX_COLOR.match?(value.to_s.strip)
 
-      ["#{key} must be a colour"]
+      [Copy.t("errors.field_must_be_colour", key: key, default: "#{key} must be a colour")]
     end
 
     def validate_attachment(key, value)
@@ -352,7 +370,11 @@ module RecordingStudioPages
       return [] if safe_url?(text)
       return [] if text.match?(RECORDING_ID)
 
-      ["#{key} must be an image or a URL"]
+      [Copy.t(
+        "errors.field_must_be_image_or_url",
+        key: key,
+        default: "#{key} must be an image or a URL"
+      )]
     end
 
     def upgrade_attachment_hash(source, specs)

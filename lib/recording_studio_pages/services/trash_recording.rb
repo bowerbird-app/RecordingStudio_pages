@@ -33,7 +33,10 @@ module RecordingStudioPages
 
       def fallback_trash!
         unless @recording.has_attribute?(:trashed_at)
-          raise Error, "Install Recording Studio Trashable before removing this."
+          raise Error, Copy.t(
+            "errors.install_trashable",
+            default: "Install Recording Studio Trashable before removing this."
+          )
         end
 
         @recording.log_event!(action: "trashed", actor: actor) if @recording.respond_to?(:log_event!)

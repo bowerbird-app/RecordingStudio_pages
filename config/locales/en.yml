@@ -86,3 +86,137 @@ en:
         untitled: "Untitled"
         mark: "Mark"
         more: "More"
+      flashes:
+        page_created: "Page created."
+        page_saved: "Page saved."
+        in_the_trash: "In the trash."
+        updated: "Updated."
+        section_removed: "Section removed."
+        section_copied: "Section copied."
+        section_added: "Section added."
+        named_section_added: "%{name} added."
+        choose_place: "Choose a place in the list."
+        public_home_is: "Public home is %{path}."
+      errors:
+        choose_workspace: "Choose a workspace for this page."
+        pages_belong_in_workspace: "Pages belong in a workspace or folder."
+        section_belongs_under_parent: "%{name} belongs under its parent section."
+        section_sits_on_page: "A section sits on a page or another section."
+        section_does_not_belong: "%{name} does not belong on this section."
+        no_access_to_copy: "You don't have access to copy this section."
+        enable_duplicatable: "Enable Recording Studio Duplicatable on the section type before copying sections"
+        enable_orderable: "Enable Recording Studio Orderable on the page type before reordering sections"
+        install_trashable: "Install Recording Studio Trashable before removing this."
+        field_required: "%{key} is required"
+        field_must_be_url: "%{key} must be a URL"
+        field_must_be_boolean: "%{key} must be true or false"
+        field_must_be_integer: "%{key} must be an integer"
+        field_must_be_list: "%{key} must be a list"
+        field_must_be_recording_ids: "%{key} must be a list of recording ids"
+        field_must_be_colour: "%{key} must be a colour"
+        field_must_be_image_or_url: "%{key} must be an image or a URL"
+        field_not_registered: "%{key} is not a registered field"
+        link_url_must_be_safe: "%{key}.url must be a http, https, or relative path"
+        variant_must_be_one_of: "variant must be one of: %{variants}"
+      recordables:
+        page:
+          label: "Page"
+          plural_label: "Pages"
+        section:
+          label: "Section"
+          plural_label: "Sections"
+      admin:
+        section:
+          title: "Pages"
+          subtitle: "Compose public pages from registered sections"
+          new_page: "Page"
+          view_all: "View all"
+        screen:
+          title: "Pages"
+          subtitle: "Compose public pages from sections."
+          new_page: "Page"
+          homepage_badge: "Home"
+        resource:
+          edit: "Edit"
+          trash: "Trash"
+          trash_confirm: "Trash this page?"
+        widgets:
+          published:
+            title: "Published"
+            info: "Pages that are on the public site."
+            link_label: "Published"
+          drafts:
+            title: "Drafts"
+            info: "Pages that are still a draft."
+            link_label: "Drafts"
+      built_ins:
+        ctas:
+          button:
+            name: "Button"
+            fields:
+              text: "Button text"
+              url: "Button URL"
+        sections:
+          top_nav:
+            name: "Menu"
+            fields:
+              name: "Name"
+              image: "Mark"
+              links: "Links"
+              text: "Label"
+              url: "URL"
+              cta: "Join"
+          hero:
+            name: "Hero"
+            fields:
+              image: "Image"
+              alignment: "Align"
+              background: "Preset"
+              eyebrow_color: "Eyebrow"
+              title_color: "Headline"
+              body_color: "Subtitle"
+            options:
+              alignment:
+                center: "Center"
+                left: "Left"
+              background:
+                dark: "On a dark photo"
+                light: "On a light photo"
+          rich_text:
+            name: "Rich text"
+            fields:
+              image: "Image"
+              background: "Background"
+            options:
+              background:
+                default: "Default"
+                muted: "Muted"
+                inverted: "Inverted"
+          image_text:
+            name: "Image and text"
+            fields:
+              image: "Image"
+          logo:
+            name: "Logo"
+            fields:
+              name: "Name"
+              url: "URL"
+              image: "Image"
+          logo_cloud:
+            name: "Logo cloud"
+          feature:
+            name: "Feature"
+            fields:
+              image: "Image"
+          feature_grid:
+            name: "Feature grid"
+          call_to_action:
+            name: "Call to action"
+          footer:
+            name: "Footer"
+            fields:
+              name: "Name"
+              note: "Note"
+              links: "Links"
+              text: "Label"
+              url: "URL"

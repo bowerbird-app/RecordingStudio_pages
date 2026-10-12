@@ -101,7 +101,11 @@ module RecordingStudioPages
       variant = stringify_keys(settings)["variant"].to_s
       return [] if variant.blank? || variants.include?(variant)
 
-      ["variant must be one of: #{variants.join(', ')}"]
+      [Copy.t(
+        "errors.variant_must_be_one_of",
+        variants: variants.join(", "),
+        default: "variant must be one of: #{variants.join(', ')}"
+      )]
     end
 
     def run_custom_validations(content, settings)

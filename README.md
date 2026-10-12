@@ -213,9 +213,9 @@ Dummy credentials (`test/dummy/config/credentials.yml.enc` plus development and 
 
 ## Interface text (I18n)
 
-Static interface copy in this gem’s own views, partials, components, and public layout uses Rails I18n under `recording_studio.pages.*`. English ships in `config/locales/en.yml`. Rails engines load `config/locales` automatically (no extra `i18n.load_path` initializer). Hosts override by adding the same keys under `recording_studio.pages` in their own `config/locales`; a host’s translations take precedence over the engine’s. This gem does not depend on `recording_studio_internationalization`, and it never shipped a top-level `recording_studio_pages.*` locale namespace.
+User-facing copy in this gem’s views, controller flashes, admin DSL, built-in field labels (at render), and service/validation errors uses Rails I18n under `recording_studio.pages.*`. English ships in `config/locales/en.yml`. Rails engines load `config/locales` automatically (no extra `i18n.load_path` initializer). Hosts override by adding the same keys under `recording_studio.pages` in their own `config/locales`; a host’s translations take precedence over the engine’s. This gem does not depend on `recording_studio_internationalization`, and it never shipped a top-level `recording_studio_pages.*` locale namespace.
 
-Database content (page titles, section bodies) stays with the host. Controllers’ flash notices and recordable registration labels are unchanged.
+Database content (page titles, section bodies) stays with the host. Public constants (`Page::LABEL`, composition filter tokens, built-in catalog English) stay English; displayed copy resolves at call/render time with those as `default:`.
 
 Sign in with `admin@admin.com` / `Password`.
 

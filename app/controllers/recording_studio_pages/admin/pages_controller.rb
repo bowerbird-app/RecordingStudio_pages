@@ -20,7 +20,8 @@ module RecordingStudioPages
         )
         return render_failure(result, :new) if result.failure?
 
-        redirect_to admin_page_path(result.value), notice: "Page created."
+        redirect_to admin_page_path(result.value),
+                    notice: Copy.t("flashes.page_created", default: "Page created.")
       end
 
       def show
@@ -40,14 +41,16 @@ module RecordingStudioPages
         )
         return render_failure(result, :edit) if result.failure?
 
-        redirect_to admin_page_path(result.value), notice: "Page saved."
+        redirect_to admin_page_path(result.value),
+                    notice: Copy.t("flashes.page_saved", default: "Page saved.")
       end
 
       def destroy
         result = Services::RemovePage.call(page_recording: page_recording, actor: current_admin_actor)
         return redirect_to(admin_pages_path, alert: result.error) if result.failure?
 
-        redirect_to admin_pages_path, notice: "In the trash."
+        redirect_to admin_pages_path,
+                    notice: Copy.t("flashes.in_the_trash", default: "In the trash.")
       end
 
       private

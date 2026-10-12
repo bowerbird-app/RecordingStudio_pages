@@ -10,7 +10,7 @@
   <% end %>
   <div class="flex flex-wrap items-center gap-3">
     <%= render FlatPack::Button::Component.new(
-      text: child.name,
+      text: pages_definition_name(child),
       icon: "plus",
       style: :primary,
       size: :md,
@@ -39,7 +39,7 @@
   ) do |dropdown| %>
     <% child_definitions.each do |child| %>
       <% dropdown.menu_item(
-        text: child.name,
+        text: pages_definition_name(child),
         icon: child.menu_icon,
         form: "add-child-#{section_recording.id}-#{child.key}",
         type: "submit"
