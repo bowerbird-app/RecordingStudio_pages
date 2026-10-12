@@ -64,7 +64,9 @@ class LibEnglishLiteralsI18nTest < ActiveSupport::TestCase
           "errors" => {
             "choose_workspace" => "Choisissez un espace.",
             "field_required" => "%{key} est requis",
-            "variant_must_be_one_of" => "variant doit etre parmi: %{variants}"
+            "variant_must_be_one_of" => "variant doit etre parmi: %{variants}",
+            "link_url_must_be_safe" => "%{key}.url doit etre http, https, ou chemin relatif",
+            "field_must_be_url" => "%{key} doit etre une URL"
           }
         }
       }
@@ -77,12 +79,27 @@ class LibEnglishLiteralsI18nTest < ActiveSupport::TestCase
                    RecordingStudioPages::Copy.user_message("title is required")
       assert_equal "variant doit etre parmi: centered, full_width",
                    RecordingStudioPages::Copy.user_message("variant must be one of: centered, full_width")
+      assert_equal "cta.url doit etre http, https, ou chemin relatif",
+                   RecordingStudioPages::Copy.user_message(
+                     "cta.url must be a http, https, or relative path"
+                   )
+      assert_equal "title est requis, url doit etre une URL",
+                   RecordingStudioPages::Copy.user_message("title is required, url must be a URL")
       assert_equal "totally unknown boom",
                    RecordingStudioPages::Copy.user_message("totally unknown boom")
     end
   ensure
     I18n.available_locales = available_before
     restore_i18n_backend_translations(snapshot) if snapshot
+  end
+
+  test "copy user_message preserves unmapped english byte for byte" do
+    assert_equal "Two  spaces,  after comma",
+                 RecordingStudioPages::Copy.user_message("Two  spaces,  after comma")
+    assert_equal "Trailing comma, ",
+                 RecordingStudioPages::Copy.user_message("Trailing comma, ")
+    assert_equal " , ",
+                 RecordingStudioPages::Copy.user_message(" , ")
   end
 
   private

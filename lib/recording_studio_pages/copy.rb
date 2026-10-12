@@ -24,6 +24,13 @@ module RecordingStudioPages
       "Install Recording Studio Trashable before removing this." => "errors.install_trashable"
     }.freeze
 
+    # Patterns whose English already contains ", ". Match these on the whole
+    # message before any join-split so commas in the literal stay intact.
+    WHOLE_MESSAGE_PATTERNS = [
+      [/\A(.+)\.url must be a http, https, or relative path\z/, "errors.link_url_must_be_safe", :key],
+      [/\Avariant must be one of: (.+)\z/, "errors.variant_must_be_one_of", :variants]
+    ].freeze
+
     FIELD_ERROR_PATTERNS = [
       [/\A(.+) is required\z/, "errors.field_required", :key],
       [/\A(.+) must be a URL\z/, "errors.field_must_be_url", :key],
@@ -34,8 +41,6 @@ module RecordingStudioPages
       [/\A(.+) must be a colour\z/, "errors.field_must_be_colour", :key],
       [/\A(.+) must be an image or a URL\z/, "errors.field_must_be_image_or_url", :key],
       [/\A(.+) is not a registered field\z/, "errors.field_not_registered", :key],
-      [/\A(.+)\.url must be a http, https, or relative path\z/, "errors.link_url_must_be_safe", :key],
-      [/\Avariant must be one of: (.+)\z/, "errors.variant_must_be_one_of", :variants],
       [/\A(.+) belongs under its parent section\.\z/, "errors.section_belongs_under_parent", :name],
       [/\A(.+) does not belong on this section\.\z/, "errors.section_does_not_belong", :name]
     ].freeze
@@ -79,22 +84,43 @@ module RecordingStudioPages
     end
 
     # Map a lib/service English message to a locale string at render time.
-    # Unknown messages pass through unchanged.
+    # Unknown messages pass through byte-for-byte. Whole-message match runs
+    # first so patterns that contain ", " (link URL, variant list) still map.
+    # Joined validate_payload errors split only when every part maps.
     def user_message(message)
       english = message.to_s
       return english if english.blank?
+
+      known = translate_known_message(english)
+      return known if known
+
       return translate_joined_message(english) if english.include?(", ")
+
+      english
+    end
+
+    def translate_known_message(english)
       return t(STATIC_ERROR_KEYS[english], default: english) if STATIC_ERROR_KEYS.key?(english)
 
-      translate_pattern_message(english) || english
+      mapped = translate_pattern_message(english, WHOLE_MESSAGE_PATTERNS)
+      return mapped if mapped
+
+      # Ordinary field patterns must not swallow joined ", "-separated errors.
+      return nil if english.include?(", ")
+
+      translate_pattern_message(english, FIELD_ERROR_PATTERNS)
     end
 
     def translate_joined_message(english)
-      english.split(", ").map { |part| user_message(part.strip) }.join(", ")
+      parts = english.split(", ", -1)
+      mapped = parts.map { |part| translate_known_message(part) }
+      return english unless mapped.all?
+
+      mapped.join(", ")
     end
 
-    def translate_pattern_message(english)
-      FIELD_ERROR_PATTERNS.each do |pattern, key, capture|
+    def translate_pattern_message(english, patterns)
+      patterns.each do |pattern, key, capture|
         match = pattern.match(english)
         return t(key, capture => match[1], default: english) if match
       end

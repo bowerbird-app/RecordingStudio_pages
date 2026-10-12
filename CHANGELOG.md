@@ -13,7 +13,7 @@ i18n WAVE 2: translate the gem's remaining user-facing English outside views (co
 
 ### Added
 - English Rails I18n keys under `recording_studio.pages` for flashes, admin section/screen/resource/widget copy, built-in section/CTA names and field/option labels, and known service/validation error strings (mapped at render).
-- `Copy.user_message` maps known English lib/service messages to locale keys at controller render, falling back to the raw message.
+- `Copy.user_message` maps known English lib/service messages to locale keys at controller render, falling back to the raw message. Whole-message match runs first (so link-URL and variant errors with commas map); joined errors split on `, ` only when every part maps, otherwise the original string is returned byte-for-byte.
 - Host English override coverage: test-only fixture `test/dummy/test/locales/pages_host_override.en.yml` loaded via `I18n.backend.load_translations` (no `I18n.load_path` mutation) plus a real-page assert on the admin pages index subtitle.
 - Always-loaded boot-order guard `test/dummy/config/locales/recording_studio_pages_host.en.yml` for a rarely shown flash key (`flashes.choose_place`), with a render assert on a bad reorder.
 - Locale regression: every `lib/**/*.rb` file must not mention `i18n.load_path` / `I18n.load_path`.
