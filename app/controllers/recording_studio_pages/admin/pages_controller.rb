@@ -47,7 +47,7 @@ module RecordingStudioPages
 
       def destroy
         result = Services::RemovePage.call(page_recording: page_recording, actor: current_admin_actor)
-        return redirect_to(admin_pages_path, alert: result.error) if result.failure?
+        return redirect_to(admin_pages_path, alert: Copy.user_message(result.error)) if result.failure?
 
         redirect_to admin_pages_path,
                     notice: Copy.t("flashes.in_the_trash", default: "In the trash.")
@@ -94,7 +94,7 @@ module RecordingStudioPages
       end
 
       def render_failure(result, view)
-        flash.now[:alert] = result.error
+        flash.now[:alert] = Copy.user_message(result.error)
         render view, status: :unprocessable_entity
       end
     end

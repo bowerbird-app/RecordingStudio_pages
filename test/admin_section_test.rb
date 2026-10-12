@@ -31,8 +31,9 @@ class AdminSectionTest < Minitest::Test
     assert_includes admin, "ENGINE_MOUNT_PATH = \"/recording_studio_pages\""
     assert_includes admin, "sortable: false"
     assert_includes admin, "default_sort :updated_at"
-    assert_includes admin, "lambda { |recording, _context|"
-    assert_includes admin, "homepage_badge_label"
+    assert_includes admin, 'value: ->(recording, _context) { recording.recordable&.homepage? ? "Home" : "" }'
+    assert_includes admin, 'subtitle "Compose public pages from sections."'
+    refute_includes admin, "homepage_badge_label"
   end
 
   def test_hub_widgets_link_to_the_pages_screen

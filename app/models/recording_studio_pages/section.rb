@@ -19,12 +19,8 @@ module RecordingStudioPages
 
     self.table_name = "recording_studio_pages_sections"
 
-    LABEL = "Section"
-    PLURAL_LABEL = "Sections"
-
-    # recording_studio_recordable captures label at class load; keep English here.
-    recording_studio_recordable label: LABEL,
-                                plural_label: PLURAL_LABEL,
+    recording_studio_recordable label: "Section",
+                                plural_label: "Sections",
                                 root: false,
                                 allowed_parent_types: ["RecordingStudioPages::Page", "RecordingStudioPages::Section"]
 
@@ -44,14 +40,6 @@ module RecordingStudioPages
 
     if defined?(RecordingStudio::Capabilities::Orderable)
       include RecordingStudio::Capabilities::Orderable.to(allows: ["RecordingStudioPages::Section"])
-    end
-
-    def self.recordable_type_label
-      Copy.t("recordables.section.label", default: LABEL)
-    end
-
-    class << self
-      alias recording_studio_type_label recordable_type_label
     end
 
     def enabled?

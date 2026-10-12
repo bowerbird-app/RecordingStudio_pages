@@ -9,25 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.5.0] - 2026-10-12
 
-i18n WAVE 2: translate the gem's remaining user-facing English outside views (controller flashes, admin DSL copy, recordable labels, built-in field labels at render, service/validation errors), plus wave-1 leftovers. Translation-only — English output stays byte-identical to main when hosts leave defaults alone.
+i18n WAVE 2: translate the gem's remaining user-facing English outside views (controller flashes, admin DSL copy where Admin evaluates callables, built-in field labels at render), plus wave-1 leftovers. Translation-only — English output stays byte-identical to main when hosts leave defaults alone. Lib/service return values and raised messages stay main's English literals; controllers map them through `Copy.user_message` at render.
 
 ### Added
-- English Rails I18n keys under `recording_studio.pages` for flashes, admin section/screen/resource/widget copy, recordable labels, built-in section/CTA names and field/option labels, and user-facing service/validation errors.
+- English Rails I18n keys under `recording_studio.pages` for flashes, admin section/screen/resource/widget copy, built-in section/CTA names and field/option labels, and known service/validation error strings (mapped at render).
+- `Copy.user_message` maps known English lib/service messages to locale keys at controller render, falling back to the raw message.
 - Host English override coverage: test-only fixture `test/dummy/test/locales/pages_host_override.en.yml` loaded via `I18n.backend.load_translations` (no `I18n.load_path` mutation) plus a real-page assert on the admin pages index subtitle.
 - Always-loaded boot-order guard `test/dummy/config/locales/recording_studio_pages_host.en.yml` for a rarely shown flash key (`flashes.choose_place`), with a render assert on a bad reorder.
 - Locale regression: every `lib/**/*.rb` file must not mention `i18n.load_path` / `I18n.load_path`.
-- Render-level English asserts for controller flashes and admin trash confirm.
+- Render-level English asserts for controller flashes, admin trash confirm, admin search (`compose` finds Pages), and lib English literals under `:fr`.
 
 ### Changed
-- Controller flashes, editor homepage subtitle, admin DSL titles/buttons/confirm/widget copy, and homepage badge resolve through `Copy.t` with English `default:`.
-- `Page` / `Section` keep `LABEL` / `PLURAL_LABEL` constants and `recording_studio_recordable` English at class load; `recordable_type_label` resolves at call time.
+- Controller flashes and editor homepage subtitle resolve through `Copy.t` with English `default:`.
+- Admin DSL titles/buttons/confirm/widget copy use callables where Admin evaluates them at render. Screen `subtitle` stays the main plain string so Admin search indexing works (Admin v2.1.0 reads it without `evaluate`). Homepage cell value stays plain `"Home"` like column headers.
 - Built-in section/CTA names and field/option labels stay English in registration (public catalog); views translate at render via helpers.
-- User-facing service and field-schema validation strings resolve through `Copy.t` with English `default:`. Admin column headers stay English.
+- FieldSchema, SectionDefinition, and service error strings stay main's English literals; controllers translate via `Copy.user_message` at render.
 
 ### Upgrade Notes
 - Install Pages `0.5.0`. No migration.
-- English hosts need no change. Copy new `recording_studio.pages.flashes.*`, `errors.*`, `recordables.*`, `admin.*`, and `built_ins.*` keys into host locale files when translating.
-- Hosts override by defining the same nested keys in their own `config/locales`. Public constants (`LABEL`, composition status tokens, built-in catalog English) stay; displayed copy follows the locale with those as `default:`.
+- English hosts need no change. Copy new `recording_studio.pages.flashes.*`, `errors.*`, `admin.*`, and `built_ins.*` keys into host locale files when translating.
+- Hosts override by defining the same nested keys in their own `config/locales`. Composition status tokens and built-in catalog English stay; displayed copy follows the locale with those as `default:`.
 - Filter options keep raw English tokens (`Draft` / `Home` / …) for matching; only display labels elsewhere are translated.
 - No dependency on `recording_studio_internationalization`.
 

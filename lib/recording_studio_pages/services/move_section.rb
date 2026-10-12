@@ -13,10 +13,7 @@ module RecordingStudioPages
       def perform
         with_rescue do
           unless @page_recording.respond_to?(:recording_studio_orderable_move!)
-            raise Error, Copy.t(
-              "errors.enable_orderable",
-              default: "Enable Recording Studio Orderable on the page type before reordering sections"
-            )
+            raise Error, "Enable Recording Studio Orderable on the page type before reordering sections"
           end
 
           @page_recording.recording_studio_orderable_move!(

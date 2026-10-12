@@ -32,6 +32,21 @@ class PagesAdminI18nRenderTest < ActionDispatch::IntegrationTest
     follow_redirect!
   end
 
+  test "admin search for compose finds Pages via plain screen subtitle" do
+    switch_to_admin_root!
+
+    screen = RecordingStudioPages::Admin::PagesScreen
+    assert_instance_of String, screen.subtitle
+    refute_match(/#<Proc/i, screen.subtitle.to_s)
+
+    get "/admin/sections", params: { q: "compose" }
+    assert_response :success
+    assert_includes response.body, "Pages"
+    refute_includes response.body, "#<Proc"
+    # Search hit comes from screen subtitle indexed as a plain string.
+    assert_match(/compose public pages from sections/i, response.body)
+  end
+
   test "admin hub section and widgets render evaluated english never Proc" do
     switch_to_admin_root!
 

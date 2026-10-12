@@ -129,10 +129,6 @@ module RecordingStudioPages
     end
     private_class_method :public_page_link
 
-    def self.homepage_badge_label
-      Copy.t("admin.screen.homepage_badge", default: "Home")
-    end
-
     class PagesSection < RecordingStudioAdmin::Section
       key SECTION_KEY
       icon :document_text
@@ -154,9 +150,9 @@ module RecordingStudioPages
     class PagesScreen < RecordingStudioAdmin::Screen
       key SCREEN_KEY
       title ->(_context) { Copy.t("admin.screen.title", default: "Pages") }
-      subtitle lambda { |_context|
-        Copy.t("admin.screen.subtitle", default: "Compose public pages from sections.")
-      }
+      # Plain string: Admin v2.1.0 indexes screen.subtitle without evaluate in
+      # available_admin_items_resolver#link_item_search_text (needs Marco to fix).
+      subtitle "Compose public pages from sections."
       blast_radius :site
       button :new_page, text: ->(_context) { Copy.t("admin.screen.new_page", default: "Page") },
                         url: ->(context) { RecordingStudioPages::Admin.new_page_path(anchor_url: RecordingStudioPages::Admin.incoming_anchor_url(context)) },
@@ -192,9 +188,7 @@ module RecordingStudioPages
         # Column headers stay English (Marco accepted).
         column :title, title: "Page", sortable: false, value: TITLE_CELL
         column :homepage, title: "Home", sortable: false,
-                          value: lambda { |recording, _context|
-                            recording.recordable&.homepage? ? RecordingStudioPages::Admin.homepage_badge_label : ""
-                          }
+                          value: ->(recording, _context) { recording.recordable&.homepage? ? "Home" : "" }
         column :updated_at
         column :status, title: "Status", sortable: false, value: STATUS_ACTIONS
         admin_action SCREEN_KEY, :edit

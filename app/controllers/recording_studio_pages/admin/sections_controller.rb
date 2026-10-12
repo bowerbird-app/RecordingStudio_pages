@@ -20,7 +20,7 @@ module RecordingStudioPages
           settings: payload[:settings],
           actor: current_admin_actor
         )
-        return redirect_to(section_home_path(parent), alert: result.error) if result.failure?
+        return redirect_to(section_home_path(parent), alert: Copy.user_message(result.error)) if result.failure?
 
         if parent.recordable_type == "RecordingStudioPages::Section"
           redirect_to section_home_path(parent), notice: added_notice_for(payload[:section_type])
@@ -50,7 +50,7 @@ module RecordingStudioPages
         if result.failure?
           return redirect_to(
             edit_admin_page_section_path(page_id: page_recording.id, id: section_recording.id),
-            alert: result.error
+            alert: Copy.user_message(result.error)
           )
         end
 
@@ -77,7 +77,7 @@ module RecordingStudioPages
           to_index: position - 1,
           actor: current_admin_actor
         )
-        return reject_reorder(result.error.to_s) if result.failure?
+        return reject_reorder(Copy.user_message(result.error)) if result.failure?
 
         render json: { ok: true }
       end
@@ -100,7 +100,7 @@ module RecordingStudioPages
           section_recording: recording,
           actor: current_admin_actor
         )
-        return redirect_to(section_home_path(parent), alert: result.error) if result.failure?
+        return redirect_to(section_home_path(parent), alert: Copy.user_message(result.error)) if result.failure?
 
         redirect_to section_home_path(parent),
                     notice: Copy.t("flashes.section_copied", default: "Section copied.")

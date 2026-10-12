@@ -3,32 +3,34 @@
 require "test_helper"
 
 # Prove RecordingStudio Admin evaluates Pages DSL callables at the arity we use
-# (1-arg context for section/screen/widget/link/button copy; 2-arg record+context
-# for resource action text/confirm). English defaults must resolve — never a Proc.
+# (1-arg context for section/widget/link/button copy; 2-arg record+context for
+# resource action text/confirm). Screen subtitle stays a plain string because
+# Admin indexes it without evaluate.
 class AdminCopyCallablesTest < ActiveSupport::TestCase
   setup do
     @context = Object.new
     @record = Object.new
   end
 
-  test "admin section and screen copy callables resolve english at arity one" do
+  test "admin section copy callables resolve english at arity one" do
     section = RecordingStudioPages::Admin::PagesSection
-    screen = RecordingStudioPages::Admin::PagesScreen
 
     assert_equal 1, section.title.arity
     assert_equal 1, section.subtitle.arity
-    assert_equal 1, screen.title.arity
-    assert_equal 1, screen.subtitle.arity
-
     assert_equal "Pages", section.evaluate(section.title, @context)
     assert_equal "Compose public pages from registered sections",
                  section.evaluate(section.subtitle, @context)
-    assert_equal "Pages", screen.evaluate(screen.title, @context)
-    assert_equal "Compose public pages from sections.",
-                 screen.evaluate(screen.subtitle, @context)
-
     refute_match(/#<Proc/, section.evaluate(section.title, @context).to_s)
-    refute_match(/#<Proc/, screen.evaluate(screen.subtitle, @context).to_s)
+  end
+
+  test "admin screen subtitle is a plain string for search indexing" do
+    screen = RecordingStudioPages::Admin::PagesScreen
+
+    assert_instance_of String, screen.subtitle
+    assert_equal "Compose public pages from sections.", screen.subtitle
+    assert_equal 1, screen.title.arity
+    assert_equal "Pages", screen.evaluate(screen.title, @context)
+    refute_match(/#<Proc/, screen.subtitle)
   end
 
   test "admin link and button text callables resolve english at arity one" do
@@ -79,6 +81,5 @@ class AdminCopyCallablesTest < ActiveSupport::TestCase
     assert_equal "Edit", edit.send(:resolve_value, edit.text, @record, @context)
     assert_equal "Trash", trash.send(:resolve_value, trash.text, @record, @context)
     assert_equal "Trash this page?", trash.send(:resolve_value, trash.confirm, @record, @context)
-    assert_equal "Home", RecordingStudioPages::Admin.homepage_badge_label
   end
 end

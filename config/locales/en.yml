@@ -118,13 +118,6 @@ en:
         field_not_registered: "%{key} is not a registered field"
         link_url_must_be_safe: "%{key}.url must be a http, https, or relative path"
         variant_must_be_one_of: "variant must be one of: %{variants}"
-      recordables:
-        page:
-          label: "Page"
-          plural_label: "Pages"
-        section:
-          label: "Section"
-          plural_label: "Sections"
       admin:
         section:
           title: "Pages"
@@ -133,9 +126,7 @@ en:
           view_all: "View all"
         screen:
           title: "Pages"
-          subtitle: "Compose public pages from sections."
           new_page: "Page"
-          homepage_badge: "Home"
         resource:
           edit: "Edit"
           trash: "Trash"

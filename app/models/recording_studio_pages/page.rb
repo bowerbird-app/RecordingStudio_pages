@@ -19,18 +19,14 @@ module RecordingStudioPages
 
     self.table_name = "recording_studio_pages_pages"
 
-    LABEL = "Page"
-    PLURAL_LABEL = "Pages"
-
     parent_types = if RecordingStudioPages.respond_to?(:page_parent_types)
                      RecordingStudioPages.page_parent_types
                    else
                      %w[Workspace Folder]
                    end
 
-    # recording_studio_recordable captures label at class load; keep English here.
-    recording_studio_recordable label: LABEL,
-                                plural_label: PLURAL_LABEL,
+    recording_studio_recordable label: "Page",
+                                plural_label: "Pages",
                                 root: false,
                                 allowed_parent_types: parent_types
 
@@ -50,14 +46,6 @@ module RecordingStudioPages
     end
 
     include RecordingStudio::Capabilities::Trashable.to if defined?(RecordingStudio::Capabilities::Trashable)
-
-    def self.recordable_type_label
-      Copy.t("recordables.page.label", default: LABEL)
-    end
-
-    class << self
-      alias recording_studio_type_label recordable_type_label
-    end
 
     def homepage?
       homepage == true
