@@ -61,9 +61,9 @@ module RecordingStudioPages
       return definition.name unless definition.source.to_s == "recording_studio_pages"
 
       if definition.is_a?(RecordingStudioPages::CtaDefinition)
-        Copy.cta_name(definition.key, default: definition.name)
+        RecordingStudioPages::Copy.cta_name(definition.key, default: definition.name)
       else
-        Copy.section_name(definition.key, default: definition.name)
+        RecordingStudioPages::Copy.section_name(definition.key, default: definition.name)
       end
     end
 
@@ -74,7 +74,7 @@ module RecordingStudioPages
       kind, owner = i18n_scope.to_s.split(".", 2)
       return english if kind.blank? || owner.blank?
 
-      Copy.field_label(kind, owner, field_key, default: english)
+      RecordingStudioPages::Copy.field_label(kind, owner, field_key, default: english)
     end
 
     def pages_setting_options(spec, field_key:, i18n_scope: nil)
@@ -84,7 +84,7 @@ module RecordingStudioPages
       kind, owner = i18n_scope.to_s.split(".", 2)
       return options if kind.blank? || owner.blank?
 
-      Copy.translate_options(kind, owner, field_key, options)
+      RecordingStudioPages::Copy.translate_options(kind, owner, field_key, options)
     end
 
     def pages_i18n_scope_for(definition)
