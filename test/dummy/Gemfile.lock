@@ -38,13 +38,13 @@ GIT
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_duplicatable.git
-  revision: dee211d728bacc553a9b666164ca1d7a8bdcb9ab
-  tag: v0.4.1
+  revision: 5c976d3abf16d1f21c0dd8ee3504c2d2d4d5d30a
+  tag: v0.5.0
   specs:
-    recording_studio_duplicatable (0.4.1)
+    recording_studio_duplicatable (0.5.0)
       rails (~> 8.1.0)
       recording_studio (~> 4.2)
-      recording_studio_accessible (~> 0.6)
+      recording_studio_accessible (~> 0.15)
 
 GIT
   remote: https://github.com/bowerbird-app/RecordingStudio_metrics.git
@@ -812,7 +812,7 @@ CHECKSUMS
   recording_studio_accessible (0.15.0)
   recording_studio_admin (2.1.0)
   recording_studio_attachable (0.15.0)
-  recording_studio_duplicatable (0.4.1)
+  recording_studio_duplicatable (0.5.0)
   recording_studio_metrics (0.2.0)
   recording_studio_orderable (0.2.2)
   recording_studio_pages (0.5.0)
