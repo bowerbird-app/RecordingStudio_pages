@@ -3,9 +3,10 @@
 require "i18n"
 
 module RecordingStudioPages
-  # Rails I18n lookups for Pages user-facing copy. Every call passes
-  # `default:` English so a host locale without a fallback never shows
-  # "translation missing". Keys live under `recording_studio.pages.*`.
+  # Locale lookups for Pages user-facing copy via {RecordingStudio.t}.
+  # Keys live under `recording_studio.pages.*`. Fallback for missing active-locale
+  # keys comes from loaded English (host overrides included), then the caller's
+  # `default:`, then the gem-shipped English table registered at boot.
   #
   # Lib/services keep main's English literals. Controllers and views call
   # `user_message` to map those known English strings to locale keys at render.
@@ -48,7 +49,7 @@ module RecordingStudioPages
     module_function
 
     def t(key, **)
-      I18n.t("#{PREFIX}.#{key}", **)
+      RecordingStudio.t("#{PREFIX}.#{key}", **)
     end
 
     def section_name(key, default:)

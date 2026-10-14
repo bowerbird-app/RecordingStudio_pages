@@ -1,18 +1,18 @@
 <% recording_studio_pages_nav(
-     title: t("recording_studio.pages.index.title"),
+     title: RecordingStudio.t("recording_studio.pages.index.title"),
      back_url: RecordingStudioPages::Admin.admin_mount_path,
      anchor_url: RecordingStudioPages::Admin.admin_mount_path
    ) %>
 
 <div class="flex w-full flex-col gap-6">
   <%= render FlatPack::PageTitle::Component.new(
-    title: t("recording_studio.pages.index.title"),
-    subtitle: t("recording_studio.pages.index.subtitle"),
+    title: RecordingStudio.t("recording_studio.pages.index.title"),
+    subtitle: RecordingStudio.t("recording_studio.pages.index.subtitle"),
     variant: :h1
   ) do |page_title| %>
     <% page_title.slot do %>
       <%= render FlatPack::Button::Component.new(
-        text: t("recording_studio.pages.index.new_page"),
+        text: RecordingStudio.t("recording_studio.pages.index.new_page"),
         icon: "plus",
         href: new_admin_page_path,
         style: :primary,
@@ -24,16 +24,16 @@
   <% if @page_recordings.empty? %>
     <%= render FlatPack::Alert::Component.new(
       style: :info,
-      title: t("recording_studio.pages.index.empty_title"),
-      description: t("recording_studio.pages.index.empty_description")
+      title: RecordingStudio.t("recording_studio.pages.index.empty_title"),
+      description: RecordingStudio.t("recording_studio.pages.index.empty_description")
     ) %>
   <% else %>
     <%= render FlatPack::Table::Component.new(data: @page_recordings, class: "text-sm") do |table| %>
-      <% table.column(title: t("recording_studio.pages.index.column_page")) { |recording| recording.recordable&.title } %>
-      <% table.column(title: t("recording_studio.pages.index.column_home")) { |recording| recording.recordable&.homepage? ? t("recording_studio.pages.index.home_badge") : "" } %>
+      <% table.column(title: RecordingStudio.t("recording_studio.pages.index.column_page")) { |recording| recording.recordable&.title } %>
+      <% table.column(title: RecordingStudio.t("recording_studio.pages.index.column_home")) { |recording| recording.recordable&.homepage? ? RecordingStudio.t("recording_studio.pages.index.home_badge") : "" } %>
       <% table.column(title: "") { |recording|
         render FlatPack::Button::Component.new(
-          text: t("recording_studio.pages.index.open"),
+          text: RecordingStudio.t("recording_studio.pages.index.open"),
           href: admin_page_path(recording),
           style: :secondary,
           size: :sm

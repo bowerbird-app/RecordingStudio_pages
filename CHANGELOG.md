@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-14
+
+English fallback for missing `recording_studio.pages.*` keys via base `RecordingStudio.t` (RecordingStudio `~> 4.7`). When the active locale has no translation, fallback comes from the loaded English, host overrides included, then the caller’s `default:`, then the gem-shipped English table registered at boot. Only this gem’s `recording_studio.pages.*` keys go through `RecordingStudio.t` / `Copy.t`; other namespaces stay on their original `I18n.t` with main’s `default:`.
+
+### Added
+- Engine initializer `recording_studio_pages.register_shipped_english` calls `RecordingStudio::Translation.register_shipped_english` on `config/locales/en.yml` before `recording_studio.load_shipped_english`.
+- Behavioral coverage for `RecordingStudio.t` parity, fallback order, `_html` escaping, boot/reload of the merged shipped table, drift guard (no hand-copied English `default:` outside Admin DSL), registration of this gem’s `en.yml` path, and real-page deleted-key / boot-override renders.
+
+### Changed
+- Views, ViewComponents, controllers, and `Copy.t` resolve through `RecordingStudio.t` for `recording_studio.pages.*` only. `Copy.t` only prefixes and delegates — no fallback or escaping of its own. Hand-copied English `default:` values that matched `en.yml` were removed outside Admin DSL.
+- Gemspec requires `recording_studio ~> 4.7`. Root and dummy Gemfiles pin GitHub tag `v4.7.0`.
+- Admin DSL, persisted strings, and publish-path catalog English stay as on main. `en.yml` is byte-identical to main.
+
+### Upgrade Notes
+- Install Pages `0.6.0` and Recording Studio `~> 4.7`. No migration.
+- Fallback comes from the loaded English, host overrides included.
+- Missing `_html` key with a non-interpolating caller `default:` stays unsafe like view `t`; interpolating caller `default:` on a missing `_html` key is stricter (args escaped, result html_safe). An Array caller `default:` on a missing `_html` key is also marked html_safe by `RecordingStudio.t` (stricter than view `t`). A plain default with no interpolation is returned as a plain (non-html_safe) String, so views will escape it.
+- Prefer `RecordingStudio.t` / `Copy.t` for new `recording_studio.pages.*` call sites. Do not hand-copy English `default:` from `en.yml`.
+- Hosts override by defining the same nested keys in their own `config/locales`. No dependency on `recording_studio_internationalization`.
+
 ## [0.5.0] - 2026-10-12
 
 i18n WAVE 2: translate the gem's remaining user-facing English outside views (controller flashes, admin DSL copy where Admin evaluates callables, built-in field labels at render), plus wave-1 leftovers. Translation-only — English output stays byte-identical to main when hosts leave defaults alone. Lib/service return values and raised messages stay main's English literals; controllers map them through `Copy.user_message` at render.
@@ -401,7 +421,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.5.1...v0.6.0
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.12...v0.4.0
 [0.3.12]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.11...v0.3.12

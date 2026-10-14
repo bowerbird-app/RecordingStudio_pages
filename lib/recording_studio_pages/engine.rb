@@ -4,6 +4,15 @@ module RecordingStudioPages
   class Engine < ::Rails::Engine
     isolate_namespace RecordingStudioPages
 
+    initializer "recording_studio_pages.register_shipped_english",
+                before: "recording_studio.load_shipped_english" do
+      next unless RecordingStudio::Translation.respond_to?(:register_shipped_english)
+
+      RecordingStudio::Translation.register_shipped_english(
+        root.join("config/locales/en.yml")
+      )
+    end
+
     initializer "recording_studio_pages.assets" do |app|
       app.config.assets.paths << root.join("app/javascript") if app.config.respond_to?(:assets)
     end

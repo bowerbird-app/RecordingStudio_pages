@@ -59,8 +59,7 @@ module RecordingStudioPages
 
         Copy.t(
           "flashes.public_home_is",
-          path: RecordingStudioPages.homepage_path,
-          default: "Public home is #{RecordingStudioPages.homepage_path}."
+          path: RecordingStudioPages.homepage_path
         )
       end
 

@@ -1,10 +1,14 @@
 # Migration Notes
 
+## 0.6.0 English fallback
+
+Install Pages `0.6.0` with `recording_studio ~> 4.7`. No migration. English hosts need no change. A plain default with no interpolation is returned as a plain (non-html_safe) String, so views will escape it.
+
+Dummy and root Gemfiles pin Recording Studio to GitHub tag `v4.7.0`. The gemspec requires `recording_studio ~> 4.7`. Upstream gem version at that tag is `4.7.0`.
+
 ## 0.3.12 signup terms test root
 
 Dummy signup terms coverage now asserts against `Gate.first_root_with_live_terms`, the same root create-password accepts when there is no current root. Nothing to run in hosts.
-
-Dummy and root Gemfiles pin Recording Studio to GitHub tag `v4.6.0`. The gemspec stays `~> 4.1`. Upstream gem version at that tag is `4.6.0`.
 
 ## 0.3.11 terms and privacy
 
@@ -36,7 +40,7 @@ That records one child per saved row, copies an item image onto that child, and 
 
 - Ruby 3.3 or newer
 - Rails 8.1 or newer
-- Recording Studio 4.x (`~> 4.1` in the gemspec; dummy GitHub tag `v4.6.0`)
+- Recording Studio 4.x (`~> 4.7` in the gemspec; dummy GitHub tag `v4.7.0`)
 - Accessible dummy tag `v0.18.0`, Attachable dummy tag `v0.15.0`, Users dummy tag `v0.21.0`, Publishable dummy tag `v0.8.0`, Root Switchable dummy tag `v0.9.0` (Cache `v0.5.0` for Users 0.21+ / Root Switchable 0.9+; Metrics `v0.2.0` for Root Switchable 0.7+), Trashable dummy tag `v0.10.0`, Admin dummy tag `v2.3.0`
 - Terms and Conditions dummy tag `v0.8.1`
 - FlatPack dummy tag `v0.1.213`

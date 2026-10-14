@@ -213,9 +213,9 @@ Dummy credentials (`test/dummy/config/credentials.yml.enc` plus development and 
 
 ## Interface text (I18n)
 
-User-facing copy in this gem’s views, controller flashes, admin DSL (where Admin evaluates callables at render), and built-in field labels (at render) uses Rails I18n under `recording_studio.pages.*`. English ships in `config/locales/en.yml`. Rails engines load `config/locales` automatically (no extra `i18n.load_path` initializer). Hosts override by adding the same keys under `recording_studio.pages` in their own `config/locales`; a host’s translations take precedence over the engine’s. This gem does not depend on `recording_studio_internationalization`, and it never shipped a top-level `recording_studio_pages.*` locale namespace.
+User-facing copy in this gem’s views, controller flashes, admin DSL (where Admin evaluates callables at render), and built-in field labels (at render) uses `RecordingStudio.t` under `recording_studio.pages.*` only. English ships in `config/locales/en.yml`. The engine registers that file with `RecordingStudio::Translation.register_shipped_english` at boot so a missing active-locale key still shows the gem’s English (fallback comes from the loaded English, host overrides included, then caller `default:`, then the shipped table). `Copy.t` only prefixes and delegates to `RecordingStudio.t` — no fallback or escaping of its own. Host or other-namespace keys stay on their original `I18n.t` with main’s `default:`. Rails engines still load `config/locales` automatically (no extra `i18n.load_path` initializer). Hosts override by adding the same keys under `recording_studio.pages` in their own `config/locales`. Requires `recording_studio ~> 4.7`. A missing `_html` key with an Array caller `default:` is marked html_safe by `RecordingStudio.t` (stricter than view `t`). A plain default with no interpolation is returned as a plain (non-html_safe) String, so views will escape it. This gem does not depend on `recording_studio_internationalization`, and it never shipped a top-level `recording_studio_pages.*` locale namespace.
 
-Database content (page titles, section bodies) stays with the host. Composition filter tokens and built-in catalog English stay English; displayed copy resolves at render with those as `default:`. Lib/service error strings stay English literals and map through `Copy.user_message` at controller render.
+Database content (page titles, section bodies) stays with the host. Composition filter tokens and built-in catalog English stay English; displayed copy resolves at render through `RecordingStudio.t` / `Copy.t`. Lib/service error strings stay English literals and map through `Copy.user_message` at controller render.
 
 Sign in with `admin@admin.com` / `Password`.
 
@@ -244,9 +244,13 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.12. Dummy GitHub tags: Recording Studio `v4.6.0`, Accessible `v0.18.0`, Attachable `v0.15.0`, Users `v0.21.0`, Publishable `v0.8.0`, Orderable `v0.3.0`, Duplicatable `v0.5.0`, Trashable `v0.10.0`, Admin `v2.3.0`, Terms and Conditions `v0.8.1`, Root Switchable `v0.9.0`, Cache `v0.5.0`, Metrics `v0.2.0`, FlatPack `v0.1.213`.
+0.6.0. Gemspec requires `recording_studio ~> 4.7`. Dummy GitHub tags: Recording Studio `v4.7.0`, Accessible `v0.18.0`, Attachable `v0.15.0`, Users `v0.21.0`, Publishable `v0.8.0`, Orderable `v0.3.0`, Duplicatable `v0.5.0`, Trashable `v0.10.0`, Admin `v2.3.0`, Terms and Conditions `v0.8.1`, Root Switchable `v0.9.0`, Cache `v0.5.0`, Metrics `v0.2.0`, FlatPack `v0.1.213`.
 
 ## Upgrade
+
+### Upgrading to 0.6.0
+
+Install Pages `0.6.0` with `recording_studio ~> 4.7`. No migration. English hosts need no change. Gem-shipped `recording_studio.pages.*` keys fall back via `RecordingStudio.t` when the active locale has no translation. A plain default with no interpolation is returned as a plain (non-html_safe) String, so views will escape it. Prefer `RecordingStudio.t` / `Copy.t` for new gem keys.
 
 1. Bundle `recording_studio_pages` with Publishable, Orderable, and Duplicatable.
 2. Mount Pages, Duplicatable, and Publishable. Keep Pages off `/`.

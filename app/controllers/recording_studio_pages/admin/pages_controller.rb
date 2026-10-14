@@ -21,7 +21,7 @@ module RecordingStudioPages
         return render_failure(result, :new) if result.failure?
 
         redirect_to admin_page_path(result.value),
-                    notice: Copy.t("flashes.page_created", default: "Page created.")
+                    notice: Copy.t("flashes.page_created")
       end
 
       def show
@@ -42,7 +42,7 @@ module RecordingStudioPages
         return render_failure(result, :edit) if result.failure?
 
         redirect_to admin_page_path(result.value),
-                    notice: Copy.t("flashes.page_saved", default: "Page saved.")
+                    notice: Copy.t("flashes.page_saved")
       end
 
       def destroy
@@ -50,7 +50,7 @@ module RecordingStudioPages
         return redirect_to(admin_pages_path, alert: Copy.user_message(result.error)) if result.failure?
 
         redirect_to admin_pages_path,
-                    notice: Copy.t("flashes.in_the_trash", default: "In the trash.")
+                    notice: Copy.t("flashes.in_the_trash")
       end
 
       private

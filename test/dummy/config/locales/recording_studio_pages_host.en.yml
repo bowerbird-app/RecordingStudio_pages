@@ -1,7 +1,10 @@
-# Host override for a rarely shown Pages flash key (bad reorder position).
-# Kept out of the default happy-path UI so other dummy tests still see gem English.
+# Host override for a rarely shown Pages key on the new-page form.
+# Kept out of the default happy-path list UI so other dummy tests still see gem English.
+# choose_place stays for the boot-order JSON flash guard in pages_host_locale_override_test.
 en:
   recording_studio:
     pages:
       flashes:
         choose_place: "HOST Choose a place in the list."
+      new:
+        create: "HOST Create page"

@@ -24,7 +24,7 @@ module RecordingStudioPages
       def label
         @rendered.content["name"].presence ||
           @rendered.content["url"].presence ||
-          t("recording_studio.pages.fallbacks.logo")
+          RecordingStudio.t("recording_studio.pages.fallbacks.logo")
       end
     end
   end

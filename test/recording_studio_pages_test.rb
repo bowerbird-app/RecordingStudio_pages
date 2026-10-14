@@ -5,17 +5,17 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.5.0", ::RecordingStudioPages::VERSION
+    assert_equal "0.6.0", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
     assert_kind_of Class, ::RecordingStudioPages::Engine
   end
 
-  def test_gemspec_pins_recording_studio_4_1
+  def test_gemspec_requires_recording_studio_4_7
     gemspec = File.read(File.expand_path("../recording_studio_pages.gemspec", __dir__))
 
-    assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 4.1"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 4.7"'
     assert_includes gemspec, "https://github.com/bowerbird-app/RecordingStudio_pages"
   end
 
@@ -61,7 +61,7 @@ class RecordingStudioPagesTest < Minitest::Test
   def test_dummy_gemfile_pins_verified_github_tags
     gemfile = File.read(File.expand_path("dummy/Gemfile", __dir__))
 
-    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v4.6.0"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio", tag: "v4.7.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_accessible", tag: "v0.18.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.9.0"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_cache", tag: "v0.5.0"'
@@ -368,8 +368,8 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes editor, "FlatPack::Grid::Component.new(cols: 2"
     assert_includes editor, "FlatPack::Card::Component.new(padding: :md)"
     assert_includes editor, "FlatPack::EmptyState::Component"
-    assert_includes editor, 't("recording_studio.pages.editor.empty_sections_title")'
-    assert_includes editor, 't("recording_studio.pages.editor.preview_title")'
+    assert_includes editor, 'RecordingStudio.t("recording_studio.pages.editor.empty_sections_title")'
+    assert_includes editor, 'RecordingStudio.t("recording_studio.pages.editor.preview_title")'
     assert_includes editor, "render_publishable_quick_actions"
     assert_includes editor, "settings_dropdown"
     assert_operator editor.index("add_section_dropdown"), :<, editor.index("render_publishable_quick_actions")
@@ -388,7 +388,7 @@ class RecordingStudioPagesTest < Minitest::Test
       File.expand_path("../app/views/recording_studio_pages/admin/pages/_add_section_dropdown.html.erb", __dir__)
     )
     assert_includes add_section_dropdown, "turbo_stream: true"
-    assert_includes add_section_dropdown, 't("recording_studio.pages.add_section.label")'
+    assert_includes add_section_dropdown, 'RecordingStudio.t("recording_studio.pages.add_section.label")'
     assert_includes add_section_dropdown, 'icon: "plus"'
     assert_includes add_section_dropdown, "icon: definition.menu_icon"
     refute_includes add_section_dropdown, "Add section"
@@ -396,11 +396,11 @@ class RecordingStudioPagesTest < Minitest::Test
     settings_dropdown = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/pages/_settings_dropdown.html.erb", __dir__)
     )
-    assert_includes settings_dropdown, 't("recording_studio.pages.settings.label")'
+    assert_includes settings_dropdown, 'RecordingStudio.t("recording_studio.pages.settings.label")'
     assert_includes settings_dropdown, 'icon: "cog-6-tooth"'
-    assert_includes settings_dropdown, 't("recording_studio.pages.settings.trash")'
+    assert_includes settings_dropdown, 'RecordingStudio.t("recording_studio.pages.settings.trash")'
     assert_includes settings_dropdown, 'icon: "trash"'
-    assert_includes settings_dropdown, 't("recording_studio.pages.settings.trash_confirm")'
+    assert_includes settings_dropdown, 'RecordingStudio.t("recording_studio.pages.settings.trash_confirm")'
     assert_includes settings_dropdown, "method: :delete"
     refute_includes settings_dropdown, "Remove page"
 
@@ -429,9 +429,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes section_edit, "FlatPack::Grid::Component.new(cols: 2"
     assert_includes section_edit, "recording_studio_pages/pages/section"
     refute_includes section_edit, 'title: "Preview"'
-    assert_includes section_edit, 't("recording_studio.pages.sections.nothing_preview_title")'
-    assert_includes section_edit, 't("recording_studio.pages.sections.update")'
-    assert_includes section_edit, 't("recording_studio.pages.sections.cancel")'
+    assert_includes section_edit, 'RecordingStudio.t("recording_studio.pages.sections.nothing_preview_title")'
+    assert_includes section_edit, 'RecordingStudio.t("recording_studio.pages.sections.update")'
+    assert_includes section_edit, 'RecordingStudio.t("recording_studio.pages.sections.cancel")'
     assert_includes section_edit, "style: :default"
     assert_includes section_edit, "flex-wrap items-center gap-3"
     assert_includes section_edit, "form: section_form_id"
@@ -441,15 +441,15 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes form, 'text: "Update"'
     assert_includes form, "form_with"
     assert_includes form, "novalidate: true"
-    assert_includes form, 't("recording_studio.pages.sections.style")'
-    assert_includes form, 't("recording_studio.pages.sections.call_to_action")'
+    assert_includes form, 'RecordingStudio.t("recording_studio.pages.sections.style")'
+    assert_includes form, 'RecordingStudio.t("recording_studio.pages.sections.call_to_action")'
     assert_includes form, 'spec[:type].to_s == "cta"'
     assert_includes form, "style-fields"
     controller = File.read(
       File.expand_path("../app/controllers/recording_studio_pages/admin/sections_controller.rb", __dir__)
     )
     assert_includes controller, "edit_admin_page_section_path"
-    assert_includes controller, 'Copy.t("flashes.updated", default: "Updated.")'
+    assert_includes controller, 'Copy.t("flashes.updated")'
     refute_includes controller, "Section saved."
     assert_includes controller, "flash.now[:notice] = added_notice"
     refute_includes controller, "helper_method :added_notice"
@@ -460,7 +460,7 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes pages_controller, "Template sections added."
     refute_includes pages_controller, "apply_template"
     refute_includes pages_controller, "template_key"
-    assert_includes pages_controller, 'Copy.t("flashes.in_the_trash", default: "In the trash.")'
+    assert_includes pages_controller, 'Copy.t("flashes.in_the_trash")'
 
     section_row = File.read(
       File.expand_path("../app/views/recording_studio_pages/admin/pages/_section_row.html.erb", __dir__)
@@ -494,7 +494,7 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes append, "recording_studio_orderable_move!"
     assert_includes index, "description:"
     refute_includes index, "message:"
-    assert_includes index, 't("recording_studio.pages.index.new_page")'
+    assert_includes index, 'RecordingStudio.t("recording_studio.pages.index.new_page")'
     assert_includes index, 'icon: "plus"'
     refute_includes index, "New page"
     new_page = File.read(File.expand_path("../app/views/recording_studio_pages/admin/pages/new.html.erb", __dir__))
@@ -528,7 +528,7 @@ class RecordingStudioPagesTest < Minitest::Test
     refute_includes dummy_screen, "recording_studio_page_nav_right"
     assert_includes edit, "max-w-xl"
     assert_includes edit, "flex-wrap items-center gap-3"
-    assert_includes edit, 't("recording_studio.pages.edit.title")'
+    assert_includes edit, 'RecordingStudio.t("recording_studio.pages.edit.title")'
     refute_includes edit, "Remove page"
     refute_includes edit, "Edit page"
 
@@ -624,7 +624,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes field, ":attachment"
     assert_includes field, ":color"
     assert_includes field, "ColorSwatch"
-    assert_includes attachment_field, 't("recording_studio.pages.attachment.choose")'
+    assert_includes attachment_field, 'RecordingStudio.t("recording_studio.pages.attachment.choose")'
     assert_includes attachment_field, "recording-studio-attachable--attachment-image-picker"
     refute_includes attachment_field, "Image url"
     assert_includes built_ins, "type: :attachment"

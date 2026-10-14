@@ -4,7 +4,7 @@
 <% cta_label = if spec[:label].present?
                  pages_field_label(spec[:label], field_key: key, i18n_scope: local_assigns[:i18n_scope])
                else
-                 t("recording_studio.pages.sections.cta_label")
+                 RecordingStudio.t("recording_studio.pages.sections.cta_label")
                end %>
 
 <div class="flex flex-col gap-4" data-controller="recording-studio-pages--cta-fields">
@@ -12,7 +12,7 @@
     name: "#{cta_name}[type]",
     label: cta_label,
     value: selected_type,
-    placeholder: t("recording_studio.pages.sections.cta_none"),
+    placeholder: RecordingStudio.t("recording_studio.pages.sections.cta_none"),
     options: RecordingStudioPages.ctas.map { |definition| [pages_definition_name(definition), definition.key] }
   ) %>
 
@@ -35,7 +35,7 @@
                      section_recording: local_assigns[:section_recording] %>
         <% end %>
       <% else %>
-        <p class="text-sm text-[var(--surface-muted-content-color)]"><%= t("recording_studio.pages.sections.cta_draws_itself") %></p>
+        <p class="text-sm text-[var(--surface-muted-content-color)]"><%= RecordingStudio.t("recording_studio.pages.sections.cta_draws_itself") %></p>
       <% end %>
     </div>
   <% end %>

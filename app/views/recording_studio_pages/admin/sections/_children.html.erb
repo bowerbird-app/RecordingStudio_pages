@@ -30,11 +30,10 @@
     <% end %>
   <% else %>
     <%= render FlatPack::EmptyState::Component.new(
-      title: t(
-        "recording_studio.pages.sections.empty_children_title",
-        name: (child_definitions.first && pages_definition_name(child_definitions.first).downcase) || t("recording_studio.pages.sections.empty_children_piece")
+      title: RecordingStudio.t("recording_studio.pages.sections.empty_children_title",
+        name: (child_definitions.first && pages_definition_name(child_definitions.first).downcase) || RecordingStudio.t("recording_studio.pages.sections.empty_children_piece")
       ),
-      description: t("recording_studio.pages.sections.empty_children_description")
+      description: RecordingStudio.t("recording_studio.pages.sections.empty_children_description")
     ) %>
   <% end %>
 </div>
