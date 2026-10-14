@@ -15,7 +15,7 @@ class RecordingStudioPagesTest < Minitest::Test
   def test_gemspec_requires_recording_studio_4_7
     gemspec = File.read(File.expand_path("../recording_studio_pages.gemspec", __dir__))
 
-    assert_includes gemspec, 'spec.add_dependency "recording_studio", ">= 4.7.0"'
+    assert_includes gemspec, 'spec.add_dependency "recording_studio", "~> 4.7"'
     assert_includes gemspec, "https://github.com/bowerbird-app/RecordingStudio_pages"
   end
 

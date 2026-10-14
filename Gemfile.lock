@@ -11,7 +11,7 @@ PATH
   specs:
     recording_studio_pages (0.6.0)
       rails (~> 8.1.0)
-      recording_studio (>= 4.7.0)
+      recording_studio (~> 4.7)
       view_component (>= 3.0, < 5.0)
 
 GEM

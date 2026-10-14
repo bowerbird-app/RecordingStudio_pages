@@ -2,7 +2,6 @@
 
 require "test_helper"
 require "yaml"
-require "set"
 
 # Ensures production call sites for gem keys do not hand-copy English from
 # en.yml (or constants equal to those strings) as `default:`. English fallback
@@ -188,6 +187,7 @@ class EnglishDefaultDriftGuardTest < Minitest::Test
     end
   end
 
+  # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
   def read_ruby_expression(source, start)
     i = start
     i += 1 while i < source.length && source[i].match?(/\s/)
@@ -219,6 +219,7 @@ class EnglishDefaultDriftGuardTest < Minitest::Test
       source[i...j]
     end
   end
+  # rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
   def allowed_dynamic_default?(default_src)
     normalized = default_src.gsub(/\s+/, "")

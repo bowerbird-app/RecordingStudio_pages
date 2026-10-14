@@ -11,7 +11,7 @@ module RecordingStudioPages
         helpers.safe_join(
           [
             helpers.render(FlatPack::PageTitle::Component.new(
-                             title: @rendered.content["title"].presence || RecordingStudio.t("recording_studio.pages.fallbacks.logos"),
+                             title: logo_cloud_title,
                              variant: :h2
                            )),
             logo_row
@@ -20,6 +20,11 @@ module RecordingStudioPages
       end
 
       private
+
+      def logo_cloud_title
+        @rendered.content["title"].presence ||
+          RecordingStudio.t("recording_studio.pages.fallbacks.logos")
+      end
 
       def items
         children = RecordingStudioPages::Composition.renderable_child_section_recordings_for(@rendered.recording)

@@ -57,9 +57,18 @@ class PagesEnglishFallbackTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_includes @response.body, "Pages"
       assert_includes @response.body, "Compose a public page from registered sections."
-      assert_includes @response.body, "Nothing here yet"
+      assert_includes @response.body, RecordingStudio.t("recording_studio.pages.index.new_page")
       refute_match(/translation missing: [^"']*recording_studio\.pages/i, @response.body)
     end
+  end
+
+  test "pages en.yml is registered for shipped english at boot without calling the initializer" do
+    expected = File.expand_path(RecordingStudioPages::Engine.root.join("config/locales/en.yml"))
+    paths = RecordingStudio::Translation.send(:registered_shipped_english_paths)
+
+    assert_includes paths, expected,
+                    "engine boot must register pages en.yml (do not call the initializer in this test)"
+    assert_equal "Pages", RecordingStudio::Translation.shipped_english.fetch(INDEX_TITLE_KEY)
   end
 
   test "deleted english key on admin pages index shows shipped title without translation missing" do

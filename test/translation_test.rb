@@ -20,9 +20,6 @@ class TranslationTest < Minitest::Test
   def setup
     @previous_locales = I18n.available_locales
     I18n.available_locales = (@previous_locales + %i[en fr de xx]).uniq
-    # Unit suite does not boot Rails engines; mirror the boot-time registration.
-    RecordingStudio::Translation.register_shipped_english(pages_en_yml_path)
-    RecordingStudio::Translation.reset_shipped_english!
     reset_english_backend!
     clear_locale_translations!(:de)
     clear_locale_translations!(:fr)
@@ -46,6 +43,17 @@ class TranslationTest < Minitest::Test
         assert_equal english, RecordingStudioPages::Copy.t(relative)
       end
     end
+  end
+
+  def test_pages_en_yml_path_is_registered_with_recording_studio_translation
+    expected = File.expand_path(pages_en_yml_path)
+    paths = RecordingStudio::Translation.send(:registered_shipped_english_paths)
+
+    assert_includes paths, expected
+    assert_equal "Pages",
+                 RecordingStudio::Translation.shipped_english.fetch(
+                   "recording_studio.pages.index.title"
+                 )
   end
 
   def test_pages_keys_are_present_in_merged_shipped_english_table_after_boot
@@ -427,6 +435,7 @@ class TranslationTest < Minitest::Test
     mutate_loaded_translation!(locale, full_key) { |node, leaf| node[leaf] = value }
   end
 
+  # rubocop:disable Metrics/CyclomaticComplexity -- walk + thaw frozen I18n nodes
   def mutate_loaded_translation!(locale, full_key)
     I18n.exists?(full_key, locale) # ensure translations are loaded / initialized
     parts = full_key.split(".").map(&:to_sym)
@@ -444,4 +453,5 @@ class TranslationTest < Minitest::Test
     end
     yield node, leaf if node.is_a?(Hash)
   end
+  # rubocop:enable Metrics/CyclomaticComplexity
 end
