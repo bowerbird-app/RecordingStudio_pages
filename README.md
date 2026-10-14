@@ -244,7 +244,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.3.12. Dummy GitHub tags: Recording Studio `v4.5.0`, Accessible `v0.17.0`, Attachable `v0.15.0`, Users `v0.21.0`, Publishable `v0.8.0`, Orderable `v0.3.0`, Duplicatable `v0.5.0`, Trashable `v0.10.0`, Admin `v2.3.0`, Terms and Conditions `v0.8.1`, Root Switchable `v0.9.0`, Cache `v0.5.0`, Metrics `v0.2.0`, FlatPack `v0.1.213`.
+0.3.12. Dummy GitHub tags: Recording Studio `v4.6.0`, Accessible `v0.17.0`, Attachable `v0.15.0`, Users `v0.21.0`, Publishable `v0.8.0`, Orderable `v0.3.0`, Duplicatable `v0.5.0`, Trashable `v0.10.0`, Admin `v2.3.0`, Terms and Conditions `v0.8.1`, Root Switchable `v0.9.0`, Cache `v0.5.0`, Metrics `v0.2.0`, FlatPack `v0.1.213`.
 
 ## Upgrade
 
