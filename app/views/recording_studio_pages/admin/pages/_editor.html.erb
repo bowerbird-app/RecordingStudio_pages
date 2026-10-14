@@ -18,8 +18,8 @@
       <% if @unknown_sections.any? %>
         <%= render FlatPack::Alert::Component.new(
           style: :warning,
-          title: t("recording_studio.pages.editor.unknown_sections_title"),
-          description: t("recording_studio.pages.editor.unknown_sections_description")
+          title: RecordingStudio.t("recording_studio.pages.editor.unknown_sections_title"),
+          description: RecordingStudio.t("recording_studio.pages.editor.unknown_sections_description")
         ) %>
       <% end %>
 
@@ -43,8 +43,8 @@
         <% end %>
       <% else %>
         <%= render FlatPack::EmptyState::Component.new(
-          title: t("recording_studio.pages.editor.empty_sections_title"),
-          description: t("recording_studio.pages.editor.empty_sections_description")
+          title: RecordingStudio.t("recording_studio.pages.editor.empty_sections_title"),
+          description: RecordingStudio.t("recording_studio.pages.editor.empty_sections_description")
         ) %>
       <% end %>
     </div>
@@ -55,8 +55,8 @@
         </div>
       <% else %>
         <%= render FlatPack::EmptyState::Component.new(
-          title: t("recording_studio.pages.editor.preview_title"),
-          description: t("recording_studio.pages.editor.preview_description")
+          title: RecordingStudio.t("recording_studio.pages.editor.preview_title"),
+          description: RecordingStudio.t("recording_studio.pages.editor.preview_description")
         ) %>
       <% end %>
     </div>

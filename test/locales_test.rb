@@ -185,14 +185,23 @@ class LocalesTest < ActiveSupport::TestCase
     end
   end
 
-  test "copy helpers resolve english defaults without missing translations" do
+  test "copy helpers resolve english through RecordingStudio.t without missing translations" do
     with_gem_english_locales do
       I18n.with_locale(:en) do
-        assert_equal "Page created.", RecordingStudioPages::Copy.t("flashes.page_created", default: "Page created.")
-        assert_equal "Hero", RecordingStudioPages::Copy.section_name("hero", default: "Hero")
+        assert_equal "Page created.", RecordingStudioPages::Copy.t("flashes.page_created")
+        assert_equal "Hero", RecordingStudioPages::Copy.section_name("hero")
         assert_equal "Button text", RecordingStudioPages::Copy.field_label("ctas", "button", "text", default: "Button text")
       end
     end
+  end
+
+  test "engine registers shipped english before recording_studio loads the merged table" do
+    names = RecordingStudioPages::Engine.initializers.map(&:name)
+    assert_includes names, "recording_studio_pages.register_shipped_english"
+
+    engine_source = File.read(File.expand_path("../lib/recording_studio_pages/engine.rb", __dir__))
+    assert_includes engine_source, "register_shipped_english"
+    assert_includes engine_source, 'before: "recording_studio.load_shipped_english"'
   end
 
   test "restores i18n load path after temporary mutation" do

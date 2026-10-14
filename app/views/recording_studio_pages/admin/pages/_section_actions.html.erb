@@ -20,29 +20,29 @@
     show_chevron: false,
     placement: :bottom_right,
     trigger_attributes: {
-      title: t("recording_studio.pages.section_actions.actions"),
-      aria: { label: t("recording_studio.pages.section_actions.actions") }
+      title: RecordingStudio.t("recording_studio.pages.section_actions.actions"),
+      aria: { label: RecordingStudio.t("recording_studio.pages.section_actions.actions") }
     }
   ) do |dropdown| %>
     <% if definition %>
       <% dropdown.menu_item(
-        text: t("recording_studio.pages.section_actions.edit"),
+        text: RecordingStudio.t("recording_studio.pages.section_actions.edit"),
         href: edit_admin_page_section_path(page_id: page_recording.id, id: recording.id),
         data: { turbo_frame: "_top" }
       ) %>
     <% end %>
     <% dropdown.menu_item(
-      text: t("recording_studio.pages.section_actions.copy"),
+      text: RecordingStudio.t("recording_studio.pages.section_actions.copy"),
       form: section_action_form_id(recording, "copy"),
       type: "submit"
     ) %>
     <% dropdown.menu_item(
-      text: recordable.enabled? ? t("recording_studio.pages.section_actions.turn_off") : t("recording_studio.pages.section_actions.turn_on"),
+      text: recordable.enabled? ? RecordingStudio.t("recording_studio.pages.section_actions.turn_off") : RecordingStudio.t("recording_studio.pages.section_actions.turn_on"),
       form: section_action_form_id(recording, "toggle"),
       type: "submit"
     ) %>
     <% dropdown.menu_item(
-      text: t("recording_studio.pages.section_actions.remove"),
+      text: RecordingStudio.t("recording_studio.pages.section_actions.remove"),
       form: section_action_form_id(recording, "remove"),
       type: "submit",
       destructive: true

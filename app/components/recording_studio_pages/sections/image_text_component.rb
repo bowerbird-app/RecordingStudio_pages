@@ -24,7 +24,7 @@ module RecordingStudioPages
           [
             helpers.render(FlatPack::PageTitle::Component.new(
                              title: @rendered.content["title"].presence ||
-                                    t("recording_studio.pages.fallbacks.image_and_text"),
+                                    RecordingStudio.t("recording_studio.pages.fallbacks.image_and_text"),
                              subtitle: helpers.sanitize(@rendered.content["body"].to_s),
                              variant: :h2
                            )),

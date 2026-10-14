@@ -3,9 +3,10 @@
 require "i18n"
 
 module RecordingStudioPages
-  # Rails I18n lookups for Pages user-facing copy. Every call passes
-  # `default:` English so a host locale without a fallback never shows
-  # "translation missing". Keys live under `recording_studio.pages.*`.
+  # Locale lookups for Pages user-facing copy via {RecordingStudio.t}.
+  # Keys live under `recording_studio.pages.*`. Fallback for missing active-locale
+  # keys comes from loaded English (host overrides included), then the caller's
+  # `default:`, then the gem-shipped English table registered at boot.
   #
   # Lib/services keep main's English literals. Controllers and views call
   # `user_message` to map those known English strings to locale keys at render.
@@ -48,27 +49,34 @@ module RecordingStudioPages
     module_function
 
     def t(key, **)
-      I18n.t("#{PREFIX}.#{key}", **)
+      RecordingStudio.t("#{PREFIX}.#{key}", **)
     end
 
-    def section_name(key, default:)
-      t("built_ins.sections.#{key}.name", default: default)
+    def section_name(key, default: nil)
+      options = {}
+      options[:default] = default unless default.nil?
+      t("built_ins.sections.#{key}.name", **options)
     end
 
-    def cta_name(key, default:)
-      t("built_ins.ctas.#{key}.name", default: default)
+    def cta_name(key, default: nil)
+      options = {}
+      options[:default] = default unless default.nil?
+      t("built_ins.ctas.#{key}.name", **options)
     end
 
-    def field_label(owner_kind, owner_key, field_key, default:)
+    def field_label(owner_kind, owner_key, field_key, default: nil)
       return default if default.blank?
 
-      t("built_ins.#{owner_kind}.#{owner_key}.fields.#{field_key}", default: default)
+      options = { default: default }
+      t("built_ins.#{owner_kind}.#{owner_key}.fields.#{field_key}", **options)
     end
 
-    def option_label(owner_kind, owner_key, field_key, value, default:)
+    def option_label(owner_kind, owner_key, field_key, value, default: nil)
+      options = {}
+      options[:default] = default unless default.nil?
       t(
         "built_ins.#{owner_kind}.#{owner_key}.options.#{field_key}.#{value}",
-        default: default
+        **options
       )
     end
 
