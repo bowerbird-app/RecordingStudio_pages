@@ -44,7 +44,7 @@ class PagesEnglishFallbackTest < ActionDispatch::IntegrationTest
       get recording_studio_pages.admin_pages_path
 
       assert_response :success
-      assert_includes @response.body, "Pages"
+      assert_select "h1", text: "Pages"
       assert_includes @response.body, "Compose a public page from registered sections."
       refute_match(/translation missing: [^"']*recording_studio\.pages/i, @response.body)
     end
@@ -55,7 +55,7 @@ class PagesEnglishFallbackTest < ActionDispatch::IntegrationTest
       get recording_studio_pages.admin_pages_path
 
       assert_response :success
-      assert_includes @response.body, "Pages"
+      assert_select "h1", text: "Pages"
       assert_includes @response.body, "Compose a public page from registered sections."
       assert_includes @response.body, RecordingStudio.t("recording_studio.pages.index.new_page")
       refute_match(/translation missing: [^"']*recording_studio\.pages/i, @response.body)
@@ -88,7 +88,7 @@ class PagesEnglishFallbackTest < ActionDispatch::IntegrationTest
           get recording_studio_pages.admin_pages_path
 
           assert_response :success
-          assert_includes @response.body, "Pages"
+          assert_select "h1", text: "Pages"
           refute_match(/translation missing: [^"']*recording_studio\.pages/i, @response.body)
         end
       end

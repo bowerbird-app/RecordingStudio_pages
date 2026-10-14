@@ -1,10 +1,14 @@
 # Migration Notes
 
+## 0.6.0 English fallback
+
+Install Pages `0.6.0` with `recording_studio ~> 4.7`. No migration. English hosts need no change. A plain default with no interpolation is returned as a plain (non-html_safe) String, so views will escape it.
+
+Dummy and root Gemfiles pin Recording Studio to GitHub tag `v4.7.0`. The gemspec requires `recording_studio ~> 4.7`. Upstream gem version at that tag is `4.7.0`.
+
 ## 0.3.12 signup terms test root
 
 Dummy signup terms coverage now asserts against `Gate.first_root_with_live_terms`, the same root create-password accepts when there is no current root. Nothing to run in hosts.
-
-Dummy and root Gemfiles pin Recording Studio to GitHub tag `v4.7.0`. The gemspec requires `recording_studio ~> 4.7`. Upstream gem version at that tag is `4.7.0`.
 
 ## 0.3.11 terms and privacy
 

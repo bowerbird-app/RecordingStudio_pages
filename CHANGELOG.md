@@ -23,7 +23,7 @@ English fallback for missing `recording_studio.pages.*` keys via base `Recording
 ### Upgrade Notes
 - Install Pages `0.6.0` and Recording Studio `~> 4.7`. No migration.
 - Fallback comes from the loaded English, host overrides included.
-- Missing `_html` key with a non-interpolating caller `default:` stays unsafe like view `t`; interpolating caller `default:` on a missing `_html` key is stricter (args escaped, result html_safe). An Array caller `default:` on a missing `_html` key is also marked html_safe by `RecordingStudio.t` (stricter than view `t`).
+- Missing `_html` key with a non-interpolating caller `default:` stays unsafe like view `t`; interpolating caller `default:` on a missing `_html` key is stricter (args escaped, result html_safe). An Array caller `default:` on a missing `_html` key is also marked html_safe by `RecordingStudio.t` (stricter than view `t`). A plain default with no interpolation is returned as a plain (non-html_safe) String, so views will escape it.
 - Prefer `RecordingStudio.t` / `Copy.t` for new `recording_studio.pages.*` call sites. Do not hand-copy English `default:` from `en.yml`.
 - Hosts override by defining the same nested keys in their own `config/locales`. No dependency on `recording_studio_internationalization`.
 
@@ -422,7 +422,7 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Basic test suite with Minitest
 
 [Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.6.0...HEAD
-[0.6.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.5.1...v0.6.0
+[0.6.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.12...v0.4.0
 [0.3.12]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.11...v0.3.12
