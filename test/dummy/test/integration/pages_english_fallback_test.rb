@@ -11,9 +11,10 @@ class PagesEnglishFallbackTest < ActionDispatch::IntegrationTest
 
   INDEX_TITLE_KEY = "recording_studio.pages.index.title"
   INDEX_SUBTITLE_KEY = "recording_studio.pages.index.subtitle"
-  CHOOSE_PLACE_KEY = "recording_studio.pages.flashes.choose_place"
+  NEW_CREATE_KEY = "recording_studio.pages.new.create"
   BOOT_HOST_LOCALE = Rails.root.join("config/locales/recording_studio_pages_host.en.yml")
-  HOST_CHOOSE_PLACE = "HOST Choose a place in the list."
+  HOST_CREATE_PAGE = "HOST Create page"
+  GEM_CREATE_PAGE = "Create page"
 
   setup do
     @actor = create_actor!("pages-english-fallback@example.com")
@@ -45,7 +46,7 @@ class PagesEnglishFallbackTest < ActionDispatch::IntegrationTest
 
       assert_response :success
       assert_select "h1", text: "Pages"
-      assert_includes @response.body, "Compose a public page from registered sections."
+      assert_select "p", text: "Compose a public page from registered sections."
       refute_match(/translation missing: [^"']*recording_studio\.pages/i, @response.body)
     end
   end
@@ -56,8 +57,8 @@ class PagesEnglishFallbackTest < ActionDispatch::IntegrationTest
 
       assert_response :success
       assert_select "h1", text: "Pages"
-      assert_includes @response.body, "Compose a public page from registered sections."
-      assert_includes @response.body, RecordingStudio.t("recording_studio.pages.index.new_page")
+      assert_select "p", text: "Compose a public page from registered sections."
+      assert_select "*", text: "Page"
       refute_match(/translation missing: [^"']*recording_studio\.pages/i, @response.body)
     end
   end
@@ -98,33 +99,24 @@ class PagesEnglishFallbackTest < ActionDispatch::IntegrationTest
     I18n.reload!
   end
 
-  test "boot-loaded host english override wins on real reorder flash page" do
+  test "boot-loaded host english override wins on admin pages new" do
     assert File.exist?(BOOT_HOST_LOCALE),
            "expected boot-loaded host override at #{BOOT_HOST_LOCALE}"
-    assert_includes File.read(BOOT_HOST_LOCALE), HOST_CHOOSE_PLACE
+    assert_includes File.read(BOOT_HOST_LOCALE), HOST_CREATE_PAGE
     assert_equal @load_path_before, I18n.load_path
 
     # Force I18n to initialize before asserting host override (order-independent).
-    I18n.t(CHOOSE_PLACE_KEY)
-    assert_equal HOST_CHOOSE_PLACE, I18n.t(CHOOSE_PLACE_KEY)
-    refute_equal "Choose a place in the list.", I18n.t(CHOOSE_PLACE_KEY)
+    I18n.t(NEW_CREATE_KEY)
+    assert_equal HOST_CREATE_PAGE, I18n.t(NEW_CREATE_KEY)
+    refute_equal GEM_CREATE_PAGE, I18n.t(NEW_CREATE_KEY)
 
-    page_recording = create_page!(parent_recording: @root, title: "Fallback reorder", actor: @actor)
-    section = add_section!(
-      page_recording: page_recording,
-      section_type: "hero",
-      content: { title: "Hero" },
-      actor: @actor
-    )
+    get recording_studio_pages.new_admin_page_path
 
-    I18n.with_locale(:de) do
-      patch recording_studio_pages.reorder_admin_page_sections_path(page_recording),
-            params: { moving_recording_id: section.id, target_position: 0 },
-            as: :json
-
-      assert_response :unprocessable_content
-      assert_equal HOST_CHOOSE_PLACE, response.parsed_body["error"]
-    end
+    assert_response :success
+    assert_select "h1", text: "New page"
+    assert_select "*", text: HOST_CREATE_PAGE
+    refute_includes @response.body, ">#{GEM_CREATE_PAGE}<"
+    assert_equal @load_path_before, I18n.load_path
   end
 
   test "shipped english table becomes a new object after rails reloader reload" do

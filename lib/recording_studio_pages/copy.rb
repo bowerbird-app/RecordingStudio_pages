@@ -52,31 +52,24 @@ module RecordingStudioPages
       RecordingStudio.t("#{PREFIX}.#{key}", **)
     end
 
-    def section_name(key, default: nil)
-      options = {}
-      options[:default] = default unless default.nil?
-      t("built_ins.sections.#{key}.name", **options)
+    def section_name(key, default:)
+      t("built_ins.sections.#{key}.name", default: default)
     end
 
-    def cta_name(key, default: nil)
-      options = {}
-      options[:default] = default unless default.nil?
-      t("built_ins.ctas.#{key}.name", **options)
+    def cta_name(key, default:)
+      t("built_ins.ctas.#{key}.name", default: default)
     end
 
-    def field_label(owner_kind, owner_key, field_key, default: nil)
+    def field_label(owner_kind, owner_key, field_key, default:)
       return default if default.blank?
 
-      options = { default: default }
-      t("built_ins.#{owner_kind}.#{owner_key}.fields.#{field_key}", **options)
+      t("built_ins.#{owner_kind}.#{owner_key}.fields.#{field_key}", default: default)
     end
 
-    def option_label(owner_kind, owner_key, field_key, value, default: nil)
-      options = {}
-      options[:default] = default unless default.nil?
+    def option_label(owner_kind, owner_key, field_key, value, default:)
       t(
         "built_ins.#{owner_kind}.#{owner_key}.options.#{field_key}.#{value}",
-        **options
+        default: default
       )
     end
 

@@ -422,7 +422,7 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Basic test suite with Minitest
 
 [Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.6.0...HEAD
-[0.6.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.5.0...v0.6.0
+[0.6.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.5.1...v0.6.0
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.12...v0.4.0
 [0.3.12]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.11...v0.3.12

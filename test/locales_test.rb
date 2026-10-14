@@ -189,7 +189,7 @@ class LocalesTest < ActiveSupport::TestCase
     with_gem_english_locales do
       I18n.with_locale(:en) do
         assert_equal "Page created.", RecordingStudioPages::Copy.t("flashes.page_created")
-        assert_equal "Hero", RecordingStudioPages::Copy.section_name("hero")
+        assert_equal "Hero", RecordingStudioPages::Copy.section_name("hero", default: "Hero")
         assert_equal "Button text", RecordingStudioPages::Copy.field_label("ctas", "button", "text", default: "Button text")
       end
     end
