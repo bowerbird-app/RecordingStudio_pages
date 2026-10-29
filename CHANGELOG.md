@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-10-28
+
+### Changed
+- Stop tracking generated `coverage/` and `test/dummy/coverage/` reports; ignore both in `.gitignore`.
+- Dummy `UPDATE_SUMMARY.md` GitHub tags now match the dummy Gemfile pins (Recording Studio `v4.7.0`, FlatPack `v0.1.213`, and the current addon tags).
+- Dummy lockfile: `recording_studio_trashable` `v0.11.0` (#43).
+- Lockfile-only Bundler Audit: `crass` `>= 1.0.8` and `net-ssh` `>= 7.3.5` (conservative). `view_component` is unchanged.
+
 ## [0.6.0] - 2026-10-14
 
 English fallback for missing `recording_studio.pages.*` keys via base `RecordingStudio.t` (RecordingStudio `~> 4.7`). When the active locale has no translation, fallback comes from the loaded English, host overrides included, then the caller’s `default:`, then the gem-shipped English table registered at boot. Only this gem’s `recording_studio.pages.*` keys go through `RecordingStudio.t` / `Copy.t`; other namespaces stay on their original `I18n.t` with main’s `default:`.
@@ -421,8 +429,10 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.5.1...v0.6.0
+[0.5.1]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.12...v0.4.0
 [0.3.12]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.11...v0.3.12
