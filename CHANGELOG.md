@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dummy `UPDATE_SUMMARY.md` GitHub tags now match the dummy Gemfile pins (Recording Studio `v4.7.0`, FlatPack `v0.1.213`, and the current addon tags).
 - Dummy lockfile: `recording_studio_trashable` `v0.11.0` (#43).
 - Lockfile-only Bundler Audit: `crass` `>= 1.0.8` and `net-ssh` `>= 7.3.5` (conservative). `view_component` is unchanged.
+- Lockfile-only Bundler Audit: `rack` `>= 3.2.8` (conservative) in root and dummy.
 
 ## [0.6.0] - 2026-10-14
 
