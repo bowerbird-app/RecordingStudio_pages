@@ -96,6 +96,7 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "fp-top-nav"
+    assert_includes response.body, "data-fp-top-nav-padding"
     assert_includes response.body, "House"
     assert_includes response.body, "About"
     assert_includes response.body, "Tonight"
@@ -104,7 +105,6 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, 'href="/pages/tonight"'
     assert_includes response.body, 'href="/users/sign_in"'
     assert_includes response.body, 'href="/"'
-    assert_includes response.body, "flat-pack--top-nav"
     assert_includes response.body, "Under the bar"
     assert_includes response.body, "viewport-fit=cover"
     nav_at = response.body.index("fp-top-nav")
@@ -202,9 +202,9 @@ class PageBuilderPublicTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "px-16 py-24"
     assert_includes response.body, "max-w-xl"
     assert_includes response.body, "--surface-muted-content-color"
-    assert_includes response.body, "bg-[var(--card-background-muted-color)]"
-    assert_includes response.body, "--card-background-muted-color: var(--color-primary)"
-    assert_includes response.body, "--surface-content-color: var(--color-primary-text)"
+    assert_includes response.body, "[background:var(--card-background-shaded)]"
+    assert_includes response.body, "[background:var(--card-background-brand)]"
+    assert_includes response.body, "--surface-content-color:var(--card-background-brand-text-color)"
     refute_includes response.body, "text-base leading-relaxed"
     refute_includes response.body, "-bottom-8"
     refute_includes response.body, "sm:min-h-[32rem]"

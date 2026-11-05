@@ -22,6 +22,8 @@ module PageBuilderTestHelper
   # Workspace). Accept those so signed-in staff are not sent to Agree while
   # exercising Pages / Admin / home.
   def accept_seeded_studio_terms!(actor)
+    return unless defined?(RecordingStudioTermsAndConditions)
+
     studio = Workspace.find_by(name: "Studio Workspace")
     return unless studio
 
@@ -86,16 +88,17 @@ module PageBuilderTestHelper
   MINI_PNG = ["89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c63000100000500010d0a2db40000000049454e44ae426082"].pack("H*")
 
   def attach_image!(parent_recording:, actor:, filename: "hero.png")
-    blob = ActiveStorage::Blob.create_and_upload!(
+    result = RecordingStudioAttachable::Services::ImportAttachment.call(
+      parent_recording: parent_recording,
       io: StringIO.new(MINI_PNG),
       filename: filename,
-      content_type: "image/png"
+      content_type: "image/png",
+      actor: actor,
+      name: filename
     )
-    parent_recording.record_attachment_upload(
-      signed_blob_id: blob.signed_id,
-      name: filename,
-      actor: actor
-    )
+    raise result.error.to_s if result.failure?
+
+    result.value
   end
 
   def publish_page!(page_recording, slug:, actor:)

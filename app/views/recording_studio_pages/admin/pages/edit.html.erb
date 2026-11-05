@@ -5,8 +5,6 @@
    ) %>
 
 <div class="flex w-full max-w-xl flex-col gap-6">
-  <%= render FlatPack::PageTitle::Component.new(title: RecordingStudio.t("recording_studio.pages.edit.title"), variant: :h1) %>
-
   <%= form_with url: admin_page_path(id: page_recording.id), method: :patch, local: true,
                 class: "flex w-full flex-col gap-4" do %>
     <%= render FlatPack::TextInput::Component.new(

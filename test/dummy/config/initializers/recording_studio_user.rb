@@ -6,9 +6,9 @@ RecordingStudioUser.configure do |config|
   config.mount_path = "/recording_studio_users"
   config.profile_route_path = "profile"
   config.admin_route_path = "admin"
-  # Layout for the engine's signed-in screens. Sign in and sign up keep the
-  # gem's own centered layout, "recording_studio_user/auth".
-  config.layout = "recording_studio/default_layout"
+  # Auth screens stay on the host application layout (Users chrome).
+  # Product screens use Recording Studio Default Layout from ApplicationController.
+  config.layout = "application"
   config.additional_profile_attributes = []
   config.require_password_confirmation = false
   # Sign-in page heading. Default "Welcome back".

@@ -92,24 +92,10 @@ module RecordingStudioPages
       end
 
       def card_attributes
-        attributes = { style: card_style, class: "w-full" }
-        theme = card_theme
-        attributes[:theme] = theme if theme
+        attributes = { class: "w-full", shadow: :none }
+        attributes[:background] = :shaded if background == "muted"
+        attributes[:background] = :brand if background == "inverted"
         attributes
-      end
-
-      def card_style
-        background == "default" ? :default : :flat
-      end
-
-      def card_theme
-        return unless background == "inverted"
-
-        {
-          background_muted: "var(--color-primary)",
-          text: "var(--color-primary-text)",
-          muted_text: "var(--color-primary-text)"
-        }
       end
 
       def background

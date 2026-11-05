@@ -49,7 +49,7 @@ class DummyHomeTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "/pages/#{publishable.id}/tonight"
     assert_includes response.body, 'href="/site"'
     assert_includes response.body, "Home"
-    assert_includes response.body, "recording-studio-root-switchable--root-switch-dropdown"
+    assert_includes response.body, "fp-button-dropdown"
     assert_includes response.body, 'href="/admin?anchor_url=%2F"'
     assert_includes response.body, 'href="/recording_studio_pages/admin/pages?anchor_url=%2F"'
     refute_includes response.body, ">v#{FlatPack::VERSION}<"
@@ -71,7 +71,7 @@ class DummyHomeTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.body, "data-controller=\"flat-pack--sidebar-layout\""
-    assert_includes response.body, "recording-studio-root-switchable--root-switch-dropdown"
+    assert_includes response.body, "fp-button-dropdown"
   end
 
   test "signed-in people can still open the live site" do

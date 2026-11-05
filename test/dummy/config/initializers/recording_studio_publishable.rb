@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RecordingStudioPublishable.configure do |config|
-  config.layout = "recording_studio/default_layout"
+  # Leave layout unset so Publishable follows Recording Studio's default layout.
   config.management_authorizer = lambda do |recording:, actor:, **|
     actor.present? &&
       recording.present? &&

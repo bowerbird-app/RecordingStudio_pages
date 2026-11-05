@@ -3,13 +3,18 @@
 module RecordingStudioPages
   class Configuration
     attr_accessor :page_parent_types, :homepage_path, :register_built_in_sections
-    attr_reader :hooks
+    attr_reader :hooks, :layout
 
     def initialize
       @page_parent_types = %w[Workspace Folder]
       @homepage_path = "/"
       @register_built_in_sections = true
+      @layout = nil
       @hooks = RecordingStudio::Hooks.new
+    end
+
+    def layout=(value)
+      @layout = RecordingStudio::Layout.accept(value)
     end
 
     def to_h
@@ -17,6 +22,7 @@ module RecordingStudioPages
         page_parent_types: Array(page_parent_types).map(&:to_s),
         homepage_path: homepage_path,
         register_built_in_sections: register_built_in_sections,
+        layout: layout,
         hooks_registered: hooks.instance_variable_get(:@registry).transform_values(&:size)
       }
     end

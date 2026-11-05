@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-05
+
+Core 6.3 Default Layout, FlatPack 0.1.341, and a security lockfile refresh. No Pages migration.
+
+### Changed
+- Gemspec requires `recording_studio >= 6.3.0` and `flat_pack >= 0.1.341`. `view_component` stays `>= 3.0, < 5.0` and is not pinned to 4.14; FlatPack 0.1.341 brings that floor.
+- Engine controllers call `recording_studio_layout { RecordingStudioPages.configuration.layout }`. `config.layout` defaults to `nil` and is validated by `RecordingStudio::Layout.accept`. Public homepage and published-page screens still use `recording_studio_pages/public`.
+- Admin gem views set `content_for :title` / `:subtitle` and `flat_pack_page_nav`. The Pages list primary action uses `register_page_nav`. Cards use `border:` / `shadow:` / `background:` instead of `style:`. TopNav no longer passes `mobile_menu_label` or `always_display`. Rich text `muted` / `inverted` fills map to Card `background: :shaded` / `:brand`.
+- Section copy and nested-section upgrade import image blobs through Attachable `ImportAttachment` (Attachable 0.22 signed ids are purpose-bound).
+- Development pin is Recording Studio `v6.3.0`. Dummy pins Accessible `v0.24.1`, Trashable `v0.12.2`, Metrics `v0.7.2`, Cache `v0.6.2`, Logs `v0.7.3`, Root Switchable `v0.11.5`, Admin `v2.9.1`, Users `v0.27.0`, Attachable `v0.22.1`, Publishable `v0.13.0`, Orderable `v0.4.8`, Duplicatable `v0.6.1`, FlatPack `v0.1.341`. Dummy omits Terms: latest tag `v0.14.2` still requires `recording_studio ~> 4.2`. Admin 2.9.1 needs Logs `v0.7.3` (not previously in this dummy).
+- Root and dummy lockfiles refresh Rails to `8.1.4.1` and the CVE floors (`rack >= 3.2.8`, `loofah >= 2.25.3`, `nokogiri >= 1.19.5`, `rails-html-sanitizer >= 1.7.2`, dummy `net-ssh >= 7.3.5`). No bundler-audit ignore for `GHSA-8qw7-6phv-7q6p`.
+- Generated `coverage/` and `test/dummy/coverage/` are untracked and gitignored. Template leftovers `MIGRATION_NOTES.md`, `UPDATE_SUMMARY.md`, and `docs/gem_template/` are gone.
+- The Pages list at phone width is one column: the page name is the open link, with a Home mark only when the title is not already Home.
+
+### Upgrade notes
+- Install Pages `0.7.0` with Recording Studio `>= 6.3.0` and FlatPack `>= 0.1.341`. No migration.
+- Replace `include RecordingStudio::UsesDefaultLayout` and `layout "recording_studio/default_layout"` with `recording_studio_layout`. Leave `RecordingStudioPages.configuration.layout` unset to keep the shared default. `false` skips the layout. A callable must take `controller:`.
+- Rebuild Tailwind so Default Layout and FlatPack 0.1.341 classes are in the host CSS. Drop Card `style:`, TopNav `mobile_menu_label`, and PageNav constructor kwargs that 0.1.341 removed.
+- Dummy no longer ships Terms clickwrap until Terms raises its core floor. Hosts that need Terms keep their own pin once that gem allows 6.3.
+- Admin `v2.9.1` is fail-closed on missing access and on export tokens unless `recording_studio_admin` is in Exportable `trusted_export_sources`.
+
 ## [0.6.0] - 2026-10-14
 
 English fallback for missing `recording_studio.pages.*` keys via base `RecordingStudio.t` (RecordingStudio `~> 4.7`). When the active locale has no translation, fallback comes from the loaded English, host overrides included, then the caller’s `default:`, then the gem-shipped English table registered at boot. Only this gem’s `recording_studio.pages.*` keys go through `RecordingStudio.t` / `Copy.t`; other namespaces stay on their original `I18n.t` with main’s `default:`.
@@ -421,7 +442,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.5.1...v0.6.0
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.3.12...v0.4.0

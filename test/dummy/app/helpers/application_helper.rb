@@ -45,12 +45,18 @@ module ApplicationHelper
     RecordingStudioPages::Admin.merge_anchor_url(path, main_app.root_path)
   end
 
-  def dummy_page_nav(title:, back_url: nil, back_label: "Home")
-    recording_studio_page_nav(
-      title: title,
-      page_nav_back_url: back_url,
-      page_nav_back_label: back_label
-    )
+  def dummy_page_nav(title:, subtitle: nil, back_url: nil, back_label: "Home")
+    content_for(:title, title)
+    content_for(:subtitle, subtitle) if subtitle.present?
+    if respond_to?(:flat_pack_page_nav)
+      flat_pack_page_nav(
+        round: true,
+        style: :default,
+        back_href: back_url,
+        back_tooltip: back_label
+      )
+    end
+    return unless respond_to?(:recording_studio_page_nav_right)
 
     recording_studio_page_nav_right do
       concat recording_studio_root_switch_dropdown(style: :ghost, size: :md)

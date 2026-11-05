@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "stringio"
 require "uri"
 
 module RecordingStudioPages
@@ -36,7 +37,7 @@ module RecordingStudioPages
         attachment = RecordingStudio::Recording.find_by(id: image_id, trashed_at: nil)
         return unless attachment&.recordable_type == "RecordingStudioAttachable::Attachment"
 
-        copied = copy_blob(child, attachment, actor)
+        copied = copy_attachment(child, attachment, actor: actor)
         return image_id if copied.blank?
 
         release(source, attachment, actor)
@@ -53,16 +54,22 @@ module RecordingStudioPages
         false
       end
 
-      def self.copy_blob(child, attachment, actor)
+      def self.copy_attachment(parent_recording, attachment, actor:)
         blob = attachment.recordable&.file&.blob
         return if blob.blank?
+        return unless defined?(RecordingStudioAttachable::Services::ImportAttachment)
 
-        uploaded = child.record_attachment_upload(
-          signed_blob_id: blob.signed_id,
-          name: attachment.recordable.name,
-          actor: actor
+        result = RecordingStudioAttachable::Services::ImportAttachment.call(
+          parent_recording: parent_recording,
+          io: StringIO.new(blob.download),
+          filename: blob.filename.to_s,
+          content_type: blob.content_type.presence || "application/octet-stream",
+          actor: actor,
+          name: attachment.recordable.name
         )
-        uploaded&.id&.to_s
+        return unless result.success?
+
+        result.value&.id&.to_s
       end
 
       def self.release(source, attachment, actor)
@@ -89,7 +96,7 @@ module RecordingStudioPages
 
         item.to_h.stringify_keys
       end
-      private_class_method :copy_blob, :release
+      private_class_method :release
     end
   end
 end
