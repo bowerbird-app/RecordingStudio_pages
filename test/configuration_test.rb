@@ -48,7 +48,25 @@ class ConfigurationTest < Minitest::Test
     assert_equal %w[Workspace Folder], configuration.page_parent_types
     assert_equal "/", configuration.homepage_path
     assert_equal true, configuration.register_built_in_sections
+    assert_nil configuration.layout
     assert_instance_of RecordingStudio::Hooks, configuration.hooks
+  end
+
+  def test_layout_accepts_nil_false_name_and_controller_callable
+    configuration = RecordingStudioPages::Configuration.new
+
+    configuration.layout = false
+    assert_equal false, configuration.layout
+
+    configuration.layout = "application"
+    assert_equal "application", configuration.layout
+
+    callable = ->(controller:) { controller.then { "application" } }
+    configuration.layout = callable
+    assert_equal callable, configuration.layout
+
+    assert_raises(ArgumentError) { configuration.layout = :application_layout }
+    assert_raises(ArgumentError) { configuration.layout = ->(_controller) { "application" } }
   end
 
   def test_merge_accepts_string_keys

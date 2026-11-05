@@ -63,20 +63,12 @@ module RecordingStudioPages
       end
 
       def copy_section_images(source:, copy:)
-        return unless copy.respond_to?(:record_attachment_upload)
         return unless defined?(RecordingStudioAttachable::Attachment)
 
         mapping = {}
         attachment_children(source).each do |child|
-          blob = child.recordable&.file&.blob
-          next unless blob
-
-          new_child = copy.record_attachment_upload(
-            signed_blob_id: blob.signed_id,
-            name: child.recordable.name,
-            actor: actor
-          )
-          mapping[child.id.to_s] = new_child.id.to_s if new_child.respond_to?(:id)
+          new_id = NestedSectionItem.copy_attachment(copy, child, actor: actor)
+          mapping[child.id.to_s] = new_id if new_id.present?
         end
         return if mapping.empty?
 

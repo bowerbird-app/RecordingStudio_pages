@@ -2,7 +2,7 @@
 
 Compose public pages from Recording Studio recordings. A page is a recording. A section is a recording of one generic type. `section_type` picks the implementation from a registry.
 
-This gem is for hosts that already run Recording Studio 4.x and want a page builder that stays inside the recordings tree.
+This gem is for hosts that already run Recording Studio 6.3 and want a page builder that stays inside the recordings tree.
 
 ## Install
 
@@ -34,9 +34,7 @@ RecordingStudio.configure do |config|
     "Folder",
     "RecordingStudioPages::Page",
     "RecordingStudioPages::Section",
-    "RecordingStudioAttachable::Attachment",
-    "RecordingStudioAttachable::Library",
-    "RecordingStudioAttachable::Placement"
+    "RecordingStudioAttachable::Attachment"
   ]
   config.require_recordable_declarations = true
 end
@@ -53,7 +51,7 @@ recording_studio_admin_for :admin, at: "/admin", root_section: :pages
 root to: "recording_studio_pages/homepages#show"
 ```
 
-Point `/` at the homepage controller. Public pages use `recording_studio_pages/public`. That layout loads Flatpack tokens (`flat_pack/variables`, `flat_pack/application`) then Tailwind, and puts the host’s named Flatpack theme on `html` (`FlatPack.configuration.default_theme`, dummy `rounded`). Do not reuse the Devise `application` layout for public pages — it is `max-w-md` for sign-in. Heroes and menus render with Flatpack at full width; other sections sit in `max-w-6xl`. Publishable `config.layout` is for Publishable's own screens; dummy sets it to `recording_studio/default_layout`.
+Point `/` at the homepage controller. Public pages use `recording_studio_pages/public`. That layout loads Flatpack tokens (`flat_pack/variables`, `flat_pack/application`) then Tailwind, and puts the host’s named Flatpack theme on `html` (`FlatPack.configuration.default_theme`, dummy `rounded`). Do not reuse the Devise `application` layout for public pages — it is `max-w-md` for sign-in. Heroes and menus render with Flatpack at full width; other sections sit in `max-w-6xl`. Page builder screens use `recording_studio_layout` and core's Default Layout. Leave `RecordingStudioPages.configuration.layout` unset unless the host needs a different shell. Publishable `config.layout` is for Publishable's own screens; leave it unset to follow the same default.
 
 ## How a page is stored
 
@@ -244,9 +242,13 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.6.0. Gemspec requires `recording_studio ~> 4.7`. Dummy GitHub tags: Recording Studio `v4.7.0`, Accessible `v0.18.0`, Attachable `v0.15.0`, Users `v0.21.0`, Publishable `v0.8.0`, Orderable `v0.3.0`, Duplicatable `v0.5.0`, Trashable `v0.11.0`, Admin `v2.3.0`, Terms and Conditions `v0.8.1`, Root Switchable `v0.9.0`, Cache `v0.5.0`, Metrics `v0.2.0`, FlatPack `v0.1.213`.
+0.7.0. Gemspec requires `recording_studio >= 6.3.0` and `flat_pack >= 0.1.341`. Dummy GitHub tags: Recording Studio `v6.3.0`, Accessible `v0.24.1`, Attachable `v0.22.1`, Users `v0.27.0`, Publishable `v0.13.0`, Orderable `v0.4.8`, Duplicatable `v0.6.1`, Trashable `v0.12.2`, Admin `v2.9.1`, Root Switchable `v0.11.5`, Cache `v0.6.2`, Metrics `v0.7.2`, Logs `v0.7.3`, FlatPack `v0.1.341`. Dummy omits Terms until that gem allows core 6.3. Admin 2.9.1 needs Logs.
 
 ## Upgrade
+
+### Upgrading to 0.7.0
+
+Install Pages `0.7.0` with Recording Studio `>= 6.3.0` and FlatPack `>= 0.1.341`. No migration. Call `recording_studio_layout` on host controllers that render gem screens. Leave `config.layout` unset for core's Default Layout. Rebuild Tailwind. See [UPGRADING.md](UPGRADING.md).
 
 ### Upgrading to 0.6.0
 
@@ -261,7 +263,7 @@ Install Pages `0.6.0` with `recording_studio ~> 4.7`. No migration. English host
 7. Install Recording Studio Trashable and keep Page’s `Capabilities::Trashable.to` so **Trash** calls `recording_studio_trashable_trash!`. Dummy mounts it at `/recording_studio_trashable`.
 8. Built-in hero content uses `cta` (`type` plus that CTA’s fields) instead of `primary_action`. Old `primary_action` rows still render. The next save writes `cta`. Image-and-text and call-to-action are unchanged.
 9. For a social Continue-with CTA, install Recording Studio Users `v0.11.0`, register People and Profile, and call the Users OmniAuth helpers from a CTA component. Dummy Join and Walk in do that. The `continue_with_providers` partial is for the sign-in screen. Continue-with buttons follow Rails credentials under `omniauth:`.
-10. Built-in `image` fields are `{ type: :attachment, kind: :image }`. Old `image_url` rows still render. The next save writes `image` when someone picks a file. Mount Attachable, register `RecordingStudioAttachable::Attachment` (and `Library` / `Placement` when on Attachable `0.12+`), start Active Storage, and eager-load its Stimulus controllers. Public pages resolve ids to `rails_blob_path`. Copying a section copies that section's photos and rewrites the ids.
+10. Built-in `image` fields are `{ type: :attachment, kind: :image }`. Old `image_url` rows still render. The next save writes `image` when someone picks a file. Mount Attachable, register `RecordingStudioAttachable::Attachment`, start Active Storage, and eager-load its Stimulus controllers. Public pages resolve ids to `rails_blob_path`. Copying a section copies that section's photos and rewrites the ids.
 11. If you overrode the rich text component, take the extra bottom inset when a corner image is present (`pb-56`), or keep your layout on purpose.
 12. Built-in **Menu** (`top_nav`) is a full-bleed Flatpack TopNav section. Add it from **Section**. Old pages stay as they are until you add one. If you overrode `_section.html.erb`, take `full_bleed?` (Hero and Menu set `full_bleed: true`). Public layout should use `viewport-fit=cover`. Load Flatpack Stimulus (`controllers/flat_pack`) so **More** on a phone opens and so the bar frosts after scroll.
 13. RS Admin hub widgets need Turbo on the admin layout. Dummy imports `@hotwired/turbo-rails` and pins `controllers/recording_studio_admin`. Run `recording_studio_admin:install` in a host for that Stimulus pin. Without Turbo, Published and Drafts stay on the shimmer. Those cards open `/admin/screens/pages`. Drafts adds `status=Draft`. Published adds `status=Published`. If you overrode the Pages screen, take **Page** under the title (not in the top-right slot), columns Page / Home / Updated at / Status / Actions, live page names linked to the published URL, the Status filter (Draft / Scheduled / Published), Home page filter, Publishable status control, and the Edit / Trash row menu.

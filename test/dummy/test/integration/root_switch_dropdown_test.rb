@@ -33,7 +33,7 @@ class RootSwitchDropdownTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, workspace.name
     assert_includes response.body, "data-controller=\"flat-pack--sidebar-layout\""
-    assert_includes response.body, "recording-studio-root-switchable--root-switch-dropdown"
+    assert_includes response.body, "fp-button-dropdown"
     refute_includes response.body, "data-recording-studio-default-layout"
   end
 

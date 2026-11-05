@@ -10,6 +10,8 @@ class LocalesTest < ActiveSupport::TestCase
   # rubocop:disable Style/FormatStringToken
   EXPECTED = {
     "layout.page" => "Page",
+    "navigation.back" => "Back",
+    "navigation.close" => "Close",
     "index.title" => "Pages",
     "index.subtitle" => "Compose a public page from registered sections.",
     "index.new_page" => "Page",

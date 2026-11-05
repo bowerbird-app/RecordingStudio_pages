@@ -6,17 +6,23 @@ module RecordingStudioPages
       render "recording_studio_pages/flash"
     end
 
-    def recording_studio_pages_nav(title:, back_url: nil, anchor_url: nil)
-      resolved_anchor = pages_nav_anchor_url(default: anchor_url)
-      if respond_to?(:recording_studio_pages_page_nav)
-        recording_studio_pages_page_nav(title: title, back_url: back_url, anchor_url: resolved_anchor)
-      elsif respond_to?(:recording_studio_page_nav)
-        recording_studio_page_nav(
-          title: title,
-          page_nav_back_url: back_url,
-          page_nav_anchor_url: resolved_anchor
-        )
-      end
+    def recording_studio_pages_nav(title:, subtitle: nil, back_url: nil, anchor_url: nil)
+      content_for(:title, title) if title.present?
+      content_for(:subtitle, subtitle) if subtitle.present?
+      pages_flat_pack_nav(back_url: back_url, anchor_url: anchor_url)
+    end
+
+    def pages_flat_pack_nav(back_url:, anchor_url:)
+      return unless respond_to?(:flat_pack_page_nav)
+
+      flat_pack_page_nav(
+        round: true,
+        style: :default,
+        back_href: back_url,
+        back_tooltip: RecordingStudio.t("recording_studio.pages.navigation.back"),
+        anchor_href: pages_nav_anchor_url(default: anchor_url),
+        anchor_tooltip: RecordingStudio.t("recording_studio.pages.navigation.close")
+      )
     end
 
     def pages_nav_anchor_url(default: nil)

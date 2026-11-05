@@ -25,6 +25,8 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
   # Terms 0.7.7+ gates against the first root with live Terms (seeded Studio
   # Workspace). Clear that for docs pages that are not about clickwrap.
   def accept_seeded_studio_terms!(actor)
+    return unless defined?(RecordingStudioTermsAndConditions)
+
     studio = Workspace.find_by(name: "Studio Workspace")
     return unless studio
 

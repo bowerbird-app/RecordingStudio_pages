@@ -3,8 +3,6 @@
 module RecordingStudioPages
   module Admin
     class BaseController < RecordingStudioPages::ApplicationController
-      include RecordingStudio::UsesDefaultLayout if defined?(RecordingStudio::UsesDefaultLayout)
-
       before_action :authenticate_user!, raise: false
       before_action :require_admin_access!
 

@@ -8,7 +8,7 @@ module RecordingStudioPages
       end
 
       def call
-        helpers.render(FlatPack::Card::Component.new(style: :outlined)) do |card|
+        helpers.render(FlatPack::Card::Component.new(border: :default)) do |card|
           image = feature_image
           card.media(aspect_ratio: "4/3", padding: :none) { image } if image
           card.body { feature_copy }

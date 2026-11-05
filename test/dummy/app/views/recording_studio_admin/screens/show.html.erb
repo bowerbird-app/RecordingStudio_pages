@@ -1,24 +1,21 @@
-<%# Admin already passes href: here. Dummy adds the plus icon on Page and
-    puts screen buttons under the title, not in the page-nav right slot. %>
-<% recording_studio_page_nav(
+<%# Dummy adds the plus icon on Page. Screen actions sit in register_page_nav. %>
+<% recording_studio_admin_page_heading(
      title: @screen.title,
-     page_nav_anchor_url: page_nav_anchor_url(default: RecordingStudioAdmin.configuration.default_mount_path)
+     anchor: page_nav_anchor_url(default: RecordingStudioAdmin.configuration.default_mount_path),
+     subtitle: @screen.subtitle
    ) %>
-<%= render "recording_studio_admin/shared/page_nav" unless recording_studio_admin_default_layout? %>
-
-<%= render FlatPack::PageTitle::Component.new(title: @screen.title, subtitle: @screen.subtitle) do |page_title| %>
-  <% if @screen.buttons.any? %>
-    <% page_title.slot do %>
-      <% @screen.buttons.each do |button| %>
-        <%= render FlatPack::Button::Component.new(
-          text: button.text,
-          href: preserve_anchor_url(button.url),
-          style: button.style,
-          icon: (button.name.to_s == "new_page" ? "plus" : nil)
-        ) %>
-      <% end %>
-    <% end %>
-  <% end %>
+<% @screen.buttons.each_with_index do |button, index| %>
+  <% register_page_nav(
+       button.text,
+       preserve_anchor_url(button.url),
+       role: recording_studio_admin_page_nav_role(button.style),
+       overflow: index >= 3,
+       icon: (button.name.to_s == "new_page" ? "plus" : nil)
+     ) %>
+<% end %>
+<% unless recording_studio_admin_default_layout? %>
+  <%= render "recording_studio_admin/shared/page_nav" %>
+  <%= render FlatPack::PageTitle::Component.new(title: @screen.title, subtitle: @screen.subtitle) %>
 <% end %>
 
 <% if @screen.widgets.any? %>
@@ -47,7 +44,7 @@
 
 <% if @screen.has_chart %>
   <%= turbo_frame_tag "screen-chart", src: recording_studio_admin_screen_region_path(@screen.key, :chart) do %>
-    <%= render FlatPack::Card::Component.new(style: :outlined, class: "mb-6") do |card| %>
+    <%= render FlatPack::Card::Component.new(border: :strong, class: "mb-6") do |card| %>
       <% card.body do %>
         <div class="space-y-4">
           <%= render FlatPack::Skeleton::Component.new(variant: :text, width: "12rem", shimmer: true) %>

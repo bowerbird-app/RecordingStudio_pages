@@ -10,10 +10,7 @@ RecordingStudio.configure do |config|
     "RecordingStudioPages::Page",
     "RecordingStudioPages::Section",
     "RecordingStudioPublishable::Publishable",
-    "RecordingStudioAttachable::Attachment",
-    "RecordingStudioAttachable::Library",
-    "RecordingStudioAttachable::Placement",
-    "RecordingStudioTermsAndConditions::Terms"
+    "RecordingStudioAttachable::Attachment"
   ]
   config.require_recordable_declarations = true
   config.app_name = "Page Builder" if config.respond_to?(:app_name=)

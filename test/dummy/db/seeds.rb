@@ -86,11 +86,15 @@ sample_feature_images = {
 }
 
 terms_recording_for_kind = lambda do |root_recording, kind|
+  next unless defined?(RecordingStudioTermsAndConditions)
+
   RecordingStudioTermsAndConditions::KindPresence.recordings_for(root_recording, kind: kind)
     .max_by { |recording| recording.created_at || Time.at(0) }
 end
 
 ensure_published_terms = lambda do |root_recording, user, kind:, title:, body:, slug:|
+  next unless defined?(RecordingStudioTermsAndConditions)
+
   recording = terms_recording_for_kind.call(root_recording, kind)
 
   if recording.blank?
@@ -371,22 +375,28 @@ begin
     ).value!
   end
 
-  terms_recording = ensure_published_terms.call(
-    root_recording,
-    user,
-    kind: RecordingStudioTermsAndConditions::Terms::KIND_TERMS,
-    title: RecordingStudioTermsAndConditions::SampleTerms::TITLE,
-    body: RecordingStudioTermsAndConditions::SampleTerms::BODY,
-    slug: "terms-and-conditions"
-  )
-  privacy_recording = ensure_published_terms.call(
-    root_recording,
-    user,
-    kind: RecordingStudioTermsAndConditions::Terms::KIND_PRIVACY,
-    title: "Privacy Policy",
-    body: "<p>We keep the version you agreed to, and a receipt of when you agreed.</p>",
-    slug: "privacy-policy"
-  )
+  terms_href = "/terms-and-conditions"
+  privacy_href = "/privacy-policy"
+  if defined?(RecordingStudioTermsAndConditions)
+    terms_recording = ensure_published_terms.call(
+      root_recording,
+      user,
+      kind: RecordingStudioTermsAndConditions::Terms::KIND_TERMS,
+      title: RecordingStudioTermsAndConditions::SampleTerms::TITLE,
+      body: RecordingStudioTermsAndConditions::SampleTerms::BODY,
+      slug: "terms-and-conditions"
+    )
+    privacy_recording = ensure_published_terms.call(
+      root_recording,
+      user,
+      kind: RecordingStudioTermsAndConditions::Terms::KIND_PRIVACY,
+      title: "Privacy Policy",
+      body: "<p>We keep the version you agreed to, and a receipt of when you agreed.</p>",
+      slug: "privacy-policy"
+    )
+    terms_href = terms_recording.recordable.published_url
+    privacy_href = privacy_recording.recordable.published_url
+  end
   homepage_sections = home_sections + [
     {
       type: :footer,
@@ -394,8 +404,8 @@ begin
         name: "House",
         note: "The fine print lives here.",
         links: [
-          { text: "Terms", url: terms_recording.recordable.published_url },
-          { text: "Privacy", url: privacy_recording.recordable.published_url }
+          { text: "Terms", url: terms_href },
+          { text: "Privacy", url: privacy_href }
         ]
       }
     }

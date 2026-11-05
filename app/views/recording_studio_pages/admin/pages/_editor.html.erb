@@ -1,10 +1,4 @@
 <div class="flex w-full flex-col gap-6">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: @page_recording.recordable.title,
-    subtitle: @editor_subtitle,
-    variant: :h1
-  ) %>
-
   <div class="flex flex-wrap items-center gap-3">
     <%= render "recording_studio_pages/admin/pages/add_section_dropdown" %>
     <% if defined?(RecordingStudioPublishable) %>

@@ -3,6 +3,9 @@ en:
     pages:
       layout:
         page: "Page"
+      navigation:
+        back: "Back"
+        close: "Close"
       index:
         title: "Pages"
         subtitle: "Compose a public page from registered sections."

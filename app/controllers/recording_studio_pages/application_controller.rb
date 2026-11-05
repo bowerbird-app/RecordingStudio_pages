@@ -2,7 +2,7 @@
 
 module RecordingStudioPages
   class ApplicationController < (defined?(::ApplicationController) ? ::ApplicationController : ActionController::Base)
-    include RecordingStudio::UsesDefaultLayout if defined?(RecordingStudio::UsesDefaultLayout)
+    recording_studio_layout { RecordingStudioPages.configuration.layout }
     helper RecordingStudioPages::ApplicationHelper
     helper RecordingStudioPublishable::ApplicationHelper if defined?(RecordingStudioPublishable)
 

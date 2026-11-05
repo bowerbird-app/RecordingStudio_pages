@@ -10,11 +10,10 @@ module RecordingStudioPages
       def call
         return if empty?
 
-        label = RecordingStudio.t("recording_studio.pages.fallbacks.more")
-        render FlatPack::TopNav::Component.new(mobile_menu_label: label) do |nav|
+        render FlatPack::TopNav::Component.new do |nav|
           nav.left { brand } if brand?
           nav.center { links } if links?
-          nav.right(always_display: true) { join } if join?
+          nav.right { join } if join?
         end
       end
 

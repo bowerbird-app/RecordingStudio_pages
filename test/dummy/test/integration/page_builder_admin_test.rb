@@ -634,10 +634,9 @@ class PageBuilderAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, ">Page<"
     assert_includes response.body, "href=\"#{list_new_page_href}\""
     assert_includes response.body, 'data-flat-pack--icon-name-value="plus"'
-    assert_includes response.body, "page-title-actions"
     subtitle_at = response.body.index("Compose public pages from sections.")
     page_button_at = response.body.index("href=\"#{list_new_page_href}\"")
-    assert_operator subtitle_at, :<, page_button_at
+    assert_operator page_button_at, :<, subtitle_at
 
     get "/admin/screens/pages/table",
         headers: { "Turbo-Frame" => "screen-table" }

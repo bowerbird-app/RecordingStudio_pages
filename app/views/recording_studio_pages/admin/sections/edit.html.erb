@@ -1,16 +1,11 @@
 <% recording_studio_pages_nav(
-     title: RecordingStudio.t("recording_studio.pages.sections.edit_title"),
+     title: (@definition && pages_definition_name(@definition)) || RecordingStudio.t("recording_studio.pages.sections.unknown"),
      back_url: page_builder_page_path,
      anchor_url: RecordingStudioPages::Admin.admin_mount_path
    ) %>
 <% section_form_id = "section-editor" %>
 
 <div class="flex w-full flex-col gap-6">
-  <%= render FlatPack::PageTitle::Component.new(
-    title: (@definition && pages_definition_name(@definition)) || RecordingStudio.t("recording_studio.pages.sections.unknown"),
-    variant: :h1
-  ) %>
-
   <div class="flex flex-wrap items-center gap-3">
     <% if @definition %>
       <%= render FlatPack::Button::Component.new(

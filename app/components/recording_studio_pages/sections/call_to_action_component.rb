@@ -18,7 +18,7 @@ module RecordingStudioPages
       end
 
       def card
-        render FlatPack::Card::Component.new(style: :elevated) do |card|
+        render FlatPack::Card::Component.new(shadow: :md) do |card|
           card.body { inner }
         end
       end

@@ -5,18 +5,17 @@ require "test_helper"
 class RecordingStudioTemplateTest < ActiveSupport::TestCase
   test "dummy app loads root switchable config and controller support" do
     assert_equal [ "all_workspaces" ], RecordingStudioRootSwitchable.configuration.scopes.keys
-    assert_equal :application_layout, RecordingStudioRootSwitchable.configuration.layout
+    assert_nil RecordingStudioRootSwitchable.configuration.layout
     assert_includes ApplicationController.ancestors, RecordingStudio::RootSwitchable::ControllerSupport
-    assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
-    assert_equal "0.1.213", FlatPack::VERSION
+    assert_includes ApplicationController.ancestors, RecordingStudio::ControllerLayout
+    assert_equal "0.1.341", FlatPack::VERSION
   end
 
   test "dummy app validates recordable declarations" do
     assert RecordingStudio.validate_recordable_declarations!
     assert_equal %w[AdminRoot RecordingStudioUser::People Workspace].sort, RecordingStudio.root_recordable_types.sort
     assert_equal %w[Workspace Folder], RecordingStudio.allowed_parent_types_for("RecordingStudioPages::Page")
-    assert_includes RecordingStudio.configuration.recordable_types, "RecordingStudioAttachable::Library"
-    assert_includes RecordingStudio.configuration.recordable_types, "RecordingStudioAttachable::Placement"
+    assert_includes RecordingStudio.configuration.recordable_types, "RecordingStudioAttachable::Attachment"
   end
 
   test "dummy app schema keeps accessible grants and page builder tables" do
@@ -95,10 +94,12 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
                                               &.recordable
     footer_links = Array(footer.content["links"])
     assert_equal %w[Terms Privacy], footer_links.map { |item| item["text"] }
-    assert footer_links.find { |item| item["text"] == "Terms" }["url"].to_s.include?("/terms/")
-    assert footer_links.find { |item| item["text"] == "Privacy" }["url"].to_s.include?("/privacy/")
-    assert RecordingStudioTermsAndConditions.current_published_for(workspace, kind: "terms_and_condition")
-    assert RecordingStudioTermsAndConditions.current_published_for(workspace, kind: "privacy_policy")
+    assert footer_links.find { |item| item["text"] == "Terms" }["url"].to_s.include?("terms")
+    assert footer_links.find { |item| item["text"] == "Privacy" }["url"].to_s.include?("privacy")
+    if defined?(RecordingStudioTermsAndConditions)
+      assert RecordingStudioTermsAndConditions.current_published_for(workspace, kind: "terms_and_condition")
+      assert RecordingStudioTermsAndConditions.current_published_for(workspace, kind: "privacy_policy")
+    end
     logo_cloud = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
                                                   .find { |recording| recording.recordable.section_type == "logo_cloud" }
     feature_grid = RecordingStudioPages::Composition.section_recordings_for(homepage_recording)
@@ -192,7 +193,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert RecordingStudio.capability_enabled?(:orderable, for: RecordingStudioPages::Page)
     assert RecordingStudio.capability_enabled?(:trashable, for: RecordingStudioPages::Page)
     refute RecordingStudio.capability_enabled?(:trashable, for: RecordingStudioPages::Section)
-    assert_includes ApplicationController.ancestors, RecordingStudio::UsesDefaultLayout
+    assert_includes ApplicationController.ancestors, RecordingStudio::ControllerLayout
   end
 
   test "dummy app mounts trashable for page trash" do
@@ -224,7 +225,6 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_includes routes, 'get "/start"'
     assert_includes routes, "recording_studio_user_auth_for :users"
     assert_includes routes, "RecordingStudioUser::Engine"
-    assert_includes routes, "RecordingStudioTermsAndConditions::Engine"
-    assert_includes ApplicationController.ancestors, RecordingStudioTermsAndConditions::ForcesAcceptance
+    refute_includes routes, "RecordingStudioTermsAndConditions::Engine"
   end
 end

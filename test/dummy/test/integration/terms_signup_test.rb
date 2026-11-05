@@ -5,6 +5,10 @@ require "cgi"
 
 class TermsSignupTest < ActionDispatch::IntegrationTest
   setup do
+    unless defined?(RecordingStudioTermsAndConditions)
+      skip "Terms latest tag still requires recording_studio ~> 4.2"
+    end
+
     @actor = create_actor!("terms-staff-#{SecureRandom.hex(4)}@example.com")
     Current.actor = @actor
     @workspace = Workspace.create!(name: "Terms Workspace #{SecureRandom.hex(4)}")

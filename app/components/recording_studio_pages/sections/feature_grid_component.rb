@@ -42,7 +42,7 @@ module RecordingStudioPages
       end
 
       def feature_card(item)
-        helpers.render(FlatPack::Card::Component.new(style: card_style)) do |card|
+        helpers.render(FlatPack::Card::Component.new(**card_attributes)) do |card|
           image = feature_image(item)
           card.media(aspect_ratio: "4/3", padding: :none) { image } if image
           card.body { feature_copy(item) }
@@ -66,8 +66,10 @@ module RecordingStudioPages
         helpers.image_tag(url, alt: item["title"].to_s, class: "h-full w-full object-cover")
       end
 
-      def card_style
-        @rendered.settings["variant"].to_s == "icon_grid" ? :default : :outlined
+      def card_attributes
+        return {} if @rendered.settings["variant"].to_s == "icon_grid"
+
+        { border: :default }
       end
     end
   end
