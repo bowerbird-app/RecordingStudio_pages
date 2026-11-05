@@ -8,6 +8,13 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_equal "0.6.1", ::RecordingStudioPages::VERSION
   end
 
+  def test_dummy_bundler_audit_ignores_view_component_while_flatpack_pins_412
+    config = File.read(File.expand_path("../test/dummy/config/bundler-audit.yml", __dir__))
+
+    assert_includes config, "GHSA-8qw7-6phv-7q6p"
+    assert_includes config, "view_component ~> 4.12.0"
+  end
+
   def test_engine_exists
     assert_kind_of Class, ::RecordingStudioPages::Engine
   end

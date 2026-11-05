@@ -1,5 +1,9 @@
 # Audit all gems listed in the Gemfile for known security problems by running bin/bundler-audit.
 # CVEs that are not relevant to the application can be enumerated on the ignore list below.
+#
+# GHSA-8qw7-6phv-7q6p is view_component < 4.14.0. Dummy stays on 4.12.0 because
+# FlatPack v0.1.213 requires view_component ~> 4.12.0. Do not bump view_component
+# here without a FlatPack release that allows >= 4.14.0.
 
 ignore:
-  - CVE-THAT-DOES-NOT-APPLY
+  - GHSA-8qw7-6phv-7q6p

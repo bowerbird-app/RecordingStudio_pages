@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dummy lockfile: `recording_studio_trashable` `v0.11.0` (#43).
 - Lockfile-only Bundler Audit: `crass` `>= 1.0.8` and `net-ssh` `>= 7.3.5` (conservative). `view_component` is unchanged.
 - Lockfile-only Bundler Audit: `rack` `>= 3.2.8` (conservative) in root and dummy.
+- Dummy Bundler Audit ignores `GHSA-8qw7-6phv-7q6p` while FlatPack `v0.1.213` pins `view_component ~> 4.12.0`. Root lockfile refreshes remaining audited gems except `view_component` and `json` (RuboCop 1.81.7).
 
 ## [0.6.0] - 2026-10-14
 

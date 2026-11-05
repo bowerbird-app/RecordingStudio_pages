@@ -112,6 +112,7 @@ For security issues, please report via GitHub Issues or contact the maintainers 
 
 - **2025-12-04**: Initial security review completed
 - **2026-10-05**: Dummy credentials use the shared RecordingStudio_* development master key; `master.key` stays gitignored
+- **2026-11-05**: Dummy `bin/bundler-audit` ignores `GHSA-8qw7-6phv-7q6p` (`view_component` `< 4.14.0`) because FlatPack `v0.1.213` requires `view_component ~> 4.12.0`. Revisit when FlatPack allows `>= 4.14.0`.
 - No vulnerabilities identified in current scope
 - Development environment appropriately configured
 - Production hardening checklist provided
