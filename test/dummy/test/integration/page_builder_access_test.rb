@@ -145,6 +145,64 @@ class PageBuilderAccessTest < ActionDispatch::IntegrationTest
     )
   end
 
+  test "outsider cannot persist a Profile after Accessible denies edit" do
+    people = RecordingStudioUser.people_root
+    outsider = create_actor!("profile-outsider-#{SecureRandom.hex(4)}@example.com")
+    Current.actor = outsider
+
+    refute RecordingStudioAccessible.authorized?(actor: outsider, recording: people, role: :edit)
+
+    profile = RecordingStudioUser::Profile.new(
+      user: outsider,
+      first_name: "Out",
+      last_name: "Sider",
+      time_zone: "UTC"
+    )
+    gate = RecordingStudio.configuration.authorize_write.call(
+      actor: outsider,
+      recording: nil,
+      recordable: profile,
+      parent_recording: people,
+      root_recording: people
+    )
+    refute gate
+
+    error = assert_raises(RecordingStudio::AuthorizationError) do
+      RecordingStudio.record!(
+        action: "created",
+        recordable: profile,
+        root_recording: people,
+        parent_recording: people,
+        actor: outsider
+      )
+    end
+    assert_match(/authorize_write/, error.message)
+    refute RecordingStudio::Recording.exists?(
+      root_recording: people,
+      recordable_type: "RecordingStudioUser::Profile",
+      recordable_id: profile.id
+    )
+  end
+
+  test "Users first Profile write stays Library 11 with no host exception" do
+    actor = create_actor!("profile-bootstrap-#{SecureRandom.hex(4)}@example.com")
+    Current.actor = actor
+    people = RecordingStudioUser.people_root
+    refute RecordingStudioAccessible.authorized?(actor: actor, recording: people, role: :edit)
+
+    begin
+      recording = RecordingStudioUser.record_profile!(
+        actor,
+        actor: actor,
+        first_name: "New",
+        last_name: "Member"
+      )
+      assert recording.present?
+    rescue RecordingStudio::AuthorizationError => error
+      skip "Users v0.27.1 first Profile cannot write under Library #11. #{error.message} Accessible cannot grant :edit on the shared People root, and Users records the Profile before bootstrap_owner_access! on that child. No host exception. Same gap Onboarding skips rather than papering over."
+    end
+  end
+
   test "core authorize_write denies content view-only revise" do
     page_recording = create_page!(
       parent_recording: @root,

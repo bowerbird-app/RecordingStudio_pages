@@ -234,6 +234,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes initializer_source, "RecordingStudio::Access"
     refute_includes initializer_source, "access_recordings_for"
     refute_includes initializer_source, "actor.present?"
+    refute_includes initializer_source, "shared_root_tree?"
     assert_includes initializer_source, "RecordingStudioPages::Page"
     assert_includes initializer_source, "RecordingStudioPages::Section"
     assert_includes initializer_source, "RecordingStudioUser::People"

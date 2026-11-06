@@ -353,13 +353,17 @@ begin
   end
 
   if RecordingStudioUser.profile_for(user).nil?
-    RecordingStudioUser.record_profile!(
-      user,
-      first_name: "Ada",
-      last_name: "Admin",
-      time_zone: "UTC",
-      actor: user
-    )
+    begin
+      RecordingStudioUser.record_profile!(
+        user,
+        first_name: "Ada",
+        last_name: "Admin",
+        time_zone: "UTC",
+        actor: user
+      )
+    rescue RecordingStudio::AuthorizationError => error
+      warn "Skipping seeded admin Profile. Users v0.27.1 first Profile cannot write under Library #11 (#{error.message}). Accessible cannot grant :edit on the shared People root."
+    end
   end
 
   folder_recording = find_or_record_child.call(folder, root_recording, root_recording)

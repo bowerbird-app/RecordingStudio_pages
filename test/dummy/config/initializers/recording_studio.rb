@@ -26,13 +26,7 @@ RecordingStudio.configure do |config|
     next false unless target
 
     role = access_row ? :admin : :edit
-    next true if RecordingStudioAccessible.authorized?(actor: actor, recording: target, role: role)
-
-    # People is a shared root. Accessible rejects grants on it. Users writes the
-    # Profile child first, then bootstraps owner access on that child.
-    defined?(RecordingStudioUser::Profile) &&
-      recordable.is_a?(RecordingStudioUser::Profile) &&
-      RecordingStudio.shared_root_tree?(target)
+    RecordingStudioAccessible.authorized?(actor: actor, recording: target, role: role)
   }
   config.event_notifications_enabled = true
   config.idempotency_mode = :return_existing
