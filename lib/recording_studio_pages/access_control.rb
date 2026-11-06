@@ -37,10 +37,10 @@ module RecordingStudioPages
       scope = page_recordings
       return scope.none unless accessible && actor
 
-      ids = scope.filter_map do |recording|
-        recording.id if authorized?(actor: actor, recording: recording, role: :view, accessible: accessible)
-      end
-      scope.where(id: ids)
+      root_ids = RecordingStudioAccessible.root_recording_ids_for(actor: actor, minimum_role: :view)
+      return scope.none if root_ids.empty?
+
+      scope.where(root_recording_id: root_ids)
     end
 
     def find_page_recording!(id:, actor:, accessible: accessible_loaded?)
@@ -55,9 +55,10 @@ module RecordingStudioPages
     def first_writable_workspace_root(actor:, accessible: accessible_loaded?)
       return unless accessible && actor
 
-      workspace_roots.find do |recording|
-        authorized?(actor: actor, recording: recording, role: :edit, accessible: accessible)
-      end
+      root_ids = RecordingStudioAccessible.root_recording_ids_for(actor: actor, minimum_role: :edit)
+      return if root_ids.empty?
+
+      workspace_roots.where(id: root_ids).first
     end
 
     def writable_page_parent(recording, actor:, accessible: accessible_loaded?)

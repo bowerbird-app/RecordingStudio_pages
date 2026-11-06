@@ -7,7 +7,13 @@ module RecordingStudioPages
       before_action :require_admin_access!
 
       helper_method :page_recording, :section_recordings, :page_builder_page_path, :section_definitions,
-                    :add_section_form_id, :section_action_form_id, :trash_page_form_id
+                    :add_section_form_id, :section_action_form_id, :trash_page_form_id, :current_admin_actor
+
+      def current_admin_actor
+        return current_user if respond_to?(:current_user)
+
+        Current.actor if defined?(Current)
+      end
 
       def default_url_options
         options = super || {}
@@ -68,7 +74,11 @@ module RecordingStudioPages
       end
 
       def require_admin_write_access!
-        return if admin_authorized?(:edit)
+        require_content_write_access!(page_recording)
+      end
+
+      def require_content_write_access!(recording)
+        return if AccessControl.authorized?(actor: current_admin_actor, recording: recording, role: :edit)
 
         head :forbidden
       end
@@ -89,12 +99,6 @@ module RecordingStudioPages
 
       def admin_context
         RecordingStudioAdmin::Context.new(controller: self) if defined?(RecordingStudioAdmin::Context)
-      end
-
-      def current_admin_actor
-        return current_user if respond_to?(:current_user)
-
-        Current.actor if defined?(Current)
       end
 
       def page_recording

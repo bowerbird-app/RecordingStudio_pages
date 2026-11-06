@@ -358,11 +358,11 @@ begin
   private_root_recording = RecordingStudio.root_recording_for(private_workspace)
   admin_root_recording = RecordingStudio.root_recording_for(admin_root)
 
-  folder_recording = find_or_record_child.call(folder, root_recording, root_recording)
-
   [root_recording, accessible_root_recording, private_root_recording, admin_root_recording].each do |recording|
     grant_admin_access.call(recording, user)
   end
+
+  folder_recording = find_or_record_child.call(folder, root_recording, root_recording)
 
   homepage_recording = find_page_recording.call("Home")
 

@@ -183,7 +183,7 @@ Edit section puts **Update** and **Cancel** under the title, then the same Grid:
 
 Gem screens call `recording_studio_pages_nav`, which uses Recording Studio page nav (back and close). Pass the original trigger as `anchor_url` so Close can leave the action stack. That is the root that opened Admin, not the Pages list. Dummy default layout maps `page_nav_anchor_url` to Flatpack PageNav `anchor_href`. Dummy signed-in `/` uses a Flatpack sidebar and a root switcher in the top bar. Dummy `/docs` still adds a root switcher and Sign out through `dummy_page_nav`. Do not wrap that host chrome onto gem screens.
 
-Writes need Accessible `:edit` on the configured admin root. Reads need `:view`. Missing Accessible or Admin denies the builder. The pages list and editor only include pages the actor can `:view`. New pages parent under a workspace or folder the actor can `:edit`.
+Opening the builder needs Accessible `:view` on the configured admin root. Changing a page needs Accessible `:edit` on that page (or the workspace it sits in) — `:edit` on the admin root is not enough if the page is only `:view`. Missing Accessible or Admin denies the builder. The pages list and editor only include pages under roots the actor can `:view`, queried through Accessible so counts stay in SQL. New pages parent under a workspace or folder the actor can `:edit`. Dummy `config.authorize_write` uses the same Accessible `:edit` check on the recording being written.
 
 `/admin` is the RS Admin hub. Switch the current root to **Admin** first. RS Admin forbids the hub while the current root is a workspace. The page builder editor does not require that switch.
 
@@ -249,7 +249,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ### Upgrading to 0.8.0
 
-Install Pages `0.8.0`. No migration. Page Builder admin fails closed without Accessible and Admin, and only shows pages the actor can `:view`. New pages parent under a workspace the actor can `:edit`. Dummy Admin stays `v2.9.1`. See [UPGRADING.md](UPGRADING.md).
+Install Pages `0.8.0`. No migration. Page Builder admin fails closed without Accessible and Admin, and only shows pages the actor can `:view`. Saving a page needs Accessible `:edit` on that page. Dummy Admin stays `v2.9.1`. See [UPGRADING.md](UPGRADING.md).
 
 ### Upgrading to 0.7.0
 

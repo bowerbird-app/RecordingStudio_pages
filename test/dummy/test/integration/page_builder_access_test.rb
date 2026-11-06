@@ -51,6 +51,78 @@ class PageBuilderAccessTest < ActionDispatch::IntegrationTest
     assert_equal @root.id, created.parent_recording_id
   end
 
+  test "page_recordings_for stays a SQL relation over Accessible roots" do
+    visible = create_page!(parent_recording: @root, title: "Mine #{SecureRandom.hex(4)}", actor: @actor)
+    hidden = hidden_page_on_other_workspace
+
+    relation = RecordingStudioPages::AccessControl.page_recordings_for(actor: @actor)
+
+    assert_kind_of ActiveRecord::Relation, relation
+    sql = relation.to_sql
+    assert_includes sql, "root_recording_id"
+    assert_includes relation.pluck(:id), visible.id
+    refute_includes relation.pluck(:id), hidden.id
+    assert_equal 1, relation.where(id: visible.id).limit(1).count
+  end
+
+  test "content view-only staff cannot mutate a page they can open" do
+    page_recording = create_page!(
+      parent_recording: @root,
+      title: "Look do not touch #{SecureRandom.hex(4)}",
+      actor: @actor
+    )
+    section = add_section!(
+      page_recording: page_recording,
+      section_type: "hero",
+      content: { title: "Stay put" },
+      actor: @actor
+    )
+    staff = content_view_only_staff
+
+    sign_in staff
+    Current.actor = staff
+
+    get recording_studio_pages.admin_page_path(page_recording)
+    assert_response :success
+    assert_includes response.body, page_recording.recordable.title
+
+    patch recording_studio_pages.admin_page_path(page_recording),
+          params: { page: { title: "Should not save" } }
+    assert_response :forbidden
+    assert_includes page_recording.reload.recordable.title, "Look do not touch"
+
+    post recording_studio_pages.admin_page_sections_path(page_recording),
+         params: { section: { section_type: "rich_text", content: { title: "Nope" } } }
+    assert_response :forbidden
+
+    patch recording_studio_pages.admin_page_section_path(page_recording, section),
+          params: { section: { content: { title: "Nope" } } }
+    assert_response :forbidden
+
+    post recording_studio_pages.admin_pages_path, params: { page: { title: "Should not create" } }
+    assert_response :forbidden
+  end
+
+  test "core authorize_write denies content view-only revise" do
+    page_recording = create_page!(
+      parent_recording: @root,
+      title: "Core gate #{SecureRandom.hex(4)}",
+      actor: @actor
+    )
+    staff = content_view_only_staff
+    Current.actor = staff
+
+    error = assert_raises(RecordingStudio::AuthorizationError) do
+      RecordingStudioPages::Services::RevisePage.call(
+        page_recording: page_recording,
+        title: "Hijacked",
+        actor: staff
+      ).value!
+    end
+    assert_match(/authorize_write/, error.message)
+    assert_includes page_recording.reload.recordable.title, "Core gate"
+  end
+
   test "staff with only the admin root cannot open another workspace page" do
     hidden = hidden_page_on_other_workspace
     staff = create_actor!("admin-only-pages@example.com")
@@ -74,6 +146,27 @@ class PageBuilderAccessTest < ActionDispatch::IntegrationTest
   end
 
   private
+
+  def content_view_only_staff
+    staff = create_actor!("content-view-only-#{SecureRandom.hex(4)}@example.com")
+    granted_admin = RecordingStudioAccessible.grant_access(
+      recording: @admin_root,
+      actor: staff,
+      role: :edit,
+      manager_actor: @actor
+    )
+    raise granted_admin.error if granted_admin.failure?
+
+    granted_content = RecordingStudioAccessible.grant_access(
+      recording: @root,
+      actor: staff,
+      role: :view,
+      manager_actor: @actor
+    )
+    raise granted_content.error if granted_content.failure?
+
+    staff
+  end
 
   def hidden_page_on_other_workspace
     other_actor = create_actor!("other-pages-#{SecureRandom.hex(4)}@example.com")

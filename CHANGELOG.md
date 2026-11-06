@@ -13,13 +13,15 @@ Page Builder admin fails closed and lists only pages the actor can see through R
 
 ### Changed
 - Admin `admin_authorized?` denies when Accessible or Admin is missing, when the actor or access recording is blank, or when Accessible says no. It no longer allows those requests through.
-- The pages list, page editor lookup, create-parent workspace, and Admin Pages screen query go through Accessible `:view` / `:edit` on the recording. Staff still need Accessible access on the Admin mount recording to open the builder.
-- Development pin is Recording Studio `v6.5.0`. Dummy pins Accessible `v0.24.2`, Trashable `v0.12.3`, Metrics `v0.7.3`, Cache `v0.6.3`, Logs `v0.7.4`, Root Switchable `v0.11.7`, Users `v0.27.1`, Publishable `v0.13.2`, Orderable `v0.4.9`, Duplicatable `v0.6.2`. Admin stays on dummy `v2.9.1` (host policy 2.5.1; not bumped). Attachable stays `v0.22.1`. FlatPack stays `v0.1.341`. Dummy sets `config.authorize_write` so core 6.5 fail-closed writes boot.
+- The pages list, page editor lookup, create-parent workspace, and Admin Pages screen query go through Accessible `:view` / `:edit` on the recording. The list uses Accessible `root_recording_ids_for` so pagination and counts stay in SQL.
+- Changing a page requires Accessible `:edit` on that page or its parent workspace. Admin-root `:edit` with content-only `:view` is denied. Dummy `config.authorize_write` uses the same Accessible check. Accessible grant writes still pass through `AccessCreationContext`. A root with no grants yet still accepts the first seed/bootstrap write.
+- Staff still need Accessible access on the Admin mount recording to open the builder.
+- Development pin is Recording Studio `v6.5.0`. Dummy pins Accessible `v0.24.2`, Trashable `v0.12.3`, Metrics `v0.7.3`, Cache `v0.6.3`, Logs `v0.7.4`, Root Switchable `v0.11.7`, Users `v0.27.1`, Publishable `v0.13.2`, Orderable `v0.4.9`, Duplicatable `v0.6.2`. Admin stays on dummy `v2.9.1` (host policy 2.5.1; not bumped). Attachable stays `v0.22.1`. FlatPack stays `v0.1.341`. Dummy `config.authorize_write` requires Accessible `:edit` on the written recording.
 
 ### Upgrade notes
 - Install Pages `0.8.0`. No Pages migration.
 - Admin page builder requires Accessible and Admin. Missing gems, a missing access recording, or a missing actor is forbidden.
-- Staff only see and open pages they can `:view`. New pages parent under a workspace (or configured page parent) they can `:edit`. Grant Accessible access on the workspace as well as the Admin root, or the builder list is empty.
+- Staff only see and open pages under roots they can `:view`. New pages parent under a workspace (or configured page parent) they can `:edit`. Saving a page needs `:edit` on that page, not only on the Admin root. Grant Accessible access on the workspace as well as the Admin root, or the builder list is empty.
 - Dummy Admin stays `v2.9.1`. Do not take this gem as a signal to move hosts off the Admin 2.5.1 policy. Users `v0.27.1` still ships its own Admin pin (off-policy; unchanged here).
 
 ## [0.7.0] - 2026-11-05

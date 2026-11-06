@@ -99,11 +99,21 @@ module RecordingStudioPages
     end
 
     def self.actor_from(context)
+      if context.respond_to?(:current_actor)
+        actor = context.current_actor
+        return actor unless actor.nil?
+      end
+
+      if defined?(Current) && Current.respond_to?(:actor)
+        actor = Current.actor
+        return actor unless actor.nil?
+      end
+
       controller = context.respond_to?(:controller) ? context.controller : nil
       return unless controller
 
-      if controller.respond_to?(:current_admin_actor, true)
-        controller.send(:current_admin_actor)
+      if controller.respond_to?(:current_admin_actor)
+        controller.current_admin_actor
       elsif controller.respond_to?(:current_user)
         controller.current_user
       end

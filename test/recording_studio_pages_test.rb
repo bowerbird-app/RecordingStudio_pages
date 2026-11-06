@@ -227,7 +227,11 @@ class RecordingStudioPagesTest < Minitest::Test
     initializer_source = File.read(initializer_path)
 
     assert_includes initializer_source, "config.require_recordable_declarations = true"
-    assert_includes initializer_source, "config.authorize_write = ->(actor:, **) { actor.present? }"
+    assert_includes initializer_source, "RecordingStudioAccessible.authorized?"
+    assert_includes initializer_source, "role: :edit"
+    assert_includes initializer_source, "AccessCreationContext.allowed?"
+    assert_includes initializer_source, "access_recordings_for(root)"
+    refute_includes initializer_source, "actor.present?"
     assert_includes initializer_source, "RecordingStudioPages::Page"
     assert_includes initializer_source, "RecordingStudioPages::Section"
     assert_includes initializer_source, "RecordingStudioUser::People"

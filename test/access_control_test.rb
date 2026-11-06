@@ -73,6 +73,34 @@ class AccessControlTest < Minitest::Test
     refute_includes source, "recordable_type: \"Workspace\""
   end
 
+  def test_page_list_uses_accessible_root_scope_in_sql
+    source = File.read(File.expand_path("../lib/recording_studio_pages/access_control.rb", __dir__))
+
+    assert_includes source, "RecordingStudioAccessible.root_recording_ids_for"
+    assert_includes source, "minimum_role: :view"
+    assert_includes source, "scope.where(root_recording_id: root_ids)"
+    refute_includes source, "filter_map"
+    refute_includes source, "ids = scope.filter_map"
+  end
+
+  def test_admin_actor_from_uses_public_readers
+    source = File.read(File.expand_path("../lib/recording_studio_pages/admin.rb", __dir__))
+
+    refute_includes source, "send(:current_admin_actor)"
+    refute_includes source, "respond_to?(:current_admin_actor, true)"
+    assert_includes source, "context.current_actor"
+    assert_includes source, "Current.actor"
+    assert_includes source, "controller.current_admin_actor"
+
+    controller = File.read(
+      File.expand_path("../app/controllers/recording_studio_pages/admin/base_controller.rb", __dir__)
+    )
+    assert_includes controller, "helper_method :page_recording"
+    assert_includes controller, ":current_admin_actor"
+    assert_includes controller, "require_content_write_access!"
+    refute_includes controller, "admin_authorized?(:edit)"
+  end
+
   def test_writable_page_parent_denies_when_accessible_is_missing
     recording = Object.new
     def recording.recordable_type

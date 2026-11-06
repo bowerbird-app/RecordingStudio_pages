@@ -3,7 +3,8 @@
 module RecordingStudioPages
   module Admin
     class PagesController < BaseController
-      before_action :require_admin_write_access!, only: %i[create update destroy]
+      before_action :require_create_write_access!, only: :create
+      before_action :require_admin_write_access!, only: %i[update destroy]
 
       def index
         @page_recordings = page_scope
@@ -67,6 +68,10 @@ module RecordingStudioPages
 
       def checked?(value)
         ActiveModel::Type::Boolean.new.cast(value) == true
+      end
+
+      def require_create_write_access!
+        require_content_write_access!(create_parent_recording)
       end
 
       def create_parent_recording
