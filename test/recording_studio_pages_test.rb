@@ -228,9 +228,11 @@ class RecordingStudioPagesTest < Minitest::Test
 
     assert_includes initializer_source, "config.require_recordable_declarations = true"
     assert_includes initializer_source, "RecordingStudioAccessible.authorized?"
-    assert_includes initializer_source, "role: :edit"
+    assert_includes initializer_source, ":edit"
+    assert_includes initializer_source, ":admin"
     assert_includes initializer_source, "AccessCreationContext.allowed?"
-    assert_includes initializer_source, "access_recordings_for(root)"
+    assert_includes initializer_source, "RecordingStudio::Access"
+    refute_includes initializer_source, "access_recordings_for"
     refute_includes initializer_source, "actor.present?"
     assert_includes initializer_source, "RecordingStudioPages::Page"
     assert_includes initializer_source, "RecordingStudioPages::Section"

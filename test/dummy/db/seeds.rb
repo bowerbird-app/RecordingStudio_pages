@@ -333,16 +333,6 @@ if user.new_record?
   user.save!
 end
 
-if RecordingStudioUser.profile_for(user).nil?
-  RecordingStudioUser.record_profile!(
-    user,
-    first_name: "Ada",
-    last_name: "Admin",
-    time_zone: "UTC",
-    actor: user
-  )
-end
-
 workspace = Workspace.find_or_create_by!(name: "Studio Workspace")
 accessible_workspace = Workspace.find_or_create_by!(name: "Client Workspace")
 private_workspace = Workspace.find_or_create_by!(name: "Private Workspace")
@@ -360,6 +350,16 @@ begin
 
   [root_recording, accessible_root_recording, private_root_recording, admin_root_recording].each do |recording|
     grant_admin_access.call(recording, user)
+  end
+
+  if RecordingStudioUser.profile_for(user).nil?
+    RecordingStudioUser.record_profile!(
+      user,
+      first_name: "Ada",
+      last_name: "Admin",
+      time_zone: "UTC",
+      actor: user
+    )
   end
 
   folder_recording = find_or_record_child.call(folder, root_recording, root_recording)

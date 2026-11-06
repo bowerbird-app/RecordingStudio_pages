@@ -103,6 +103,48 @@ class PageBuilderAccessTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
+  test "AccessCreationContext does not persist a page for a view-only actor" do
+    page_recording = create_page!(
+      parent_recording: @root,
+      title: "Context gate #{SecureRandom.hex(4)}",
+      actor: @actor
+    )
+    staff = content_view_only_staff
+    Current.actor = staff
+
+    error = assert_raises(RecordingStudio::AuthorizationError) do
+      RecordingStudioAccessible::AccessCreationContext.allow do
+        RecordingStudioPages::Services::RevisePage.call(
+          page_recording: page_recording,
+          title: "Hijacked in context",
+          actor: staff
+        ).value!
+      end
+    end
+    assert_match(/authorize_write/, error.message)
+    assert_includes page_recording.reload.recordable.title, "Context gate"
+  end
+
+  test "empty tree does not let an ungranted actor persist a page" do
+    empty_root = create_workspace_root!("Empty #{SecureRandom.hex(4)}")
+    stranger = create_actor!("empty-tree-#{SecureRandom.hex(4)}@example.com")
+    Current.actor = stranger
+
+    error = assert_raises(RecordingStudio::AuthorizationError) do
+      RecordingStudioPages::Services::CreatePage.call(
+        parent_recording: empty_root,
+        title: "Should not land",
+        actor: stranger
+      ).value!
+    end
+    assert_match(/authorize_write/, error.message)
+    assert RecordingStudioAccessible.access_recordings_for(empty_root).none?
+    refute RecordingStudio::Recording.exists?(
+      root_recording: empty_root,
+      recordable_type: "RecordingStudioPages::Page"
+    )
+  end
+
   test "core authorize_write denies content view-only revise" do
     page_recording = create_page!(
       parent_recording: @root,
