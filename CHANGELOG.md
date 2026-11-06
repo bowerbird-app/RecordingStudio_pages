@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-06
+
+Page Builder admin fails closed and lists only pages the actor can see through Recording Studio Accessible.
+
+### Changed
+- Admin `admin_authorized?` denies when Accessible or Admin is missing, when the actor or access recording is blank, or when Accessible says no. It no longer allows those requests through.
+- The pages list, page editor lookup, create-parent workspace, and Admin Pages screen query go through Accessible `:view` / `:edit` on the recording. The list uses Accessible `root_recording_ids_for` so pagination and counts stay in SQL.
+- Changing a page requires Accessible `:edit` on that page or its parent workspace. Admin-root `:edit` with content-only `:view` is denied. Dummy `config.authorize_write` uses the same Accessible check. `AccessCreationContext` allows only `RecordingStudio::Access` rows. Other writes still need Accessible `:edit`. Access rows outside that context need `:admin`. A root with no grants does not allow Page, folder, or Users Profile writes. Seeds and tests grant Accessible access before those child writes. Users `v0.27.1` still records the first Profile under the shared People root before `bootstrap_owner_access!` on that child; Accessible cannot grant `:edit` on People, so that Users bootstrap write is denied. Dummy does not add a host exception.
+- Staff still need Accessible access on the Admin mount recording to open the builder.
+- Development pin is Recording Studio `v6.5.0`. Dummy pins Accessible `v0.24.2`, Trashable `v0.12.3`, Metrics `v0.7.3`, Cache `v0.6.3`, Logs `v0.7.4`, Root Switchable `v0.11.7`, Users `v0.27.1`, Publishable `v0.13.2`, Orderable `v0.4.9`, Duplicatable `v0.6.2`. Admin stays on dummy `v2.9.1` (host policy 2.5.1; not bumped). Attachable stays `v0.22.1`. FlatPack stays `v0.1.341`. Dummy `config.authorize_write` requires Accessible `:edit` on the written recording.
+
+### Upgrade notes
+- Install Pages `0.8.0`. No Pages migration.
+- Admin page builder requires Accessible and Admin. Missing gems, a missing access recording, or a missing actor is forbidden.
+- Staff only see and open pages under roots they can `:view`. New pages parent under a workspace (or configured page parent) they can `:edit`. Saving a page needs `:edit` on that page, not only on the Admin root. Grant Accessible access on the workspace as well as the Admin root, or the builder list is empty.
+- Dummy Admin stays `v2.9.1`. Do not take this gem as a signal to move hosts off the Admin 2.5.1 policy. Users `v0.27.1` still ships its own Admin pin (off-policy; unchanged here).
+
 ## [0.7.0] - 2026-11-05
 
 Core 6.3 Default Layout, FlatPack 0.1.341, and a security lockfile refresh. No Pages migration.
@@ -442,7 +459,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.5.1...v0.6.0
 [0.5.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.4.0...v0.5.0

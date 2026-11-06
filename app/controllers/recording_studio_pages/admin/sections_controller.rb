@@ -3,8 +3,8 @@
 module RecordingStudioPages
   module Admin
     class SectionsController < BaseController
-      before_action :require_admin_write_access!, only: %i[create update destroy reorder toggle duplicate]
       before_action :page_recording
+      before_action :require_admin_write_access!, only: %i[create update destroy reorder toggle duplicate]
 
       def new
         redirect_to admin_page_path(id: page_recording.id)
