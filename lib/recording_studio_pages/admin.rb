@@ -98,6 +98,17 @@ module RecordingStudioPages
       RecordingStudioAdmin.configuration.default_mount_path.to_s.chomp("/")
     end
 
+    def self.actor_from(context)
+      controller = context.respond_to?(:controller) ? context.controller : nil
+      return unless controller
+
+      if controller.respond_to?(:current_admin_actor, true)
+        controller.send(:current_admin_actor)
+      elsif controller.respond_to?(:current_user)
+        controller.current_user
+      end
+    end
+
     def self.render_publishable_actions(recording, context)
       view = context.respond_to?(:view_context) ? context.view_context : nil
       return unless view
@@ -171,10 +182,11 @@ module RecordingStudioPages
         RecordingStudioPages::Admin.render_page_title(recording, context)
       }
 
-      query do |_context|
-        RecordingStudio::Recording.where(recordable_type: "RecordingStudioPages::Page", trashed_at: nil)
-                                  .includes(:recordable)
-                                  .order(updated_at: :desc)
+      query do |context|
+        actor = RecordingStudioPages::Admin.actor_from(context)
+        RecordingStudioPages::AccessControl.page_recordings_for(actor: actor)
+                                           .includes(:recordable)
+                                           .order(updated_at: :desc)
       end
 
       table do

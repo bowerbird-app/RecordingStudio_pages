@@ -15,6 +15,7 @@ RecordingStudio.configure do |config|
   config.require_recordable_declarations = true
   config.app_name = "Page Builder" if config.respond_to?(:app_name=)
   config.actor = -> { Current.actor }
+  config.authorize_write = ->(actor:, **) { actor.present? }
   config.event_notifications_enabled = true
   config.idempotency_mode = :return_existing
   config.recordable_dup_strategy = :dup

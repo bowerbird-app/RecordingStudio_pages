@@ -3,6 +3,7 @@
 require "recording_studio"
 require "view_component"
 require "recording_studio_pages/version"
+require "recording_studio_pages/access_control"
 require "recording_studio_pages/errors"
 require "recording_studio_pages/copy"
 require "recording_studio_pages/configuration"

@@ -74,17 +74,17 @@ module RecordingStudioPages
       end
 
       def admin_authorized?(role)
-        return true unless defined?(RecordingStudioAccessible)
-        return true unless defined?(RecordingStudioAdmin)
-
-        access_recording = RecordingStudioAdmin.configuration.access_recording_resolver&.call(admin_context)
-        return false unless access_recording
-
-        RecordingStudioAccessible.authorized?(
+        AccessControl.admin_authorized?(
+          role: role,
           actor: current_admin_actor,
-          recording: access_recording,
-          role: role
+          access_recording: admin_access_recording
         )
+      end
+
+      def admin_access_recording
+        return unless defined?(RecordingStudioAdmin)
+
+        RecordingStudioAdmin.configuration.access_recording_resolver&.call(admin_context)
       end
 
       def admin_context
@@ -98,10 +98,9 @@ module RecordingStudioPages
       end
 
       def page_recording
-        @page_recording ||= RecordingStudio::Recording.find_by!(
+        @page_recording ||= AccessControl.find_page_recording!(
           id: params[:page_id] || params[:id],
-          recordable_type: "RecordingStudioPages::Page",
-          trashed_at: nil
+          actor: current_admin_actor
         )
       end
 

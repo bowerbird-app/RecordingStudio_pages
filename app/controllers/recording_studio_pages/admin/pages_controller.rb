@@ -56,9 +56,9 @@ module RecordingStudioPages
       private
 
       def page_scope
-        RecordingStudio::Recording.where(recordable_type: "RecordingStudioPages::Page", trashed_at: nil)
-                                  .includes(:recordable)
-                                  .order(updated_at: :desc)
+        AccessControl.page_recordings_for(actor: current_admin_actor)
+                     .includes(:recordable)
+                     .order(updated_at: :desc)
       end
 
       def page_params
@@ -70,7 +70,8 @@ module RecordingStudioPages
       end
 
       def create_parent_recording
-        switched_content_root || first_workspace_root
+        AccessControl.writable_page_parent(switched_content_root, actor: current_admin_actor) ||
+          AccessControl.first_writable_workspace_root(actor: current_admin_actor)
       end
 
       def switched_content_root
@@ -78,19 +79,10 @@ module RecordingStudioPages
 
         recording = current_root_recording
         return if recording.blank?
-        return recording if RecordingStudioPages.page_parent?(recording)
 
-        nil
+        recording
       rescue StandardError
         nil
-      end
-
-      def first_workspace_root
-        RecordingStudio::Recording.find_by(
-          parent_recording_id: nil,
-          trashed_at: nil,
-          recordable_type: "Workspace"
-        )
       end
 
       def render_failure(result, view)

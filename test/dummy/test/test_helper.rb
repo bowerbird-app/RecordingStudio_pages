@@ -118,7 +118,8 @@ module PageBuilderTestHelper
       action: "created",
       recordable: recordable,
       root_recording: root_recording,
-      parent_recording: parent_recording
+      parent_recording: parent_recording,
+      actor: Current.actor
     ).recording
   end
 end

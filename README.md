@@ -11,6 +11,7 @@ Add the gem, then install and migrate:
 ```ruby
 # Gemfile
 gem "recording_studio_pages", github: "bowerbird-app/RecordingStudio_pages"
+gem "recording_studio_accessible", github: "bowerbird-app/RecordingStudio_accessible"
 gem "recording_studio_publishable", github: "bowerbird-app/RecordingStudio_publishable"
 gem "recording_studio_orderable", github: "bowerbird-app/RecordingStudio_orderable"
 gem "recording_studio_duplicatable", github: "bowerbird-app/RecordingStudio_duplicatable"
@@ -182,7 +183,7 @@ Edit section puts **Update** and **Cancel** under the title, then the same Grid:
 
 Gem screens call `recording_studio_pages_nav`, which uses Recording Studio page nav (back and close). Pass the original trigger as `anchor_url` so Close can leave the action stack. That is the root that opened Admin, not the Pages list. Dummy default layout maps `page_nav_anchor_url` to Flatpack PageNav `anchor_href`. Dummy signed-in `/` uses a Flatpack sidebar and a root switcher in the top bar. Dummy `/docs` still adds a root switcher and Sign out through `dummy_page_nav`. Do not wrap that host chrome onto gem screens.
 
-Writes need Accessible `:edit` on the configured admin root. Reads need `:view`.
+Writes need Accessible `:edit` on the configured admin root. Reads need `:view`. Missing Accessible or Admin denies the builder. The pages list and editor only include pages the actor can `:view`. New pages parent under a workspace or folder the actor can `:edit`.
 
 `/admin` is the RS Admin hub. Switch the current root to **Admin** first. RS Admin forbids the hub while the current root is a workspace. The page builder editor does not require that switch.
 
@@ -242,9 +243,13 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.7.0. Gemspec requires `recording_studio >= 6.3.0` and `flat_pack >= 0.1.341`. Dummy GitHub tags: Recording Studio `v6.3.0`, Accessible `v0.24.1`, Attachable `v0.22.1`, Users `v0.27.0`, Publishable `v0.13.0`, Orderable `v0.4.8`, Duplicatable `v0.6.1`, Trashable `v0.12.2`, Admin `v2.9.1`, Root Switchable `v0.11.5`, Cache `v0.6.2`, Metrics `v0.7.2`, Logs `v0.7.3`, FlatPack `v0.1.341`. Dummy omits Terms until that gem allows core 6.3. Admin 2.9.1 needs Logs.
+0.8.0. Gemspec requires `recording_studio >= 6.3.0` and `flat_pack >= 0.1.341`. Dummy GitHub tags: Recording Studio `v6.5.0`, Accessible `v0.24.2`, Attachable `v0.22.1`, Users `v0.27.1`, Publishable `v0.13.2`, Orderable `v0.4.9`, Duplicatable `v0.6.2`, Trashable `v0.12.3`, Admin `v2.9.1` (left on 2.9.1; host policy is 2.5.1), Root Switchable `v0.11.7`, Cache `v0.6.3`, Metrics `v0.7.3`, Logs `v0.7.4`, FlatPack `v0.1.341`. Dummy omits Terms until that gem allows core 6.3. Admin 2.9.1 needs Logs.
 
 ## Upgrade
+
+### Upgrading to 0.8.0
+
+Install Pages `0.8.0`. No migration. Page Builder admin fails closed without Accessible and Admin, and only shows pages the actor can `:view`. New pages parent under a workspace the actor can `:edit`. Dummy Admin stays `v2.9.1`. See [UPGRADING.md](UPGRADING.md).
 
 ### Upgrading to 0.7.0
 
