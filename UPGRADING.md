@@ -1,5 +1,14 @@
 # Upgrading Recording Studio Pages
 
+## 0.8.0
+
+Bump to `0.8.0`. No Pages migration.
+
+1. Install Pages `0.8.0`. Keep Recording Studio `>= 6.3.0` (dummy development pin `v6.5.0`) and FlatPack `>= 0.1.341`. Core 6.5.0 requires `config.authorize_write`. Dummy checks Accessible `:edit` on the recording being written (not a present actor). Host `AccessCreationContext` must allow only `RecordingStudio::Access` rows. Call `bootstrap_owner_access!` or `grant_access` before child Page or folder writes. Dummy does not allow a Profile write after Accessible `:edit` is false. Users `v0.27.1` first Profile under the shared People root stays a Users bootstrap gap.
+2. Page Builder admin now fails closed: Accessible and Admin must be loaded, the access recording must resolve, and the actor must be Accessible-authorized on that recording. Missing Accessible used to allow the request.
+3. The pages list and editor only load pages under roots the actor can `:view` (Accessible `root_recording_ids_for`). Creating a page parents it under a workspace (or other configured page parent) the actor can `:edit`. Saving still needs `:edit` on that page. Grant Accessible access on the content root as well as the Admin root. `:edit` on the Admin root with only `:view` on the page does not allow a save.
+4. Dummy Admin stays `v2.9.1`. Hosts that follow the Admin 2.5.1 policy should not bump Admin from this gem. Users `v0.27.1` remains off-policy for Admin; this gem does not change that.
+
 ## 0.7.0
 
 Bump to `0.7.0` with Recording Studio `>= 6.3.0` and FlatPack `>= 0.1.341`. No Pages migration.

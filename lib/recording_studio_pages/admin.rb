@@ -98,6 +98,46 @@ module RecordingStudioPages
       RecordingStudioAdmin.configuration.default_mount_path.to_s.chomp("/")
     end
 
+    def self.actor_from(context)
+      actor = actor_from_context(context)
+      return actor unless actor.nil?
+
+      actor = actor_from_current
+      return actor unless actor.nil?
+
+      actor_from_controller(context)
+    end
+
+    def self.actor_from_context(context)
+      return unless context.respond_to?(:current_actor)
+
+      context.current_actor
+    end
+    private_class_method :actor_from_context
+
+    def self.actor_from_current
+      return unless defined?(Current) && Current.respond_to?(:actor)
+
+      Current.actor
+    end
+    private_class_method :actor_from_current
+
+    def self.actor_from_controller(context)
+      controller = context.respond_to?(:controller) ? context.controller : nil
+      return unless controller
+
+      actor_from_admin_controller(controller)
+    end
+    private_class_method :actor_from_controller
+
+    def self.actor_from_admin_controller(controller)
+      return controller.current_admin_actor if controller.respond_to?(:current_admin_actor)
+      return controller.current_user if controller.respond_to?(:current_user)
+
+      nil
+    end
+    private_class_method :actor_from_admin_controller
+
     def self.render_publishable_actions(recording, context)
       view = context.respond_to?(:view_context) ? context.view_context : nil
       return unless view
@@ -171,10 +211,11 @@ module RecordingStudioPages
         RecordingStudioPages::Admin.render_page_title(recording, context)
       }
 
-      query do |_context|
-        RecordingStudio::Recording.where(recordable_type: "RecordingStudioPages::Page", trashed_at: nil)
-                                  .includes(:recordable)
-                                  .order(updated_at: :desc)
+      query do |context|
+        actor = RecordingStudioPages::Admin.actor_from(context)
+        RecordingStudioPages::AccessControl.page_recordings_for(actor: actor)
+                                           .includes(:recordable)
+                                           .order(updated_at: :desc)
       end
 
       table do

@@ -29,13 +29,15 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
 
   test "allowed child can be recorded under a workspace root" do
     root_recording = RecordingStudio.root_recording_for(Workspace.create!(name: unique_name("Child Workspace")))
+    grant_write!(root_recording)
     folder = Folder.new(name: unique_name("Allowed Folder"))
 
     event = RecordingStudio.record!(
       action: "created",
       recordable: folder,
       root_recording: root_recording,
-      parent_recording: root_recording
+      parent_recording: root_recording,
+      actor: write_actor
     )
 
     assert_equal folder, event.recording.recordable
@@ -44,6 +46,7 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
 
   test "page can be recorded under allowed workspace and folder parents" do
     root_recording = RecordingStudio.root_recording_for(Workspace.create!(name: unique_name("Page Workspace")))
+    grant_write!(root_recording)
     folder_recording = record_child(Folder.new(name: unique_name("Page Folder")), root_recording, root_recording)
 
     workspace_page_recording = record_child(
@@ -80,6 +83,7 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
 
   test "page cannot be recorded under another page" do
     root_recording = RecordingStudio.root_recording_for(Workspace.create!(name: unique_name("Invalid Page Workspace")))
+    grant_write!(root_recording)
     page_recording = record_child(
       RecordingStudioPages::Page.new(title: unique_name("Parent Page"), homepage: false),
       root_recording,
@@ -118,8 +122,34 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
       action: "created",
       recordable: recordable,
       root_recording: root_recording,
-      parent_recording: parent_recording
+      parent_recording: parent_recording,
+      actor: write_actor
     ).recording
+  end
+
+  def grant_write!(recording, actor = write_actor)
+    result = RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: actor)
+    return if result.success?
+
+    manager = User.where.not(id: actor.id).first
+    if manager
+      result = RecordingStudioAccessible.grant_access(
+        recording: recording,
+        actor: actor,
+        role: :admin,
+        manager_actor: manager
+      )
+    end
+
+    raise result.error if result.failure?
+  end
+
+  def write_actor
+    password = "Password123!"
+    User.find_or_create_by!(email: "declarations@example.com") do |user|
+      user.password = password
+      user.password_confirmation = password
+    end
   end
 
   def unique_name(prefix)
