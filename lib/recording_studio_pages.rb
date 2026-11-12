@@ -33,6 +33,7 @@ require "recording_studio_pages/services/remove_section"
 require "recording_studio_pages/services/remove_page"
 require "recording_studio_pages/services/nested_section_item"
 require "recording_studio_pages/services/upgrade_nested_sections"
+require "recording_studio_pages/page_sections_capability"
 require "recording_studio_pages/engine"
 
 module RecordingStudioPages

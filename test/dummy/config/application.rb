@@ -18,6 +18,7 @@ require "action_cable/engine"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 require "recording_studio_attachable"
+require "recording_studio_api"
 
 module Dummy
   class Application < Rails::Application

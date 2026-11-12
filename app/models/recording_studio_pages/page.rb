@@ -30,6 +30,8 @@ module RecordingStudioPages
                                 root: false,
                                 allowed_parent_types: parent_types
 
+    include RecordingStudio::Capabilities::PageSections.to
+
     if defined?(RecordingStudio::Capabilities::Publishable)
       include RecordingStudio::Capabilities::Publishable.to(
         public_controller: "recording_studio_pages/published_pages",

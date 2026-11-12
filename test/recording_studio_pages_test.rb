@@ -5,7 +5,7 @@ require "json"
 
 class RecordingStudioPagesTest < Minitest::Test
   def test_version_matches_release
-    assert_equal "0.8.0", ::RecordingStudioPages::VERSION
+    assert_equal "0.9.0", ::RecordingStudioPages::VERSION
   end
 
   def test_engine_exists
@@ -90,6 +90,9 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_duplicatable", tag: "v0.6.2"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_trashable", tag: "v0.12.3"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_admin", tag: "v2.9.1"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_api", tag: "v0.21.3"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_moveable", tag: "v4.1.1"'
+    assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_icons", tag: "v0.2.1"'
     assert_includes gemfile, 'github: "bowerbird-app/RecordingStudio_users", tag: "v0.27.1"'
     refute_includes gemfile, 'github: "bowerbird-app/RecordingStudio_terms_and_conditions"'
     assert_includes gemfile, 'github: "bowerbird-app/flatpack", tag: "v0.1.341"'
@@ -232,6 +235,8 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes initializer_source, ":admin"
     assert_includes initializer_source, "AccessCreationContext.allowed?"
     assert_includes initializer_source, "RecordingStudio::Access"
+    assert_includes initializer_source, "next true if access_row && RecordingStudioAccessible::AccessCreationContext.allowed?"
+    assert_includes initializer_source, "next true if defined?(RecordingStudioApi::ApiClient) && [RecordingStudioApi::ApiClient, RecordingStudioApi::ApiCredential, RecordingStudioApi::ApiAccessToken, RecordingStudioApi::AdminApi].any? { recordable.is_a?(_1) } && RecordingStudioAccessible::AccessCreationContext.allowed?"
     refute_includes initializer_source, "access_recordings_for"
     refute_includes initializer_source, "actor.present?"
     refute_includes initializer_source, "shared_root_tree?"

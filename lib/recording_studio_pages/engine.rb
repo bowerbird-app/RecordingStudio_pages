@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "api"
+
 module RecordingStudioPages
   class Engine < ::Rails::Engine
     isolate_namespace RecordingStudioPages
@@ -39,6 +41,7 @@ module RecordingStudioPages
         recording_studio_orderable
         recording_studio_duplicatable
         recording_studio_admin
+        recording_studio_api
       ].each do |name|
         require name
       rescue LoadError
@@ -146,6 +149,10 @@ module RecordingStudioPages
     # Run after_initialize hooks
     initializer "recording_studio_pages.after_initialize", after: "recording_studio_pages.load_config" do |_app|
       RecordingStudioPages.configuration.hooks.run(:after_initialize, self)
+    end
+
+    initializer "recording_studio_pages.api" do
+      config.to_prepare { Api.register! }
     end
 
     # Apply model extensions when models are loaded

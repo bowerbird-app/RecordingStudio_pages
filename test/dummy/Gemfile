@@ -22,7 +22,11 @@ gem "recording_studio_user", github: "bowerbird-app/RecordingStudio_users", tag:
 gem "recording_studio_cache", github: "bowerbird-app/RecordingStudio_cache", tag: "v0.6.3"
 gem "recording_studio_metrics", github: "bowerbird-app/RecordingStudio_metrics", tag: "v0.7.3"
 gem "recording_studio_logs", github: "bowerbird-app/RecordingStudio_logs", tag: "v0.7.4"
+gem "recording_studio_api", github: "bowerbird-app/RecordingStudio_api", tag: "v0.21.3"
+gem "recording_studio_moveable", github: "bowerbird-app/RecordingStudio_moveable", tag: "v4.1.1"
+gem "recording_studio_icons", github: "bowerbird-app/RecordingStudio_icons", tag: "v0.2.1"
 gem "recording_studio_root_switchable", github: "bowerbird-app/RecordingStudio_root_switchable", tag: "v0.11.7"
+gem "redis", "~> 5.3"
 
 # Recording Studio Users owns sign-in chrome; Devise stays the actor library.
 gem "devise"

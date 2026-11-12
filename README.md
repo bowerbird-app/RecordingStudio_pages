@@ -122,7 +122,7 @@ Duplicate keys raise `RecordingStudioPages::DuplicateRegistration`. Unknown type
 
 `full_bleed: true` draws the section edge to edge. Hero and Menu do this. Leave it off for reading-width sections.
 
-`RecordingStudioPages.catalog` lists every registered section and call to action, including field types, required flags, settings, and variants. That catalog is the machine-readable surface for future API and MCP tooling.
+`RecordingStudioPages.catalog` lists every registered section and call to action, including field types, required flags, settings, and variants. When Recording Studio API is loaded, `GET /recording_studio_api/api/v1/pages_catalog` returns that hash. MCP hosts that wrap the API get the same catalog tool. No Pages MCP tools.
 
 ## Register a call to action
 
@@ -185,6 +185,23 @@ Gem screens call `recording_studio_pages_nav`, which uses Recording Studio page 
 
 Opening the builder needs Accessible `:view` on the configured admin root. Changing a page needs Accessible `:edit` on that page (or the workspace it sits in) — `:edit` on the admin root is not enough if the page is only `:view`. Missing Accessible or Admin denies the builder. The pages list and editor only include pages under roots the actor can `:view`, queried through Accessible so counts stay in SQL. New pages parent under a workspace or folder the actor can `:edit`. Dummy `config.authorize_write` uses the same Accessible `:edit` check on the recording being written. `AccessCreationContext` does not open Page writes. Grant Accessible access before the first child write. Dummy does not let a Profile write through after Accessible denies `:edit` on the shared People root.
 
+### JSON API and MCP
+
+When Recording Studio API is loaded, this gem registers `RecordingStudioPages::Page` and `RecordingStudioPages::Section` on each named API (`each_api`). MCP hosts that wrap that API get the same actions. Default API create is not used, because it would skip `CreatePage`.
+
+| Verb | Path | Accessible role |
+|---|---|---|
+| GET | `/recording_studio_api/api/v1/pages_catalog` | `:view` on the grant's root |
+| POST | `/recording_studio_api/api/v1/pages` | `:edit` on the parent |
+| PATCH | `/recording_studio_api/api/v1/pages/:id` | `:edit` on the page |
+| PATCH | `/recording_studio_api/api/v1/sections/:id` | `:edit` on the section |
+| POST | `/recording_studio_api/api/v1/pages/:id/actions/page_sections_add` | `:edit` on the parent page |
+| POST | `/recording_studio_api/api/v1/sections/:id/actions/page_sections_add` | `:edit` on the parent section |
+| POST | `/recording_studio_api/api/v1/sections/:id/actions/page_sections_duplicate` | `:edit` on the section |
+| POST | `/recording_studio_api/api/v1/sections/:id/actions/page_sections_toggle` | `:edit` on the section |
+
+Create sends `parent_id`, `title`, and `homepage` at the root of the body. Add section sends `section_type`, plus optional `content`, `settings`, and `enabled`. The path id is the parent page or parent section. Toggle sends `enabled`. Section input is validated by the existing catalog and services. This gem does not gemspec-depend on `recording_studio_api`. If that constant is missing, Pages boots with no JSON page routes.
+
 `/admin` is the RS Admin hub. Switch the current root to **Admin** first. RS Admin forbids the hub while the current root is a workspace. The page builder editor does not require that switch.
 
 The hub’s Published and Drafts cards load through Turbo frames. Each card opens the Pages list. Drafts arrives with Draft selected. Published arrives with Published selected. Dummy imports `@hotwired/turbo-rails` and pins RS Admin Stimulus (`controllers/recording_studio_admin`, the same pin `recording_studio_admin:install` adds). Without those, the cards stay on the shimmer. Hosts that already ran the Admin install already have the Stimulus pin; they still need Turbo on the layout that serves `/admin`.
@@ -243,9 +260,13 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.8.0. Gemspec requires `recording_studio >= 6.3.0` and `flat_pack >= 0.1.341`. Dummy GitHub tags: Recording Studio `v6.5.0`, Accessible `v0.24.2`, Attachable `v0.22.1`, Users `v0.27.1`, Publishable `v0.13.2`, Orderable `v0.4.9`, Duplicatable `v0.6.2`, Trashable `v0.12.3`, Admin `v2.9.1` (left on 2.9.1; host policy is 2.5.1), Root Switchable `v0.11.7`, Cache `v0.6.3`, Metrics `v0.7.3`, Logs `v0.7.4`, FlatPack `v0.1.341`. Dummy omits Terms until that gem allows core 6.3. Admin 2.9.1 needs Logs.
+0.9.0. Gemspec requires `recording_studio >= 6.3.0` and `flat_pack >= 0.1.341`. Dummy GitHub tags: Recording Studio `v6.5.0`, Accessible `v0.24.2`, Attachable `v0.22.1`, Users `v0.27.1`, Publishable `v0.13.2`, Orderable `v0.4.9`, Duplicatable `v0.6.2`, Trashable `v0.12.3`, Admin `v2.9.1` (left on 2.9.1; host policy is 2.5.1), Root Switchable `v0.11.7`, Cache `v0.6.3`, Metrics `v0.7.3`, Logs `v0.7.4`, Recording Studio API `v0.21.3`, Moveable `v4.1.1`, Icons `v0.2.1`, FlatPack `v0.1.341`. Dummy omits Terms until that gem allows core 6.3. Admin 2.9.1 needs Logs. API 0.21.3 needs Moveable, Icons, Logs, Admin, and Redis.
 
 ## Upgrade
+
+### Upgrading to 0.9.0
+
+Install Pages `0.9.0`. No migration. Page catalog, create, revise, add section, revise section, duplicate section, and toggle section are on Recording Studio API when that gem is loaded. MCP uses that same registration. Access still matches the page builder. See [UPGRADING.md](UPGRADING.md).
 
 ### Upgrading to 0.8.0
 

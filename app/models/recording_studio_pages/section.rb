@@ -24,6 +24,8 @@ module RecordingStudioPages
                                 root: false,
                                 allowed_parent_types: ["RecordingStudioPages::Page", "RecordingStudioPages::Section"]
 
+    include RecordingStudio::Capabilities::PageSections.to
+
     if defined?(RecordingStudio::Capabilities::Duplicatable)
       include RecordingStudio::Capabilities::Duplicatable.to(
         prefix: nil,
