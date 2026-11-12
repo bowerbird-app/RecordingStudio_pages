@@ -10,7 +10,12 @@ RecordingStudio.configure do |config|
     "RecordingStudioPages::Page",
     "RecordingStudioPages::Section",
     "RecordingStudioPublishable::Publishable",
-    "RecordingStudioAttachable::Attachment"
+    "RecordingStudioAttachable::Attachment",
+    "RecordingStudio::Access",
+    "RecordingStudioApi::ApiClient",
+    "RecordingStudioApi::ApiCredential",
+    "RecordingStudioApi::ApiAccessToken",
+    "RecordingStudioApi::AdminApi"
   ]
   config.require_recordable_declarations = true
   config.app_name = "Page Builder" if config.respond_to?(:app_name=)
@@ -20,7 +25,8 @@ RecordingStudio.configure do |config|
 
     access_row = recordable.is_a?(RecordingStudio::Access) ||
                  recording&.recordable.is_a?(RecordingStudio::Access)
-    next true if access_row && RecordingStudioAccessible::AccessCreationContext.allowed?
+    api_row = defined?(RecordingStudioApi) && recordable.class.name.start_with?("RecordingStudioApi::")
+    next true if (access_row || api_row) && RecordingStudioAccessible::AccessCreationContext.allowed?
 
     target = recording || parent_recording || root_recording
     next false unless target

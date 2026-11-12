@@ -1,5 +1,22 @@
 # Upgrading Recording Studio Pages
 
+## 0.9.0
+
+Bump to `0.9.0`. No Pages migration.
+
+1. Install Pages `0.9.0`. Keep Recording Studio `>= 6.3.0` and FlatPack `>= 0.1.341`.
+2. Page catalog, create, revise, add section, revise section, duplicate section, and toggle section are on Recording Studio API when that gem is loaded. MCP advertises those registrations. This gem does not add MCP tools and does not gemspec-depend on `recording_studio_api`.
+3. Access matches the HTML builder: Accessible `:view` on the grant's root to read the catalog; `:edit` on the parent to create a page or add a section; `:edit` on the page or section to revise, copy, or toggle. A page in another workspace is 404.
+4. Install Recording Studio API in the host if you want the JSON surface:
+
+```sh
+bin/rails generate recording_studio_api:install
+bin/rails generate recording_studio_api:migrations
+bin/rails db:migrate
+```
+
+Turn on `:api_access_point` on roots that should hold API clients, and add `RecordingStudioApi::ApiClient` to `access_actor_types`. Dummy pins API `v0.21.3`, Moveable `v4.1.1`, Icons `v0.2.1`, and Redis `~> 5.3`. Dummy Admin stays `v2.9.1`.
+
 ## 0.8.0
 
 Bump to `0.8.0`. No Pages migration.

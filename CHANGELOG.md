@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-12
+
+Pages catalog, create, revise, add section, revise section, duplicate section, and toggle section are on Recording Studio API. MCP advertises that same surface.
+
+### Added
+
+- Page create and revise on Recording Studio API, with handlers that call `CreatePage` and `RevisePage`.
+- Section revise on the section resource, calling `ReviseSection`. The catalog validates section fields.
+- Standalone endpoints for catalog (`pages.catalog`), add section, duplicate section, and toggle section. MCP uses those registrations. No Pages MCP tools.
+- Dummy mounts Recording Studio API `v0.21.3` so hosts and MCP adapters can use the same Accessible-gated surface. Dummy `authorize_write` allows Recording Studio API recordables inside `AccessCreationContext` so `ProvisionApiClient` can record clients; page writes stay Accessible `:edit`.
+
+### Upgrade
+
+Pin `v0.9.0`. There is no Pages migration. Hosts that already have Recording Studio API get these actions when this gem loads. Install and mount API (and MCP, if you use it) as those gems document. HTML render, boot registration, and internal services stay off the JSON surface. Access matches the page builder: `:view` to read the catalog, `:edit` on the parent to create a page or add a section, `:edit` on the page or section to revise, copy, or toggle.
+
 ## [0.8.0] - 2026-11-06
 
 Page Builder admin fails closed and lists only pages the actor can see through Recording Studio Accessible.
@@ -459,7 +474,8 @@ New addons copied from this template are born on Recording Studio 4.x.
 - Comprehensive README and documentation
 - Basic test suite with Minitest
 
-[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/bowerbird-app/RecordingStudio_pages/compare/v0.5.1...v0.6.0
