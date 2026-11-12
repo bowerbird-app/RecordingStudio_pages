@@ -44,7 +44,7 @@ class PagesApiTest < ActionDispatch::IntegrationTest
     assert_response :success, response.body
     assert_equal "Tonight live", revised.fetch("title")
 
-    added = call(:post, "/page_sections/#{page_id}/add", @editor_token, section_type: "hero", content: { title: "Hello" })
+    added = call(:post, "/pages/#{page_id}/actions/page_sections_add", @editor_token, section_type: "hero", content: { title: "Hello" })
     assert_response :success, response.body
     assert_equal "hero", added.fetch("section_type")
     assert_equal "Hello", added.fetch("content").fetch("title")
@@ -59,12 +59,12 @@ class PagesApiTest < ActionDispatch::IntegrationTest
     page = create_page!(parent_recording: @workspace, title: "Copy me", actor: @owner)
     section = add_section!(page_recording: page, section_type: "hero", content: { title: "One" }, actor: @owner)
 
-    copy = call(:post, "/page_sections/#{section.id}/duplicate", @editor_token)
+    copy = call(:post, "/sections/#{section.id}/actions/page_sections_duplicate", @editor_token)
     assert_response :success, response.body
     refute_equal section.id, copy.fetch("id")
     assert_equal "hero", copy.fetch("section_type")
 
-    toggled = call(:post, "/page_sections/#{section.id}/toggle", @editor_token, enabled: false)
+    toggled = call(:post, "/sections/#{section.id}/actions/page_sections_toggle", @editor_token, enabled: false)
     assert_response :success, response.body
     assert_equal false, toggled.fetch("enabled")
     assert_equal false, section.reload.recordable.enabled?
@@ -80,16 +80,16 @@ class PagesApiTest < ActionDispatch::IntegrationTest
     patch "#{BASE}/pages/#{SecureRandom.uuid}", params: { title: "Nope" }, as: :json
     assert_response :unauthorized
 
-    post "#{BASE}/page_sections/#{SecureRandom.uuid}/add", params: { section_type: "hero" }, as: :json
+    post "#{BASE}/pages/#{SecureRandom.uuid}/actions/page_sections_add", params: { section_type: "hero" }, as: :json
     assert_response :unauthorized
 
     patch "#{BASE}/sections/#{SecureRandom.uuid}", params: { content: { title: "Nope" } }, as: :json
     assert_response :unauthorized
 
-    post "#{BASE}/page_sections/#{SecureRandom.uuid}/duplicate", as: :json
+    post "#{BASE}/sections/#{SecureRandom.uuid}/actions/page_sections_duplicate", as: :json
     assert_response :unauthorized
 
-    post "#{BASE}/page_sections/#{SecureRandom.uuid}/toggle", params: { enabled: false }, as: :json
+    post "#{BASE}/sections/#{SecureRandom.uuid}/actions/page_sections_toggle", params: { enabled: false }, as: :json
     assert_response :unauthorized
   end
 
@@ -103,16 +103,16 @@ class PagesApiTest < ActionDispatch::IntegrationTest
     call(:patch, "/pages/#{page.id}", @viewer_token, title: "No")
     assert_response :forbidden, response.body
 
-    call(:post, "/page_sections/#{page.id}/add", @viewer_token, section_type: "hero", content: { title: "No" })
+    call(:post, "/pages/#{page.id}/actions/page_sections_add", @viewer_token, section_type: "hero", content: { title: "No" })
     assert_response :forbidden, response.body
 
     call(:patch, "/sections/#{section.id}", @viewer_token, content: { title: "No" })
     assert_response :forbidden, response.body
 
-    call(:post, "/page_sections/#{section.id}/duplicate", @viewer_token)
+    call(:post, "/sections/#{section.id}/actions/page_sections_duplicate", @viewer_token)
     assert_response :forbidden, response.body
 
-    call(:post, "/page_sections/#{section.id}/toggle", @viewer_token, enabled: false)
+    call(:post, "/sections/#{section.id}/actions/page_sections_toggle", @viewer_token, enabled: false)
     assert_response :forbidden, response.body
   end
 
@@ -131,16 +131,16 @@ class PagesApiTest < ActionDispatch::IntegrationTest
     call(:post, "/pages", @editor_token, parent_id: @other.id, title: "Nope")
     assert_response :not_found, response.body
 
-    call(:post, "/page_sections/#{stranger_page.id}/add", @editor_token, section_type: "hero", content: { title: "Nope" })
+    call(:post, "/pages/#{stranger_page.id}/actions/page_sections_add", @editor_token, section_type: "hero", content: { title: "Nope" })
     assert_response :not_found, response.body
 
     call(:patch, "/sections/#{stranger_section.id}", @editor_token, content: { title: "Nope" })
     assert_response :not_found, response.body
 
-    call(:post, "/page_sections/#{stranger_section.id}/duplicate", @editor_token)
+    call(:post, "/sections/#{stranger_section.id}/actions/page_sections_duplicate", @editor_token)
     assert_response :not_found, response.body
 
-    call(:post, "/page_sections/#{stranger_section.id}/toggle", @editor_token, enabled: false)
+    call(:post, "/sections/#{stranger_section.id}/actions/page_sections_toggle", @editor_token, enabled: false)
     assert_response :not_found, response.body
   end
 
@@ -148,10 +148,10 @@ class PagesApiTest < ActionDispatch::IntegrationTest
     page = create_page!(parent_recording: @workspace, title: "Form", actor: @owner)
     section = add_section!(page_recording: page, section_type: "hero", content: { title: "Hero" }, actor: @owner)
 
-    call(:post, "/page_sections/#{page.id}/add", @editor_token, section_type: "not_a_section")
+    call(:post, "/pages/#{page.id}/actions/page_sections_add", @editor_token, section_type: "not_a_section")
     assert_response :unprocessable_entity, response.body
 
-    call(:post, "/page_sections/#{page.id}/add", @editor_token, section_type: "hero", content: { title: "" })
+    call(:post, "/pages/#{page.id}/actions/page_sections_add", @editor_token, section_type: "hero", content: { title: "" })
     assert_response :unprocessable_entity, response.body
 
     call(:patch, "/sections/#{section.id}", @editor_token, content: { title: "" })
@@ -174,10 +174,44 @@ class PagesApiTest < ActionDispatch::IntegrationTest
                  RecordingStudioApi.resource_handler("RecordingStudioPages::Section", :update)
 
     catalog = RecordingStudioApi.registered_endpoint("pages.catalog")
-    add = RecordingStudioApi.registered_endpoint("sections.add")
+    add = RecordingStudioApi.capability_action(:page_sections_add)
+    duplicate = RecordingStudioApi.capability_action(:page_sections_duplicate)
+    toggle = RecordingStudioApi.capability_action(:page_sections_toggle)
     assert_equal "Page - Catalog", catalog.openapi[:title]
     assert_equal "Section - Add", add.openapi[:title]
+    assert_equal :page_sections, add.capability
+    assert_equal :edit, add.required_role
+    assert_equal :edit, duplicate.required_role
+    assert_equal :edit, toggle.required_role
     assert_equal false, add.input_contract.as_json[:reject_unknown]
+    assert_nil RecordingStudioApi.registered_endpoint("sections.add")
+
+    page_actions = RecordingStudioApi.capability_actions_for("RecordingStudioPages::Page").map(&:name)
+    section_actions = RecordingStudioApi.capability_actions_for("RecordingStudioPages::Section").map(&:name)
+    assert_equal %w[page_sections_add], page_actions
+    assert_equal %w[page_sections_add page_sections_duplicate page_sections_toggle], section_actions
+  end
+
+  test "page_sections actions stay off types that already have other capabilities" do
+    add = RecordingStudioApi.capability_action(:page_sections_add)
+    refute RecordingStudio.capability_enabled?(:page_sections, for: "Folder")
+    refute RecordingStudio.capability_enabled?(:page_sections, for: "Workspace")
+    refute RecordingStudioApi.capability_action_enabled_for?(add, "Folder")
+    refute RecordingStudioApi.capability_action_enabled_for?(add, "Workspace")
+    refute_includes RecordingStudioApi.capability_actions_for("Folder").map(&:name), "page_sections_add"
+    refute_includes RecordingStudioApi.capability_actions_for("Workspace").map(&:name), "page_sections_add"
+  end
+
+  test "a colliding page_sections action name raises" do
+    error = assert_raises(RecordingStudioApi::ConfigurationError) do
+      RecordingStudioApi.register_capability_action(
+        :page_sections_add,
+        capability: :page_sections,
+        handler: ->(context) { context.recording }
+      )
+    end
+
+    assert_match(/already registered/, error.message)
   end
 
   private

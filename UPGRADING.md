@@ -5,8 +5,8 @@
 Bump to `0.9.0`. No Pages migration.
 
 1. Install Pages `0.9.0`. Keep Recording Studio `>= 6.3.0` and FlatPack `>= 0.1.341`.
-2. Page catalog, create, revise, add section, revise section, duplicate section, and toggle section are on Recording Studio API when that gem is loaded. MCP advertises those registrations. This gem does not add MCP tools and does not gemspec-depend on `recording_studio_api`.
-3. Access matches the HTML builder: Accessible `:view` on the grant's root to read the catalog; `:edit` on the parent to create a page or add a section; `:edit` on the page or section to revise, copy, or toggle. A page in another workspace is 404.
+2. Page catalog, create, revise, add section, revise section, duplicate section, and toggle section are on Recording Studio API when that gem is loaded. Catalog is `pages.catalog`. Add, duplicate, and toggle are `page_sections_*` capability actions on `:page_sections`. MCP advertises those registrations. This gem does not add MCP tools and does not gemspec-depend on `recording_studio_api`.
+3. Access matches the HTML builder: Accessible `:view` on the grant's root to read the catalog; `:edit` on the parent to create a page or add a section; `:edit` on the page or section to revise, copy, or toggle. A page in another workspace is 404. Member routes are `/pages/:id/actions/page_sections_add`, `/sections/:id/actions/page_sections_add`, `/sections/:id/actions/page_sections_duplicate`, and `/sections/:id/actions/page_sections_toggle`.
 4. Install Recording Studio API in the host if you want the JSON surface:
 
 ```sh

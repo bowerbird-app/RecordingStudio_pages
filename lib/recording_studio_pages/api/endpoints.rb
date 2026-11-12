@@ -3,15 +3,12 @@
 require_relative "documentation"
 require_relative "section_docs"
 require_relative "errors"
-require_relative "lookup"
 
 module RecordingStudioPages
   module Api
     module Endpoints
       CATALOG_NAME = "pages.catalog"
-      ADD_NAME = "sections.add"
-      DUPLICATE_NAME = "sections.duplicate"
-      TOGGLE_NAME = "sections.toggle"
+      CAPABILITY = :page_sections
       EMPTY_CONTRACT = { reject_unknown: false, fields: {} }.freeze
       ADD_CONTRACT = { reject_unknown: false, fields: SectionDocs::ADD_FIELDS }.freeze
       TOGGLE_CONTRACT = { reject_unknown: false, fields: SectionDocs::TOGGLE_FIELDS }.freeze
@@ -20,71 +17,50 @@ module RecordingStudioPages
 
       def register!(api)
         register_catalog(api)
-        register_add_section(api)
-        register_duplicate_section(api)
-        register_toggle_section(api)
+        section_actions.each { |action| register_capability_action(api, action.fetch(:name), **action.except(:name)) }
       end
 
       def register_catalog(api)
-        register_endpoint(
-          api,
-          CATALOG_NAME,
+        return if ::RecordingStudioApi.registered_endpoint(CATALOG_NAME, api: api.name)
+
+        ::RecordingStudioApi.register_endpoint(CATALOG_NAME, **catalog_endpoint(api))
+      end
+
+      def catalog_endpoint(api)
+        {
+          api: api.name,
           http_verb: :get,
           path: "pages_catalog",
           handler: Catalog,
           serializer: nil,
           openapi: SectionDocs::CATALOG,
           input_contract: EMPTY_CONTRACT
+        }
+      end
+
+      def register_capability_action(api, name, handler:, **)
+        existing = ::RecordingStudioApi.capability_action(name, api: api.name)
+        return if existing&.handler == handler
+
+        ::RecordingStudioApi.register_capability_action(
+          name,
+          api: api.name,
+          capability: CAPABILITY,
+          required_role: :edit,
+          handler: handler,
+          **
         )
       end
 
-      def register_add_section(api)
-        register_endpoint(
-          api,
-          ADD_NAME,
-          http_verb: :post,
-          path: "page_sections/:id/add",
-          handler: AddSection,
-          serializer: recording_serializer,
-          openapi: SectionDocs::ADD,
-          input_contract: ADD_CONTRACT
-        )
-      end
-
-      def register_duplicate_section(api)
-        register_endpoint(
-          api,
-          DUPLICATE_NAME,
-          http_verb: :post,
-          path: "page_sections/:id/duplicate",
-          handler: DuplicateSection,
-          serializer: recording_serializer,
-          openapi: SectionDocs::DUPLICATE,
-          input_contract: EMPTY_CONTRACT
-        )
-      end
-
-      def register_toggle_section(api)
-        register_endpoint(
-          api,
-          TOGGLE_NAME,
-          http_verb: :post,
-          path: "page_sections/:id/toggle",
-          handler: ToggleSection,
-          serializer: recording_serializer,
-          openapi: SectionDocs::TOGGLE,
-          input_contract: TOGGLE_CONTRACT
-        )
-      end
-
-      def register_endpoint(api, name, **)
-        return if ::RecordingStudioApi.registered_endpoint(name, api: api)
-
-        ::RecordingStudioApi.register_endpoint(name, api: api, **)
-      end
-
-      def recording_serializer
-        ::RecordingStudioApi::Serializers::ResourceRecordingSerializer
+      def section_actions
+        [
+          { name: :page_sections_add, handler: AddSection, openapi: SectionDocs::ADD,
+            input_contract: ADD_CONTRACT },
+          { name: :page_sections_duplicate, handler: DuplicateSection, openapi: SectionDocs::DUPLICATE,
+            input_contract: EMPTY_CONTRACT },
+          { name: :page_sections_toggle, handler: ToggleSection, openapi: SectionDocs::TOGGLE,
+            input_contract: TOGGLE_CONTRACT }
+        ]
       end
 
       class Catalog
@@ -96,7 +72,7 @@ module RecordingStudioPages
 
       class AddSection
         def self.call(context)
-          parent = Lookup.find!(context, context.params[:id], types: [Lookup::PAGE_TYPE, Lookup::SECTION_TYPE])
+          parent = context.recording
           context.access_grant.authorize!(recording: parent, role: :edit)
           Errors.unwrap(Services::AddSection.call(**add_arguments(parent, context)))
         end
@@ -108,7 +84,7 @@ module RecordingStudioPages
             content: context.params[:content] || {},
             settings: context.params[:settings] || {},
             enabled: context.params.key?(:enabled) ? context.params[:enabled] : true,
-            actor: Lookup.actor(context)
+            actor: context.actor
           }
         end
         private_class_method :add_arguments
@@ -116,23 +92,23 @@ module RecordingStudioPages
 
       class DuplicateSection
         def self.call(context)
-          section = Lookup.find!(context, context.params[:id], types: [Lookup::SECTION_TYPE])
+          section = context.recording
           context.access_grant.authorize!(recording: section, role: :edit)
           Errors.unwrap(
-            Services::DuplicateSection.call(section_recording: section, actor: Lookup.actor(context))
+            Services::DuplicateSection.call(section_recording: section, actor: context.actor)
           )
         end
       end
 
       class ToggleSection
         def self.call(context)
-          section = Lookup.find!(context, context.params[:id], types: [Lookup::SECTION_TYPE])
+          section = context.recording
           context.access_grant.authorize!(recording: section, role: :edit)
           Errors.unwrap(
             Services::ToggleSection.call(
               section_recording: section,
               enabled: context.params[:enabled],
-              actor: Lookup.actor(context)
+              actor: context.actor
             )
           )
         end

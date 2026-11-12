@@ -8,7 +8,11 @@ module RecordingStudioPages
     module SectionResource
       class Update
         def self.call(context)
-          section = Lookup.find!(context, context.id, types: [Lookup::SECTION_TYPE])
+          section = context.scoped_recordings.find_by(id: context.id)
+          if section.nil? || section.recordable_type != Lookup::SECTION_TYPE
+            raise ::RecordingStudioApi::NotFoundError, "Resource was not found in this API scope"
+          end
+
           context.access_grant.authorize!(recording: section, role: :edit)
           updated = Errors.unwrap(Services::ReviseSection.call(**revise_arguments(section, context)))
           { json: Lookup.serialize(updated, context) }

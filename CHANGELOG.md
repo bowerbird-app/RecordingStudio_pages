@@ -15,12 +15,12 @@ Pages catalog, create, revise, add section, revise section, duplicate section, a
 
 - Page create and revise on Recording Studio API, with handlers that call `CreatePage` and `RevisePage`.
 - Section revise on the section resource, calling `ReviseSection`. The catalog validates section fields.
-- Standalone endpoints for catalog (`pages.catalog`), add section, duplicate section, and toggle section. MCP uses those registrations. No Pages MCP tools.
-- Dummy mounts Recording Studio API `v0.21.3` so hosts and MCP adapters can use the same Accessible-gated surface. Dummy `authorize_write` allows Recording Studio API recordables inside `AccessCreationContext` so `ProvisionApiClient` can record clients; page writes stay Accessible `:edit`.
+- Catalog stays a named endpoint (`pages.catalog`). Add, duplicate, and toggle are Recording Studio API capability actions (`page_sections_add`, `page_sections_duplicate`, `page_sections_toggle`) on the Pages `:page_sections` capability, enabled only on `Page` and `Section`. MCP uses those registrations. No Pages MCP tools.
+- Dummy mounts Recording Studio API `v0.21.3` so hosts and MCP adapters can use the same Accessible-gated surface. Dummy `authorize_write` keeps main's Access-row `AccessCreationContext` line and adds an `is_a?` allow for Recording Studio API client, credential, token, and admin-api recordables in that same context. Page writes stay Accessible `:edit`.
 
 ### Upgrade
 
-Pin `v0.9.0`. There is no Pages migration. Hosts that already have Recording Studio API get these actions when this gem loads. Install and mount API (and MCP, if you use it) as those gems document. HTML render, boot registration, and internal services stay off the JSON surface. Access matches the page builder: `:view` to read the catalog, `:edit` on the parent to create a page or add a section, `:edit` on the page or section to revise, copy, or toggle.
+Pin `v0.9.0`. There is no Pages migration. Hosts that already have Recording Studio API get these actions when this gem loads. Install and mount API (and MCP, if you use it) as those gems document. HTML render, boot registration, and internal services stay off the JSON surface. Access matches the page builder: `:view` to read the catalog, `:edit` on the parent to create a page or add a section, `:edit` on the page or section to revise, copy, or toggle. Add, copy, and toggle are member capability-action routes (`/pages/:id/actions/page_sections_add`, `/sections/:id/actions/page_sections_duplicate`, `/sections/:id/actions/page_sections_toggle`).
 
 ## [0.8.0] - 2026-11-06
 

@@ -195,9 +195,10 @@ When Recording Studio API is loaded, this gem registers `RecordingStudioPages::P
 | POST | `/recording_studio_api/api/v1/pages` | `:edit` on the parent |
 | PATCH | `/recording_studio_api/api/v1/pages/:id` | `:edit` on the page |
 | PATCH | `/recording_studio_api/api/v1/sections/:id` | `:edit` on the section |
-| POST | `/recording_studio_api/api/v1/page_sections/:id/add` | `:edit` on the parent page or section |
-| POST | `/recording_studio_api/api/v1/page_sections/:id/duplicate` | `:edit` on the section |
-| POST | `/recording_studio_api/api/v1/page_sections/:id/toggle` | `:edit` on the section |
+| POST | `/recording_studio_api/api/v1/pages/:id/actions/page_sections_add` | `:edit` on the parent page |
+| POST | `/recording_studio_api/api/v1/sections/:id/actions/page_sections_add` | `:edit` on the parent section |
+| POST | `/recording_studio_api/api/v1/sections/:id/actions/page_sections_duplicate` | `:edit` on the section |
+| POST | `/recording_studio_api/api/v1/sections/:id/actions/page_sections_toggle` | `:edit` on the section |
 
 Create sends `parent_id`, `title`, and `homepage` at the root of the body. Add section sends `section_type`, plus optional `content`, `settings`, and `enabled`. The path id is the parent page or parent section. Toggle sends `enabled`. Section input is validated by the existing catalog and services. This gem does not gemspec-depend on `recording_studio_api`. If that constant is missing, Pages boots with no JSON page routes.
 

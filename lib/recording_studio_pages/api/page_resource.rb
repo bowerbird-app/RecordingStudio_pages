@@ -26,7 +26,11 @@ module RecordingStudioPages
 
       class Update
         def self.call(context)
-          page = Lookup.find!(context, context.id, types: [Lookup::PAGE_TYPE])
+          page = context.scoped_recordings.find_by(id: context.id)
+          if page.nil? || page.recordable_type != Lookup::PAGE_TYPE
+            raise ::RecordingStudioApi::NotFoundError, "Resource was not found in this API scope"
+          end
+
           context.access_grant.authorize!(recording: page, role: :edit)
           attributes = PageFields.call(context)
           updated = Errors.unwrap(Services::RevisePage.call(page_recording: page, actor: context.actor, **attributes))
