@@ -19,7 +19,7 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
   test "root recordable creates a root recording" do
     workspace = Workspace.create!(name: unique_name("Root Workspace"))
 
-    root_recording = RecordingStudio.root_recording_for(workspace)
+    root_recording = RecordingStudio.create_root_recording!(workspace, actor: write_actor)
 
     assert_predicate root_recording, :persisted?
     assert_equal workspace, root_recording.recordable
@@ -28,7 +28,7 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
   end
 
   test "allowed child can be recorded under a workspace root" do
-    root_recording = RecordingStudio.root_recording_for(Workspace.create!(name: unique_name("Child Workspace")))
+    root_recording = RecordingStudio.create_root_recording!(Workspace.create!(name: unique_name("Child Workspace")), actor: write_actor)
     grant_write!(root_recording)
     folder = Folder.new(name: unique_name("Allowed Folder"))
 
@@ -45,7 +45,7 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
   end
 
   test "page can be recorded under allowed workspace and folder parents" do
-    root_recording = RecordingStudio.root_recording_for(Workspace.create!(name: unique_name("Page Workspace")))
+    root_recording = RecordingStudio.create_root_recording!(Workspace.create!(name: unique_name("Page Workspace")), actor: write_actor)
     grant_write!(root_recording)
     folder_recording = record_child(Folder.new(name: unique_name("Page Folder")), root_recording, root_recording)
 
@@ -68,12 +68,12 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
     folder = Folder.create!(name: unique_name("Root Rejected Folder"))
 
     assert_raises(RecordingStudio::RootNotAllowed) do
-      RecordingStudio.root_recording_for(folder)
+      RecordingStudio.create_root_recording!(folder)
     end
   end
 
   test "parentless child under an existing root is invalid" do
-    root_recording = RecordingStudio.root_recording_for(Workspace.create!(name: unique_name("Parentless Workspace")))
+    root_recording = RecordingStudio.create_root_recording!(Workspace.create!(name: unique_name("Parentless Workspace")), actor: write_actor)
     folder = Folder.create!(name: unique_name("Parentless Folder"))
     recording = RecordingStudio::Recording.new(root_recording: root_recording, recordable: folder)
 
@@ -82,7 +82,7 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
   end
 
   test "page cannot be recorded under another page" do
-    root_recording = RecordingStudio.root_recording_for(Workspace.create!(name: unique_name("Invalid Page Workspace")))
+    root_recording = RecordingStudio.create_root_recording!(Workspace.create!(name: unique_name("Invalid Page Workspace")), actor: write_actor)
     grant_write!(root_recording)
     page_recording = record_child(
       RecordingStudioPages::Page.new(title: unique_name("Parent Page"), homepage: false),
@@ -146,10 +146,14 @@ class RecordingStudioDeclarationsTest < ActiveSupport::TestCase
 
   def write_actor
     password = "Password123!"
-    User.find_or_create_by!(email: "declarations@example.com") do |user|
+    user = User.find_or_initialize_by(email: "declarations@example.com")
+    if user.new_record?
       user.password = password
       user.password_confirmation = password
     end
+    user.skip_confirmation! if user.respond_to?(:skip_confirmation!) && !user.confirmed?
+    user.save! if user.new_record? || user.changed?
+    user
   end
 
   def unique_name(prefix)

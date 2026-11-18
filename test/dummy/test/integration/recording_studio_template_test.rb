@@ -8,7 +8,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_nil RecordingStudioRootSwitchable.configuration.layout
     assert_includes ApplicationController.ancestors, RecordingStudio::RootSwitchable::ControllerSupport
     assert_includes ApplicationController.ancestors, RecordingStudio::ControllerLayout
-    assert_equal "0.1.341", FlatPack::VERSION
+    assert_equal "0.1.378", FlatPack::VERSION
   end
 
   test "dummy app validates recordable declarations" do
@@ -168,7 +168,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal 3, Workspace.count
     seeded_profile = RecordingStudioUser.profile_for(User.find_by!(email: "admin@admin.com"))
     if seeded_profile.nil?
-      skip "Users v0.27.1 first Profile cannot write under Library #11. Accessible cannot grant :edit on the shared People root, and Users records the Profile before bootstrap_owner_access! on that child. No host exception. Same gap Onboarding skips rather than papering over."
+      skip "Users v0.36.0 first Profile cannot write under Library #11. Accessible cannot grant :edit on the shared People root, and Users records the Profile before bootstrap_owner_access! on that child. No host exception. Same gap Onboarding skips rather than papering over."
     end
     assert_not_nil seeded_profile
 
@@ -214,6 +214,33 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert defined?(RecordingStudioDuplicatable)
     assert_includes routes, "RecordingStudioDuplicatable::Engine"
     assert RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Section)
+  end
+
+  test "admin root resolver is the Admin recording and the switcher keeps viewable roots" do
+    actor = create_actor!("root-filter-#{SecureRandom.hex(4)}@example.com")
+    owner = create_actor!("root-owner-#{SecureRandom.hex(4)}@example.com")
+    Current.actor = actor
+    visible = create_workspace_root!("Visible #{SecureRandom.hex(4)}", actor: actor)
+    hidden_workspace = Workspace.create!(name: "Hidden #{SecureRandom.hex(4)}")
+    hidden = RecordingStudio.create_root_recording!(hidden_workspace, actor: owner)
+    grant_admin!(visible, actor)
+    grant_admin!(hidden, owner)
+    admin = create_admin_root!(actor: actor)
+    grant_admin!(admin, actor)
+
+    assert_equal admin, RecordingStudioAccessible.admin_root
+    assert_equal "Admin", admin.recordable.name
+
+    scope = RecordingStudioRootSwitchable.configuration.scopes.fetch("all_workspaces")
+    listed = scope.available_roots.call(actor: actor)
+    assert_includes listed, visible
+    assert_includes listed, admin
+    refute_includes listed, hidden
+    assert scope.access_check.call(actor: actor, recording: visible)
+    refute scope.access_check.call(actor: actor, recording: hidden)
+    refute scope.access_check.call(actor: nil, recording: visible)
+  ensure
+    Current.actor = nil
   end
 
   test "dummy host registers extra hero CTAs and no templates" do

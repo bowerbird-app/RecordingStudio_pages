@@ -6,7 +6,7 @@ This Rails app exists to validate the Recording Studio Page Builder in a real ho
 
 - Recording Studio Users for sign-in, People, Profile, and Continue-with social buttons
 - Recording Studio Terms and Conditions for published Terms and a Privacy Policy. Signup create-password shows the continue notice and accepts both. Admin lists a Terms section.
-- A seeded admin person (`admin@admin.com` / `Password`). Dummy tries to record a Profile under the shared People root. Users `v0.27.1` writes that Profile before `bootstrap_owner_access!` on the child, and Accessible cannot grant `:edit` on People, so Library #11 may skip that seed write. Dummy does not add a host exception.
+- A seeded admin person (`admin@admin.com` / `Password123!`). Dummy tries to record a Profile under the shared People root. Users `v0.36.0` writes that Profile before `bootstrap_owner_access!` on the child, and Accessible cannot grant `:edit` on People, so Library #11 may skip that seed write. Dummy does not add a host exception.
 - `Current.actor` wiring for Recording Studio events
 - Workspace roots plus seeded page and section recordings
 - Public homepage at `/` for visitors, from a published page recording. Dummy seed restores the sample Home sections if they drift. Home starts with a Menu (House, About, Tonight, Join), then a left-aligned hero, then a feature grid whose Pages, Pieces, and Reuse cards include a sample picture that runs the full width of the card, flush with the border. It ends with a footer (House, “The fine print lives here.”) linking to the seeded Terms and Privacy Policy. Signed-in people preview that same live page at `/site`.
@@ -33,7 +33,7 @@ Run the commands above from the dummy app directory, not the repository root.
 Then open the app and sign in with:
 
 - Email: `admin@admin.com`
-- Password: `Password`
+- Password: `Password123!`
 
 Sign-in is email first (**Continue with email**), then password. A Google Continue-with button shows because dummy sets a placeholder `omniauth_providers` entry (and dummy credentials also include `omniauth:` keys). That id is not a real OAuth client. Hosts put live secrets in Rails credentials and leave `omniauth_providers` empty.
 

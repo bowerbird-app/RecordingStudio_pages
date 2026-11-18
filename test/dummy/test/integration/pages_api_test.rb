@@ -217,15 +217,18 @@ class PagesApiTest < ActionDispatch::IntegrationTest
   private
 
   def user(name)
-    User.create!(
+    user = User.new(
       email: "#{name}-#{SecureRandom.hex(4)}@example.com",
       password: "Password123!",
       password_confirmation: "Password123!"
     )
+    user.skip_confirmation! if user.respond_to?(:skip_confirmation!)
+    user.save!
+    user
   end
 
   def owned_root(recordable, actor: @owner)
-    root = RecordingStudio.root_recording_for(recordable)
+    root = RecordingStudio.create_root_recording!(recordable, actor: actor)
     result = RecordingStudioAccessible.bootstrap_owner_access!(recording: root, actor: actor)
     raise result.error if result.failure?
 

@@ -13,12 +13,16 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
   TEST_PASSWORD = "DocsTestPassword!2026"
 
   setup do
-    @user = User.find_or_create_by!(email: "docs-test@example.com") do |user|
-      user.password = TEST_PASSWORD
-      user.password_confirmation = TEST_PASSWORD
+    @user = User.find_or_initialize_by(email: "docs-test@example.com")
+    if @user.new_record?
+      @user.password = TEST_PASSWORD
+      @user.password_confirmation = TEST_PASSWORD
     end
+    @user.skip_confirmation! if @user.respond_to?(:skip_confirmation!) && !@user.confirmed?
+    @user.save! if @user.new_record? || @user.changed?
     accept_seeded_studio_terms!(@user)
 
+    Current.actor = @user
     sign_in @user
   end
 
@@ -90,7 +94,7 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
 
   test "recordings tree page renders successfully" do
     workspace = Workspace.create!(name: "Tree Workspace")
-    root_recording = RecordingStudio.root_recording_for(workspace)
+    root_recording = RecordingStudio.create_root_recording!(workspace, actor: @user)
     grant_write!(root_recording)
     folder = Folder.create!(name: "Reference")
     folder_recording = record_child(folder, root_recording, root_recording)
@@ -152,10 +156,10 @@ class DocsControllerTest < ActionDispatch::IntegrationTest
 
     workspace = Workspace.create!(name: "Counted Workspace")
     2.times do
-      RecordingStudio.root_recording_for(Workspace.create!(name: "Counted Workspace #{SecureRandom.hex(4)}"))
+      RecordingStudio.create_root_recording!(Workspace.create!(name: "Counted Workspace #{SecureRandom.hex(4)}"), actor: @user)
     end
 
-    root_recording = RecordingStudio.root_recording_for(workspace)
+    root_recording = RecordingStudio.create_root_recording!(workspace, actor: @user)
     grant_write!(root_recording)
     folder = Folder.create!(name: "Counted Folder")
     record_child(folder, root_recording, root_recording)

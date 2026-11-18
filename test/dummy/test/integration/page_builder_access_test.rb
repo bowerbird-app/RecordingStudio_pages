@@ -7,11 +7,11 @@ class PageBuilderAccessTest < ActionDispatch::IntegrationTest
 
   setup do
     @actor = create_actor!("pages-access@example.com")
+    Current.actor = @actor
     @root = create_workspace_root!("Visible Workspace #{SecureRandom.hex(4)}")
     @admin_root = create_admin_root!
     grant_admin!(@admin_root, @actor)
     grant_admin!(@root, @actor)
-    Current.actor = @actor
     sign_in @actor
   end
 
@@ -199,7 +199,7 @@ class PageBuilderAccessTest < ActionDispatch::IntegrationTest
       )
       assert recording.present?
     rescue RecordingStudio::AuthorizationError => error
-      skip "Users v0.27.1 first Profile cannot write under Library #11. #{error.message} Accessible cannot grant :edit on the shared People root, and Users records the Profile before bootstrap_owner_access! on that child. No host exception. Same gap Onboarding skips rather than papering over."
+      skip "Users v0.36.0 first Profile cannot write under Library #11. #{error.message} Accessible cannot grant :edit on the shared People root, and Users records the Profile before bootstrap_owner_access! on that child. No host exception. Same gap Onboarding skips rather than papering over."
     end
   end
 

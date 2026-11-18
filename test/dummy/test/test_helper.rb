@@ -10,10 +10,14 @@ module PageBuilderTestHelper
   TEST_PASSWORD = "Password123!"
 
   def create_actor!(email)
-    user = User.find_or_create_by!(email: email) do |actor|
-      actor.password = TEST_PASSWORD
-      actor.password_confirmation = TEST_PASSWORD
+    user = User.find_or_initialize_by(email: email)
+    if user.new_record?
+      user.password = TEST_PASSWORD
+      user.password_confirmation = TEST_PASSWORD
     end
+    # Users 0.36 adds Devise confirmable. Unconfirmed actors cannot stay signed in.
+    user.skip_confirmation! if user.respond_to?(:skip_confirmation!) && !user.confirmed?
+    user.save! if user.new_record? || user.changed?
     accept_seeded_studio_terms!(user)
     user
   end
@@ -32,14 +36,14 @@ module PageBuilderTestHelper
     end
   end
 
-  def create_workspace_root!(name)
+  def create_workspace_root!(name, actor: Current.actor)
     workspace = Workspace.create!(name: name)
-    RecordingStudio.root_recording_for(workspace)
+    RecordingStudio.create_root_recording!(workspace, actor: actor)
   end
 
-  def create_admin_root!(name: "Admin")
+  def create_admin_root!(name: "Admin", actor: Current.actor)
     admin_root = AdminRoot.find_or_create_by!(name: name)
-    RecordingStudio.root_recording_for(admin_root)
+    RecordingStudio.create_root_recording!(admin_root, actor: actor)
   end
 
   def grant_admin!(recording, actor)
@@ -48,14 +52,16 @@ module PageBuilderTestHelper
     result = RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: actor)
     return result.value if result.success?
 
-    manager = User.where.not(id: actor.id).first
-    if manager
+    User.where.not(id: actor.id).find_each do |manager|
+      next unless RecordingStudioAccessible.authorized?(actor: manager, recording: recording, role: :admin)
+
       result = RecordingStudioAccessible.grant_access(
         recording: recording,
         actor: actor,
         role: :admin,
         manager_actor: manager
       )
+      break if result.success?
     end
 
     raise result.error if result.failure?

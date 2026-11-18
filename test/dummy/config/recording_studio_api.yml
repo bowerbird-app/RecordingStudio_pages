@@ -1,0 +1,2 @@
+# Minimal Recording Studio API config so the dummy boots on API 1.12+.
+shared: {}

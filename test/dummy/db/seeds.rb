@@ -328,10 +328,11 @@ start_from_url_sections = [
 
 user = User.find_or_initialize_by(email: "admin@admin.com")
 if user.new_record?
-  user.password = "Password"
-  user.password_confirmation = "Password"
-  user.save!
+  user.password = "Password123!"
+  user.password_confirmation = "Password123!"
 end
+user.skip_confirmation! if user.respond_to?(:skip_confirmation!) && !user.confirmed?
+user.save! if user.new_record? || user.changed?
 
 workspace = Workspace.find_or_create_by!(name: "Studio Workspace")
 accessible_workspace = Workspace.find_or_create_by!(name: "Client Workspace")
@@ -343,10 +344,10 @@ previous_actor = Current.actor
 Current.actor = user
 
 begin
-  root_recording = RecordingStudio.root_recording_for(workspace)
-  accessible_root_recording = RecordingStudio.root_recording_for(accessible_workspace)
-  private_root_recording = RecordingStudio.root_recording_for(private_workspace)
-  admin_root_recording = RecordingStudio.root_recording_for(admin_root)
+  root_recording = RecordingStudio.create_root_recording!(workspace, actor: user)
+  accessible_root_recording = RecordingStudio.create_root_recording!(accessible_workspace, actor: user)
+  private_root_recording = RecordingStudio.create_root_recording!(private_workspace, actor: user)
+  admin_root_recording = RecordingStudio.create_root_recording!(admin_root, actor: user)
 
   [root_recording, accessible_root_recording, private_root_recording, admin_root_recording].each do |recording|
     grant_admin_access.call(recording, user)
@@ -362,7 +363,7 @@ begin
         actor: user
       )
     rescue RecordingStudio::AuthorizationError => error
-      warn "Skipping seeded admin Profile. Users v0.27.1 first Profile cannot write under Library #11 (#{error.message}). Accessible cannot grant :edit on the shared People root."
+      warn "Skipping seeded admin Profile. Users v0.36.0 first Profile cannot write under Library #11 (#{error.message}). Accessible cannot grant :edit on the shared People root."
     end
   end
 
@@ -529,7 +530,7 @@ begin
   sync_house_menu.call(homepage_recording, house_links, join_url, user)
   RecordingStudioPages::Services::UpgradeNestedSections.call(actor: user).value!
 
-  puts "Seeded Home, About, Tonight, Join, Walk in, and Start from a URL. Sign in as admin@admin.com / Password."
+  puts "Seeded Home, About, Tonight, Join, Walk in, and Start from a URL. Sign in as admin@admin.com / Password123!."
   puts "Seeded: Workspace '#{workspace.name}' with homepage '#{homepage_recording.recordable.title}'"
   puts "Seeded: Admin root '#{admin_root.name}'"
 ensure
