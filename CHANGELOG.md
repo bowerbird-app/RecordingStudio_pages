@@ -20,6 +20,7 @@ Development pins move to Recording Studio `v7.7.1` and FlatPack `v0.1.378`. Dumm
 - The section image field passes `picker_url` into the Attachable image modal (required since Attachable 0.26).
 - Dummy sets Accessible `admin_root_resolver` to the Admin root recording named Admin. Admin `:site` screens, including Pages and compose search, need that recording to equal the current access recording.
 - Dummy root switcher `available_roots` and `access_check` keep a candidate only when the current actor has Accessible `:view` on that root.
+- Security bumps: puma 8.1.2 and msgpack 1.8.7.
 
 ### Upgrade
 
