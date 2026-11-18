@@ -52,14 +52,16 @@ module PageBuilderTestHelper
     result = RecordingStudioAccessible.bootstrap_owner_access!(recording: recording, actor: actor)
     return result.value if result.success?
 
-    manager = User.where.not(id: actor.id).first
-    if manager
+    User.where.not(id: actor.id).find_each do |manager|
+      next unless RecordingStudioAccessible.authorized?(actor: manager, recording: recording, role: :admin)
+
       result = RecordingStudioAccessible.grant_access(
         recording: recording,
         actor: actor,
         role: :admin,
         manager_actor: manager
       )
+      break if result.success?
     end
 
     raise result.error if result.failure?
