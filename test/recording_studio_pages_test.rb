@@ -32,8 +32,17 @@ class RecordingStudioPagesTest < Minitest::Test
     gemspec = File.read(File.expand_path("../recording_studio_pages.gemspec", __dir__))
 
     assert_includes gemspec, 'spec.add_dependency "recording_studio", ">= 6.3.0"'
+    refute_includes gemspec, "< 8.0"
+    refute_match(/recording_studio", "= /, gemspec)
     assert_includes gemspec, 'spec.add_dependency "flat_pack", ">= 0.1.341"'
     assert_includes gemspec, "https://github.com/bowerbird-app/RecordingStudio_pages"
+
+    upgrading = File.read(File.expand_path("../UPGRADING.md", __dir__))
+    changelog = File.read(File.expand_path("../CHANGELOG.md", __dir__))
+    assert_includes upgrading, "Hosts moving to Recording Studio 7.7 must run the Recording Studio 7.4, 7.5, and 7.7 migrations"
+    assert_includes changelog, "Hosts moving to Recording Studio 7.7 must run the Recording Studio 7.4, 7.5, and 7.7 migrations"
+    refute_match(/skip the Recording Studio 7\.4/i, upgrading)
+    refute_match(/skip the Recording Studio 7\.4/i, changelog)
   end
 
   def test_gemspec_excludes_cursor_config
@@ -650,6 +659,7 @@ class RecordingStudioPagesTest < Minitest::Test
     assert_includes field, ":color"
     assert_includes field, "ColorSwatch"
     assert_includes attachment_field, 'RecordingStudio.t("recording_studio.pages.attachment.choose")'
+    assert_includes attachment_field, "picker_url: attachable.recording_attachment_picker_path(picker_recording)"
     assert_includes attachment_field, "recording-studio-attachable--attachment-image-picker"
     refute_includes attachment_field, "Image url"
     assert_includes built_ins, "type: :attachment"

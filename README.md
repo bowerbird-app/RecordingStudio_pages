@@ -266,7 +266,7 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ### Upgrading to 0.9.1
 
-Install Pages `0.9.1`. No Pages migration. Development pins are Recording Studio `v7.7.1` and FlatPack `v0.1.378`. See [UPGRADING.md](UPGRADING.md).
+Install Pages `0.9.1`. No Pages migration. Development pins are Recording Studio `v7.7.1` and FlatPack `v0.1.378`. Hosts moving to Recording Studio 7.7 must run the Recording Studio 7.4, 7.5, and 7.7 migrations. Set Accessible `admin_root_resolver` to the Admin access recording so `:site` screens stay visible. See [UPGRADING.md](UPGRADING.md).
 
 ### Upgrading to 0.9.0
 

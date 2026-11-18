@@ -216,6 +216,33 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert RecordingStudio.capability_enabled?(:duplicatable, for: RecordingStudioPages::Section)
   end
 
+  test "admin root resolver is the Admin recording and the switcher keeps viewable roots" do
+    actor = create_actor!("root-filter-#{SecureRandom.hex(4)}@example.com")
+    owner = create_actor!("root-owner-#{SecureRandom.hex(4)}@example.com")
+    Current.actor = actor
+    visible = create_workspace_root!("Visible #{SecureRandom.hex(4)}", actor: actor)
+    hidden_workspace = Workspace.create!(name: "Hidden #{SecureRandom.hex(4)}")
+    hidden = RecordingStudio.create_root_recording!(hidden_workspace, actor: owner)
+    grant_admin!(visible, actor)
+    grant_admin!(hidden, owner)
+    admin = create_admin_root!(actor: actor)
+    grant_admin!(admin, actor)
+
+    assert_equal admin, RecordingStudioAccessible.admin_root
+    assert_equal "Admin", admin.recordable.name
+
+    scope = RecordingStudioRootSwitchable.configuration.scopes.fetch("all_workspaces")
+    listed = scope.available_roots.call(actor: actor)
+    assert_includes listed, visible
+    assert_includes listed, admin
+    refute_includes listed, hidden
+    assert scope.access_check.call(actor: actor, recording: visible)
+    refute scope.access_check.call(actor: actor, recording: hidden)
+    refute scope.access_check.call(actor: nil, recording: visible)
+  ensure
+    Current.actor = nil
+  end
+
   test "dummy host registers extra hero CTAs and no templates" do
     assert RecordingStudioPages.cta?(:button)
     assert RecordingStudioPages.cta?(:social_logins)

@@ -17,10 +17,13 @@ Development pins move to Recording Studio `v7.7.1` and FlatPack `v0.1.378`. Dumm
 - Dummy pins Accessible `v0.54.0`, Attachable `v0.32.1`, Publishable `v1.2.1`, Orderable `v0.11.0`, Duplicatable `v1.1.0`, Trashable `v1.2.0`, Admin `v2.19.0`, Users `v0.36.0`, Cache `v0.7.0`, Metrics `v0.9.1`, Logs `v0.8.1`, API `v1.15.0`, Moveable `v6.0.1`, Icons `v0.4.1`, Root Switchable `v0.16.0`, and FlatPack `v0.1.378`.
 - Gemspec floors stay `recording_studio >= 6.3.0` and `flat_pack >= 0.1.341`. Those floors still allow 6.x; this release was tested on 7.7.1.
 - Dummy ships a minimal `config/recording_studio_api.yml` (`shared: {}`) so API 1.12+ can boot.
+- The section image field passes `picker_url` into the Attachable image modal (required since Attachable 0.26).
+- Dummy sets Accessible `admin_root_resolver` to the Admin root recording named Admin. Admin `:site` screens, including Pages and compose search, need that recording to equal the current access recording.
+- Dummy root switcher `available_roots` and `access_check` keep a candidate only when the current actor has Accessible `:view` on that root.
 
 ### Upgrade
 
-Install Pages `0.9.1`. There is no Pages migration. Hosts already on Recording Studio 7 keep their own core migrations. The dummy does not copy the Recording Studio 7.4, 7.5, or 7.7 root-index migrations.
+Install Pages `0.9.1`. There is no Pages migration. Hosts moving to Recording Studio 7.7 must run the Recording Studio 7.4, 7.5, and 7.7 migrations. The dummy does not copy those root-index migrations. Set `RecordingStudioAccessible` `admin_root_resolver` to the same root recording Admin uses for access when a screen has blast radius `:site`.
 
 ## [0.9.0] - 2026-11-12
 
