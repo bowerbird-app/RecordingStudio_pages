@@ -12,7 +12,7 @@ class TermsSignupTest < ActionDispatch::IntegrationTest
     @actor = create_actor!("terms-staff-#{SecureRandom.hex(4)}@example.com")
     Current.actor = @actor
     @workspace = Workspace.create!(name: "Terms Workspace #{SecureRandom.hex(4)}")
-    @root = RecordingStudio.root_recording_for(@workspace)
+    @root = RecordingStudio.create_root_recording!(@workspace, actor: @actor)
     grant_admin!(@root, @actor)
     @terms = publish_document!(
       kind: "terms_and_condition",

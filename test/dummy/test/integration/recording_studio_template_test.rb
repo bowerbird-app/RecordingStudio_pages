@@ -8,7 +8,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_nil RecordingStudioRootSwitchable.configuration.layout
     assert_includes ApplicationController.ancestors, RecordingStudio::RootSwitchable::ControllerSupport
     assert_includes ApplicationController.ancestors, RecordingStudio::ControllerLayout
-    assert_equal "0.1.341", FlatPack::VERSION
+    assert_equal "0.1.378", FlatPack::VERSION
   end
 
   test "dummy app validates recordable declarations" do
@@ -168,7 +168,7 @@ class RecordingStudioTemplateTest < ActiveSupport::TestCase
     assert_equal 3, Workspace.count
     seeded_profile = RecordingStudioUser.profile_for(User.find_by!(email: "admin@admin.com"))
     if seeded_profile.nil?
-      skip "Users v0.27.1 first Profile cannot write under Library #11. Accessible cannot grant :edit on the shared People root, and Users records the Profile before bootstrap_owner_access! on that child. No host exception. Same gap Onboarding skips rather than papering over."
+      skip "Users v0.36.0 first Profile cannot write under Library #11. Accessible cannot grant :edit on the shared People root, and Users records the Profile before bootstrap_owner_access! on that child. No host exception. Same gap Onboarding skips rather than papering over."
     end
     assert_not_nil seeded_profile
 

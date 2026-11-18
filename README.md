@@ -233,7 +233,7 @@ User-facing copy in this gem’s views, controller flashes, admin DSL (where Adm
 
 Database content (page titles, section bodies) stays with the host. Composition filter tokens and built-in catalog English stay English; displayed copy resolves at render through `RecordingStudio.t` / `Copy.t`. Lib/service error strings stay English literals and map through `Copy.user_message` at controller render.
 
-Sign in with `admin@admin.com` / `Password`.
+Sign in with `admin@admin.com` / `Password123!`.
 
 - `/` visitors see the published homepage (seeded Home starts with a Menu, then a left-aligned hero). Signed-in people see the host home: sidebar, root switcher, example page buttons.
 - `/site` the live marketing homepage while you are signed in
@@ -260,9 +260,13 @@ These are limits in sibling gems. This gem documents them instead of forking the
 
 ## Version
 
-0.9.0. Gemspec requires `recording_studio >= 6.3.0` and `flat_pack >= 0.1.341`. Dummy GitHub tags: Recording Studio `v6.5.0`, Accessible `v0.24.2`, Attachable `v0.22.1`, Users `v0.27.1`, Publishable `v0.13.2`, Orderable `v0.4.9`, Duplicatable `v0.6.2`, Trashable `v0.12.3`, Admin `v2.9.1` (left on 2.9.1; host policy is 2.5.1), Root Switchable `v0.11.7`, Cache `v0.6.3`, Metrics `v0.7.3`, Logs `v0.7.4`, Recording Studio API `v0.21.3`, Moveable `v4.1.1`, Icons `v0.2.1`, FlatPack `v0.1.341`. Dummy omits Terms until that gem allows core 6.3. Admin 2.9.1 needs Logs. API 0.21.3 needs Moveable, Icons, Logs, Admin, and Redis.
+0.9.1. Gemspec requires `recording_studio >= 6.3.0` and `flat_pack >= 0.1.341`. Dummy GitHub tags: Recording Studio `v7.7.1`, Accessible `v0.54.0`, Attachable `v0.32.1`, Users `v0.36.0`, Publishable `v1.2.1`, Orderable `v0.11.0`, Duplicatable `v1.1.0`, Trashable `v1.2.0`, Admin `v2.19.0`, Root Switchable `v0.16.0`, Cache `v0.7.0`, Metrics `v0.9.1`, Logs `v0.8.1`, Recording Studio API `v1.15.0`, Moveable `v6.0.1`, Icons `v0.4.1`, FlatPack `v0.1.378`. Dummy omits Terms until that gem allows core 7. The gemspec floor still allows Recording Studio 6.x; this release was tested on 7.7.1.
 
 ## Upgrade
+
+### Upgrading to 0.9.1
+
+Install Pages `0.9.1`. No Pages migration. Development pins are Recording Studio `v7.7.1` and FlatPack `v0.1.378`. See [UPGRADING.md](UPGRADING.md).
 
 ### Upgrading to 0.9.0
 

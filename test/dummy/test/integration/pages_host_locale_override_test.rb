@@ -16,11 +16,11 @@ class PagesHostLocaleOverrideTest < ActionDispatch::IntegrationTest
     @load_path_before = I18n.load_path.dup
     @backend_before = I18n.backend
     @actor = create_actor!("host-locale-pages@example.com")
+    Current.actor = @actor
     @root = create_workspace_root!("Host Locale Workspace #{SecureRandom.hex(4)}")
     @admin_root = create_admin_root!
     grant_admin!(@admin_root, @actor)
     grant_admin!(@root, @actor)
-    Current.actor = @actor
     sign_in @actor
   end
 

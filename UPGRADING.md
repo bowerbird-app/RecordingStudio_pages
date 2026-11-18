@@ -1,5 +1,14 @@
 # Upgrading Recording Studio Pages
 
+## 0.9.1
+
+Bump to `0.9.1`. No Pages migration.
+
+1. Install Pages `0.9.1`. Gemspec floors stay Recording Studio `>= 6.3.0` and FlatPack `>= 0.1.341`. Those floors still allow 6.x. This release was tested with Recording Studio `v7.7.1` and FlatPack `v0.1.378`.
+2. Dummy pins Accessible `v0.54.0`, Attachable `v0.32.1`, Publishable `v1.2.1`, Orderable `v0.11.0`, Duplicatable `v1.1.0`, Trashable `v1.2.0`, Admin `v2.19.0`, Users `v0.36.0`, Cache `v0.7.0`, Metrics `v0.9.1`, Logs `v0.8.1`, API `v1.15.0`, Moveable `v6.0.1`, Icons `v0.4.1`, and Root Switchable `v0.16.0`.
+3. API 1.12+ needs `config/recording_studio_api.yml`. The dummy ships a minimal file (`shared: {}`).
+4. The dummy does not copy Recording Studio 7.4, 7.5, or 7.7 root-index migrations. Hosts follow core's own upgrade for those.
+
 ## 0.9.0
 
 Bump to `0.9.0`. No Pages migration.

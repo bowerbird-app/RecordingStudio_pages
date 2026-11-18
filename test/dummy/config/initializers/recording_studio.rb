@@ -30,7 +30,10 @@ RecordingStudio.configure do |config|
     next true if defined?(RecordingStudioApi::ApiClient) && [RecordingStudioApi::ApiClient, RecordingStudioApi::ApiCredential, RecordingStudioApi::ApiAccessToken, RecordingStudioApi::AdminApi].any? { recordable.is_a?(_1) } && RecordingStudioAccessible::AccessCreationContext.allowed?
 
     target = recording || parent_recording || root_recording
-    next false unless target
+    # Recording Studio 7 creates roots through create_root_recording!, which
+    # has no parent yet. A present actor may open a new root. Later writes
+    # still need Accessible access on the target.
+    next true if target.nil?
 
     role = access_row ? :admin : :edit
     RecordingStudioAccessible.authorized?(actor: actor, recording: target, role: role)

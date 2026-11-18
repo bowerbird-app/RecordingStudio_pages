@@ -7,11 +7,11 @@ class NestedSectionsTest < ActionDispatch::IntegrationTest
 
   setup do
     @actor = create_actor!("nested-sections@example.com")
+    Current.actor = @actor
     @root = create_workspace_root!("Nested Workspace #{SecureRandom.hex(4)}")
     @admin_root = create_admin_root!
     grant_admin!(@admin_root, @actor)
     grant_admin!(@root, @actor)
-    Current.actor = @actor
     sign_in @actor
   end
 
